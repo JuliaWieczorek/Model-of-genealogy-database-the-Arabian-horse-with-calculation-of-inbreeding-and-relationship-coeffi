@@ -13,11 +13,13 @@ class Baza(object):
 
     def czytajdane(self):
         """Funkcja pobiera i wyświetla dane z bazy."""
-        cur.execute(" SELECT id_os, nazwa FROM OSOBNIKI ")
+        self.lista = []
+        cur.execute(" SELECT id_os, nazwa, plec FROM OSOBNIKI ")
         self.osobnicy = cur.fetchall()
         for self.osobnik in self.osobnicy:
-            print(self.osobnik['id_os'], self.osobnik['nazwa'])
-        print()
+            self.dane = (self.osobnik['id_os'], self.osobnik['nazwa'], self.osobnik['plec'])
+            self.lista.append(self.dane)
+        return self.lista
 
     def czytajrelacje(self):
         """ Funkcja pobiera i wyświetla dane z encji relacja """
@@ -139,13 +141,34 @@ class Baza(object):
         print(planarity.is_planar(self.b))
         print(planarity.ascii(self.b))
 
-    def czytajdane(self):
+    def czytajdane2(self):
         """Funkcja pobiera i wyświetla dane z bazy."""
         cur.execute("SELECT id_os, id_hod FROM OSOBNIKI")
         self.osobnicy = cur.fetchall()
         for self.osobnik in self.osobnicy:
             print('(', self.osobnik['id_os'], ',', self.osobnik['id_hod'], '),')
         print()
+
+    def segregujPoPlci(self):
+        """Funkcja czytaj dane segregujaca wzgledem plci."""
+        print("""Wybierz:
+              1. samiec
+              2. samica""")
+        w = input()
+        print("wybrales", w)
+        self.wybor = []
+        self.wszystko = self.czytajdane()
+        if w == "1":
+            for i in self.wszystko:
+                for j in i:
+                    if j == 'samiec':
+                        self.wybor.append(i)
+        elif w == "2":
+            for i in self.wszystko:
+                for j in i:
+                    if j == 'samica':
+                        self.wybor.append(i)
+        print(self.wybor)
 
     def dodaj_gatunki(self):
         """Funkcja służąca do wpisywania danych do encji gatunki """
@@ -200,8 +223,11 @@ class Baza(object):
     '''
 
 jula = Baza()
+# jula.segregujPoPlci()
+# jula.relacjepoimionach()
 # jula.czytajdane()
-jula.czytajgatunki()
+# jula.dodaj_osobniki()
+# jula.czytajgatunki()
 
 conn.commit()
 cur.close()

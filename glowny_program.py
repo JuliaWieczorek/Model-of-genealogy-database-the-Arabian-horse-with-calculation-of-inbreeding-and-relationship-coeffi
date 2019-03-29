@@ -93,6 +93,5 @@ class Program():
             print("Nie ma takiej funkcji.")
 
 
-
 menu = Program()
 menu.__main__()
