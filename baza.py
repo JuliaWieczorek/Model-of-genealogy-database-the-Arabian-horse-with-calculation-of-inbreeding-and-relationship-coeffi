@@ -215,7 +215,6 @@ class StrukturaBazyDanych():
                         self.osobniki)
         conn.commit()
 
-# drop()
 baza = StrukturaBazyDanych()
 cur.close()
 conn.close()

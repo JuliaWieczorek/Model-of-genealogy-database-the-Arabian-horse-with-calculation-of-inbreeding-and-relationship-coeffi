@@ -11,10 +11,9 @@ def all_osobniki():
     for all in cur.execute('SELECT nazwa FROM osobniki'):
         print(all)
 
-
-def find_child(nzw1):
+def find_child(id1):
     list_of_child = []
-    for row in cur.execute('SELECT id_os1 FROM RELACJE WHERE id_os2=?', [nzw1]):
+    for row in cur.execute('SELECT id_os1 FROM RELACJE WHERE id_os2=?', (id1,)):
         list_of_child.append(tuple(row))
     print('Lista dzieci osobnika:', list_of_child)
     if len(list_of_child) > 0:
@@ -22,22 +21,22 @@ def find_child(nzw1):
         print('Ten osobnik ma %i dzieci' % count_child)
 
 
-def find_parent(nzw1):
+def find_parent(id1):
     list_of_parents = []
-    for row in cur.execute('SELECT id_os2 FROM relacje WHERE id_os1=?', [nzw1]):
+    for row in cur.execute('SELECT id_os2 FROM relacje WHERE id_os1=?', (id1)):
         list_of_parents.append(tuple(row))
     return list_of_parents
 
 
-def find_grand(nzw1):
+def find_grand(id1):
     lista = []
     for row in cur.execute('SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)',
-                           [nzw1]):
+                           [id1]):
         lista.append(row)
     return lista
 
 
-def find_pra(nzw1):
+def find_pra(id1):
     lista = []
     for row in cur.execute(
             'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?))',

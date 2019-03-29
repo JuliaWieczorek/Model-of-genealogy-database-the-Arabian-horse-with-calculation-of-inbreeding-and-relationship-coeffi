@@ -170,6 +170,21 @@ class Baza(object):
                         self.wybor.append(i)
         print(self.wybor)
 
+    def id_nazwa(self, id):
+        """Funkcja zamieniająca id w nazwe osobnika"""
+        self.id = id
+        for row in cur.execute("SELECT nazwa FROM osobniki WHERE id_os=?", (self.id,)):
+            self.nazwa = row[0]
+        return self.nazwa
+
+    def nazwa_id(self, nazwa):
+        """Funkcja podaje id osobnika"""
+        self.nazwa = nazwa
+        for row in cur.execute("SELECT id_os FROM osobniki WHERE nazwa=?", (self.nazwa,)):
+            self.id = row[0]
+            print(self.id)
+        return self.id
+
     def dodaj_gatunki(self):
         """Funkcja służąca do wpisywania danych do encji gatunki """
         print("Podaj nazwe gatunku")
@@ -223,9 +238,10 @@ class Baza(object):
     '''
 
 jula = Baza()
+# jula.czytajrelacje()
 # jula.segregujPoPlci()
 # jula.relacjepoimionach()
-# jula.czytajdane()
+# jula.nazwa_id('CARO')
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
 
