@@ -4,24 +4,21 @@ import sqlite3
 import math
 import baza_danych
 
-conn = sqlite3.connect('baza.db')
-cur = conn.cursor()
-
-
 class Oblicz(object):
 
     def __main__(self):
         self.menu()
         self.funkcje = {'1': self.all_osobniki, '2': self.find_child1, '3': self.find_parent1, '4': self.find_grand1,
-                   '5': self.find_pra1, '6': self.wspolny_przodek1, '7': self.sciezka1, '8': self.tree1,
-                   '9': self.inbred1, '10': self.pokrewienstwo1, '11': self.inbred_pokr1}
-        self.nazwyFunkcji = {'1': 'all_osobniki', '2': 'znajdujaca potomkow osobnika', '3': 'znajdujaca rodzicow osobnika',
-                        '4': 'znajdujaca dziadkow osobika',
-                        '5': 'odnajdujaca dziadkow', '6': 'szukajaca wspolnych przodkow',
-                        '7': 'funkcje wyznaczajaca sciezke',
-                        '8': 'wyznaczajaca drzewo pokolen',
-                        '9': 'obliczajaca wspolczynnik inbredu', '10': 'obliczajaca wspolczynnik pokrewienstwa',
-                        '11': 'obliczajaca wspó³czynnik inbredu'}
+                        '5': self.find_pra1, '6': self.wspolny_przodek1, '7': self.sciezka1, '8': self.tree1,
+                        '9': self.inbred1, '10': self.pokrewienstwo1, '11': self.inbred_pokr1}
+        self.nazwyFunkcji = {'1': 'all_osobniki', '2': 'znajdujaca potomkow osobnika',
+                             '3': 'znajdujaca rodzicow osobnika',
+                             '4': 'znajdujaca dziadkow osobika',
+                             '5': 'odnajdujaca dziadkow', '6': 'szukajaca wspolnych przodkow',
+                             '7': 'funkcje wyznaczajaca sciezke',
+                             '8': 'wyznaczajaca drzewo pokolen',
+                             '9': 'obliczajaca wspolczynnik inbredu', '10': 'obliczajaca wspolczynnik pokrewienstwa',
+                             '11': 'obliczajaca wspó³czynnik inbredu'}
         self.op = input("Co wybierzesz?-> ")
         while self.op != '12':
             if self.op == '2' or self.op == '3' or self.op == '4' or self.op == '5' or self.op == '8' or \
@@ -38,43 +35,53 @@ class Oblicz(object):
             self.op = input("Co wybierzesz?-> ")
 
     def all_osobniki(self):
-        for self.all in cur.execute('SELECT nazwa FROM osobniki'):
+        baza_danych.Baza.open(self)
+        for self.all in baza_danych.Baza.open.cur.execute('SELECT nazwa FROM osobniki'):
             print(self.all)
+        baza_danych.Baza.close(self)
 
     def find_child(self, id1):
         self.id1 = id1
         self.list_of_child = []
-        for row in cur.execute('SELECT id_os1 FROM RELACJE WHERE id_os2=?', (self.id1,)):
+        baza_danych.Baza.open(self)
+        for row in baza_danych.Baza.open.cur.execute('SELECT id_os1 FROM RELACJE WHERE id_os2=?', (self.id1,)):
             self.nzw = baza_danych.Baza.id_nazwa(self, row)
             self.list_of_child.append(tuple(self.nzw))
         print('Lista dzieci osobnika:', self.list_of_child)
         if len(self.list_of_child) > 0:
             self.count_child = len(self.list_of_child)
             print('Ten osobnik ma %i dzieci' % self.count_child)
+        baza_danych.Baza.close(self)
 
     def find_parent(self, id1):
         self.id = id1
         self.list_of_parents = []
-        for self.row in cur.execute('SELECT id_os2 FROM relacje WHERE id_os1=?', (self.id)):
+        baza_danych.Baza.open(self)
+        for self.row in baza_danych.Baza.open.cur.execute('SELECT id_os2 FROM relacje WHERE id_os1=?', (self.id)):
             self.list_of_parents.append(tuple(self.row))
+        baza_danych.Baza.close(self)
         return self.list_of_parents
 
     def find_grand(self, id1):
         self.id1 = id1
         self.lista = []
-        for self.row in cur.execute(
+        baza_danych.Baza.open(self)
+        for self.row in baza_danych.Baza.open.cur.execute(
                 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)',
                 [self.id1]):
             self.lista.append(self.row)
+        baza_danych.Baza.close(self)
         return self.lista
 
     def find_pra(self, id1):
         self.id1 = id1
         self.lista = []
-        for self.row in cur.execute(
+        baza_danych.Baza.open(self)
+        for self.row in baza_danych.Baza.open.cur.execute(
                 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?))',
                 [self.id1]):
             self.lista.append(self.row)
+        baza_danych.Baza.close(self)
         return self.lista
 
     def tree(self, nzw):
@@ -327,7 +334,7 @@ class Oblicz(object):
         self.full = self.full[0:len(self.full) / 2]
         return self.full
 
-    def sciezka_konkretna(self, nzw1, nzw2, cos): #zamiany!
+    def sciezka_konkretna(self, nzw1, nzw2, cos):  # zamiany!
         self.nzw1 = nzw1
         self.nzw2 = nzw2
         self.cos = cos
@@ -741,8 +748,9 @@ class Oblicz(object):
                         self.wsp_d_7 += 4
                         self.wsp_d_8 += 4
                         self.wsp_d_9 += 2
-                        self.full.extend([self.wsp_d_1, self.wsp_d_2, self.wsp_d_3, self.wsp_d_4, self.wsp_d_5, self.wsp_d_6,
-                                     self.wsp_d_7, self.wsp_d_8, self.wsp_d_9])
+                        self.full.extend(
+                            [self.wsp_d_1, self.wsp_d_2, self.wsp_d_3, self.wsp_d_4, self.wsp_d_5, self.wsp_d_6,
+                             self.wsp_d_7, self.wsp_d_8, self.wsp_d_9])
                     elif (self.la == 1 and self.lb == 0 and self.lc == 2 and self.ld == 4) or (
                             self.la == 0 and self.lb == 1 and self.lc == 2 and self.ld == 4):  ##
                         self.wsp_d_1 += 6
@@ -829,7 +837,7 @@ class Oblicz(object):
                                           self.wsp_d_6])
                     elif ((self.la == 1 and self.lb == 0 and self.lc == 2 and self.ld == 1) or (
                             self.la == 0 and self.lb == 1 and self.lc == 2 and self.ld == 1) or (
-                            self.la == 1 and self.lb == 0 and self.lc == 1 and self.ld == 2) or (
+                                  self.la == 1 and self.lb == 0 and self.lc == 1 and self.ld == 2) or (
                                   self.la == 0 and self.lb == 1 and self.lc == 1 and self.ld == 2)):
                         self.wsp_d_1 += 6
                         self.wsp_d_2 += 6
@@ -857,20 +865,20 @@ class Oblicz(object):
 
                 elif ((((self.lista_dziadkow == [2]) and (self.lista_pra == [4])) or (
                         (self.lista_dziadkow == [3]) and (self.lista_pra == [4])) or (
-                        (self.lista_dziadkow == [2]) and (self.lista_pra == [5])) or (
-                        (self.lista_dziadkow == [3]) and (self.lista_pra == [5])) or (
-                        (self.lista_dziadkow == [2]) and (self.lista_pra == [4, 5])) or (
-                        (self.lista_dziadkow == [2]) and (self.lista_pra == [5, 4])) or (
-                        (self.lista_dziadkow == [3] and (self.lista_pra == [4, 5])) or (
-                        (self.lista_dziadkow == [3] and (self.lista_pra == [5, 4])) or (
-                        (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [4])) or (
-                        (self.lista_dziadkow == [3, 2]) and (self.lista_pra == [4])) or (
-                        (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [5])) or (
-                        (self.lista_dziadkow == [3, 2]) and (self.lista_pra == [5])) or (
-                        (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [4, 5])) or (
-                        (self.lista_dziadkow == [3, 2] and (self.lista_pra == [4, 5])) or (
-                        (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [3, 2])) or (
-                        (self.lista_dziadkow == [1, 0]) and (self.lista_pra == [5, 4]))))))):
+                               (self.lista_dziadkow == [2]) and (self.lista_pra == [5])) or (
+                               (self.lista_dziadkow == [3]) and (self.lista_pra == [5])) or (
+                               (self.lista_dziadkow == [2]) and (self.lista_pra == [4, 5])) or (
+                               (self.lista_dziadkow == [2]) and (self.lista_pra == [5, 4])) or (
+                               (self.lista_dziadkow == [3] and (self.lista_pra == [4, 5])) or (
+                               (self.lista_dziadkow == [3] and (self.lista_pra == [5, 4])) or (
+                               (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [4])) or (
+                                       (self.lista_dziadkow == [3, 2]) and (self.lista_pra == [4])) or (
+                                       (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [5])) or (
+                                       (self.lista_dziadkow == [3, 2]) and (self.lista_pra == [5])) or (
+                                       (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [4, 5])) or (
+                                       (self.lista_dziadkow == [3, 2] and (self.lista_pra == [4, 5])) or (
+                                       (self.lista_dziadkow == [2, 3]) and (self.lista_pra == [3, 2])) or (
+                                               (self.lista_dziadkow == [1, 0]) and (self.lista_pra == [5, 4]))))))):
                     for self.c in range(len(self.C)):
                         self.c = self.C.pop()
                         if (self.c == self.cos):
@@ -944,8 +952,9 @@ class Oblicz(object):
 
                         self.wsp_d_7 += 4
                         self.wsp_d_8 += 4
-                        self.full.extend([self.wsp_d_1, self.wsp_d_2, self.wsp_d_3, self.wsp_d_4, self.wsp_d_5, self.wsp_d_6,
-                                     self.wsp_d_7, self.wsp_d_8])
+                        self.full.extend(
+                            [self.wsp_d_1, self.wsp_d_2, self.wsp_d_3, self.wsp_d_4, self.wsp_d_5, self.wsp_d_6,
+                             self.wsp_d_7, self.wsp_d_8])
                     elif (((self.lc == 2) and (self.ld == 1) and (self.le == 2) and (self.lf == 3)) or (
                             (self.lc == 2) and (self.ld == 1) and (self.le == 3) and (self.lf == 2))
                           or ((self.lc == 1) and (self.ld == 2) and (self.le == 2) and (self.lf == 3)) or (
@@ -1372,6 +1381,7 @@ class Oblicz(object):
               "9 - wspó³czynnik inbredu\n"
               "10 - wspó³czynnik pokrewienstwa\n"
               "11 - wspó³czynnik inbredu")
+
 
 jula = Oblicz()
 jula.__main__()

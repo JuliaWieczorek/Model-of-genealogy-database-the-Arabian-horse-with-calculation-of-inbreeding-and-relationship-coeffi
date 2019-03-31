@@ -4,18 +4,28 @@
 import sqlite3
 import planarity
 
-conn = sqlite3.connect('baza.db')
-conn.row_factory = sqlite3.Row
-cur = conn.cursor()
+# conn = sqlite3.connect('baza.db')
+# conn.row_factory = sqlite3.Row
+# cur = conn.cursor()
 
 
 class Baza(object):
 
+    def open(self):
+        self.conn = sqlite3.connect('baza.db')
+        self.conn.row_factory = sqlite3.Row
+        self.cur = self.conn.cursor()
+
+    def close(self):
+        self.conn.commit()
+        self.cur.close()
+        self.conn.close()
+
     def czytajdane(self):
         """Funkcja pobiera i wyświetla dane z bazy."""
         self.lista = []
-        cur.execute(" SELECT id_os, nazwa, plec FROM OSOBNIKI ")
-        self.osobnicy = cur.fetchall()
+        self.cur.execute(" SELECT id_os, nazwa, plec FROM OSOBNIKI ")
+        self.osobnicy = self.cur.fetchall()
         for self.osobnik in self.osobnicy:
             self.dane = (self.osobnik['id_os'], self.osobnik['nazwa'], self.osobnik['plec'])
             self.lista.append(self.dane)
@@ -23,16 +33,16 @@ class Baza(object):
 
     def czytajrelacje(self):
         """ Funkcja pobiera i wyświetla dane z encji relacja """
-        cur.execute(" SELECT id_os1, id_os2 FROM RELACJE ")
-        self.relacja = cur.fetchall()
+        self.cur.execute(" SELECT id_os1, id_os2 FROM RELACJE ")
+        self.relacja = self.cur.fetchall()
         for self.rel in self.relacja:
             print(self.rel['id_os1'], self.rel['id_os2'])
         print()
 
     def czytajgatunki(self):
         """ Funkcja pobiera i wyświetla dane z gatunki"""
-        cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
-        self.gatunek = cur.fetchall()
+        self.cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
+        self.gatunek = self.cur.fetchall()
         self.lista = []
         for self.gat in self.gatunek:
             print(self.gat['id_gat'], self.gat['gatunek'])
@@ -43,8 +53,8 @@ class Baza(object):
 
     def czytajhodowcow(self):
         """Funckja wczytująca wszystkich hodowców z bazy"""
-        cur.execute(" SELECT id_hod, imie, nazwisko FROM HODOWCY")
-        self.hodowca = cur.fetchall()
+        self.cur.execute(" SELECT id_hod, imie, nazwisko FROM HODOWCY")
+        self.hodowca = self.cur.fetchall()
         self.lista = []
         for self.hod in self.hodowca:
             print(self.hod['id_hod'], self.hod['imie'], self.hod['nazwisko'])
@@ -54,8 +64,8 @@ class Baza(object):
 
     def czytajosobniki_hodocy(self):
         """Funckja wczytująca encje laczaca"""
-        cur.execute("SELECT id_os, id_hod FROM OSOBNIKI_HODOWCY")
-        self.os_hod = cur.fetchall()
+        self.cur.execute("SELECT id_os, id_hod FROM OSOBNIKI_HODOWCY")
+        self.os_hod = self.cur.fetchall()
         for self.oh in self.os_hod:
             print(self.oh['id_os'], self.oh['id_hod'])
         print()
@@ -63,54 +73,54 @@ class Baza(object):
     def relacjepoimionach(self):
         """Funkcja laczy tabele osobnik i relacja
             Wczytuje dane relacji i tlumacze id osobnikow na ich imiona"""
-        cur.execute(
+        self.cur.execute(
             """
             SELECT o1.nazwa as 'rodzic', o2.nazwa as 'potomek' FROM OSOBNIKI AS o1
             join RELACJE on o1.id_os==RELACJE.id_os1
             join OSOBNIKI as o2 on o2.id_os==RELACJE.id_os2
             """)
-        self.relacja = cur.fetchall()
+        self.relacja = self.cur.fetchall()
         for self.rel in self.relacja:
             print(self.rel['rodzic'], self.rel['potomek'])
         print()
 
     def wlasciciele(self):
         """Funckja wypisze właścicieli wraz z ich pupilami """
-        cur.execute(
+        self.cur.execute(
             """
             SELECT imie, nazwisko, nazwa from HODOWCY
             join OSOBNIKI using(id_hod)
             """)
-        self.wlasciciele = cur.fetchall()
+        self.wlasciciele = self.cur.fetchall()
         for self.wl in self.wlasciciele:
             print(self.wl['imie'], self.wl['nazwisko'], self.wl['nazwa'])
-        cur.execute(
+        self.cur.execute(
             """
             SELECT imie, nazwisko, count(nazwa) as ilosc from HODOWCY
             join OSOBNIKI using(id_hod)
             group by imie
             """)
-        self.wlasciciele = cur.fetchall()
+        self.wlasciciele = self.cur.fetchall()
         for self.wl in self.wlasciciele:
             print(self.wl['imie'], self.wl['nazwisko'], self.wl['ilosc'])
         print()
 
     def gatunekosobnika(self):
         """Funkcja wypisze gatunki z ktorych pochodza osobniki """
-        cur.execute(
+        self.cur.execute(
             """
             SELECT nazwa, gatunek from OSOBNIKI
             join GATUNKI on OSOBNIKI.id_gat == GATUNKI.id_gat
             """)
-        self.gatunki = cur.fetchall()
+        self.gatunki = self.cur.fetchall()
         for self.gat in self.gatunki:
             print(self.gat['nazwa'], self.gat['gatunek'])
         print()
 
     def wpisujwgraf(self):
         """Funkcja pobiera i modyfikuje dane w forme grafu tołp """
-        cur.execute("SELECT id_os1, id_os2 FROM RELACJE")
-        self.relacja = cur.fetchall()
+        self.cur.execute("SELECT id_os1, id_os2 FROM RELACJE")
+        self.relacja = self.cur.fetchall()
         self.graph = ()
         self.listagrafow = []
         for self.rel in self.relacja:
@@ -121,13 +131,13 @@ class Baza(object):
 
     def wpisujwgraf_po_nazwach(self):
         """Funkcja pobiera i modyfikuje dane w forme grafu tołp """
-        cur.execute(
+        self.cur.execute(
             """
             SELECT o1.nazwa as 'rodzic', o2.nazwa as 'potomek' FROM OSOBNIKI AS o1
             join RELACJE on o1.id_os==RELACJE.id_os1
             join OSOBNIKI as o2 on o2.id_os==RELACJE.id_os2
             """)
-        self.relacja = cur.fetchall()
+        self.relacja = self.cur.fetchall()
         self.graph = ()
         self.listagrafow1 = []
         for self.rel in self.relacja:
@@ -143,8 +153,8 @@ class Baza(object):
 
     def czytajdane2(self):
         """Funkcja pobiera i wyświetla dane z bazy."""
-        cur.execute("SELECT id_os, id_hod FROM OSOBNIKI")
-        self.osobnicy = cur.fetchall()
+        self.cur.execute("SELECT id_os, id_hod FROM OSOBNIKI")
+        self.osobnicy = self.cur.fetchall()
         for self.osobnik in self.osobnicy:
             print('(', self.osobnik['id_os'], ',', self.osobnik['id_hod'], '),')
         print()
@@ -172,16 +182,18 @@ class Baza(object):
 
     def id_nazwa(self, id):
         """Funkcja zamieniająca id w nazwe osobnika"""
+        # self.open()
         self.id = id
-        for row in cur.execute("SELECT nazwa FROM osobniki WHERE id_os=?", (self.id,)):
+        for row in self.cur.execute("SELECT nazwa FROM osobniki WHERE id_os=?", (self.id,)):
             self.nazwa = row[0]
             print(self.nazwa)
+        # self.close()
         return self.nazwa
 
     def nazwa_id(self, nazwa):
         """Funkcja podaje id osobnika"""
         self.nazwa = nazwa
-        for row in cur.execute("SELECT id_os FROM osobniki WHERE nazwa=?", (self.nazwa,)):
+        for row in self.cur.execute("SELECT id_os FROM osobniki WHERE nazwa=?", (self.nazwa,)):
             self.id = row[0]
             print(self.id)
         return self.id
@@ -190,11 +202,10 @@ class Baza(object):
         """Funkcja służąca do wpisywania danych do encji gatunki """
         print("Podaj nazwe gatunku")
         self.x = input()
-        cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
-        self.gatunek = cur.fetchall()
+        self.cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
+        self.gatunek = self.cur.fetchall()
         self.n = len(self.gatunek)
-        cur.execute("INSERT INTO GATUNKI VALUES(?,?)", (self.n + 1, self.x))
-        conn.commit()
+        self.cur.execute("INSERT INTO GATUNKI VALUES(?,?)", (self.n + 1, self.x))
 
     def dodaj_osobniki(self):
         print("Ile osobników chcesz dodać?")
@@ -212,15 +223,15 @@ class Baza(object):
 
         for self.i in self.czyt:
             if self.gatunek == self.czyt:
-                cur.execute("SELECT id_gat FROM GATUNKI WHERE gatunek = (?)", (self.gatunek))
-                self.n = cur.fetchall()
+                self.cur.execute("SELECT id_gat FROM GATUNKI WHERE gatunek = (?)", (self.gatunek))
+                self.n = self.cur.fetchall()
                 print(self.n)
                 break
             else:
-                cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
-                self.gatunek = cur.fetchall()
-                n = len(self.gatunek) + 1
-                cur.execute("INSERT INTO GATUNKI VALUES(?,?)", (self.n, self.gatunek))
+                self.cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
+                self.gatunek = self.cur.fetchall()
+                self.n = len(self.gatunek) + 1
+                self.cur.execute("INSERT INTO GATUNKI VALUES(?,?)", (self.n, self.gatunek))
                 self.czytajgatunki()
                 break
 
@@ -238,7 +249,7 @@ class Baza(object):
 
     '''
 
-jula = Baza()
+# jula = Baza()
 # jula.czytajrelacje()
 # jula.segregujPoPlci()
 # jula.relacjepoimionach()
@@ -247,6 +258,3 @@ jula = Baza()
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
 
-conn.commit()
-cur.close()
-conn.close()
