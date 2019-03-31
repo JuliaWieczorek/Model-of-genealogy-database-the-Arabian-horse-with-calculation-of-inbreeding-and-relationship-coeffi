@@ -175,6 +175,7 @@ class Baza(object):
         self.id = id
         for row in cur.execute("SELECT nazwa FROM osobniki WHERE id_os=?", (self.id,)):
             self.nazwa = row[0]
+            print(self.nazwa)
         return self.nazwa
 
     def nazwa_id(self, nazwa):
@@ -242,6 +243,7 @@ jula = Baza()
 # jula.segregujPoPlci()
 # jula.relacjepoimionach()
 # jula.nazwa_id('CARO')
+# jula.id_nazwa(2)
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
 
