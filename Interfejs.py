@@ -5,10 +5,10 @@
 from tkinter import *
 import tkinter as tk
 from tkinter import filedialog
-#from tkinter import messagebox
+from tkinter import messagebox
 from tkinter import scrolledtext
 from tkinter import Listbox
-from tkinter import Scrollbar
+#from tkinter import Scrollbar
 
 Hodowcy=['Cezary Bober', 'Julia Wieczorek', 'Mateusz Markowski', 'Alicja Dera']
 # DEFINICJE
@@ -76,7 +76,6 @@ def dodajHodowce():
     def kliknij():
         dod = E1.get() + " " + E2.get()
         Hodowcy.append(dod)
-      #  print(Hodowcy)
         res = "Dodano hodowce: " + E1.get() + " " + E2.get() + "\n"
         wynik.insert(INSERT, res)
         return
@@ -107,64 +106,74 @@ def dodajHodowce():
 def edytujHodowce():
     # Wygl¹d okna
     edycja = Tk()
-    edycja.geometry("700x400+0+0")
+    edycja.geometry("800x350+0+0")
     edycja.title("Edycja Hodowcy")
     edycja_label = tk.Label(edycja)
     edycja_label.grid()
 
-    F1=Frame(edycja, borderwidth=2, relief='ridge')
+    F1=Frame(edycja, borderwidth=2, relief='ridge') # Nazwa Hodowcy
     F1.grid(column=0,row=0)
-    F2 = Frame(edycja, borderwidth=2, relief='ridge')
-    F2.grid(column=1, row=2)
-    F3 = Frame(edycja, borderwidth=2, relief='ridge')
+    F2 = Frame(edycja, borderwidth=2, relief='ridge') # Entry imie
+    F2.grid(column=4, row=2)
+    F3 = Frame(edycja, borderwidth=2, relief='ridge') # Listbox
     F3.grid(column=0, row=2)
-    F4 = Frame(edycja, borderwidth=2, relief='ridge')
-    F4.grid(column=1, row=0)
-
+    F4 = Frame(edycja, borderwidth=2, relief='ridge') # wybierz
+    F4.grid(column=2, row=2)
+    F5 = Frame(edycja, borderwidth=2, relief='ridge') # Zapisz
+    F5.grid(column=7, row=2)
+    F6 = Frame(edycja, borderwidth=2) # 2 strza³ka
+    F6.grid(column=3, row=2)
+    F7 = Frame(edycja, borderwidth=2) # 1 strza³ka
+    F7.grid(column=1, row=2)
+    F8 = Frame(edycja, borderwidth=2) # 3 strza³ka
+    F8.grid(column=6, row=2)
+    F9 = Frame(edycja, borderwidth=2, relief='ridge')  # Entry nazwisko
+    F9.grid(column=5, row=2)
+    F10 = Frame(edycja, borderwidth=2)  # Nazwa Imie
+    F10.grid(column=4, row=1)
+    F11 = Frame(edycja, borderwidth=2)  # Nazwa Nazwisko
+    F11.grid(column=5, row=1)
+    F12 = Frame(edycja, borderwidth=2)  # Odœwie¿
+    F12.grid(column=0, row=1)
 
     L1 = Label(F1, text="HODOWCY")
     L1.grid()
     E1 = Entry(F2, bd=5)
     E1.grid()
+    E2 = Entry(F9,bd=5)
+    E2.grid()
+    L2= Label(F6, text="--->")
+    L2.grid()
+    L3 = Label(F7, text="--->")
+    L3.grid()
+    L4 = Label(F8, text="--->")
+    L4.grid()
+    L5 = Label(F10, text="Imie")
+    L5.grid()
+    L5 = Label(F11, text="Nazwisko")
+    L5.grid()
 
-    #L1 = Label(edycja, text="Nazwisko Hodowcy")
-   # L1.grid()
-   # E2 = Entry(edycja, bd=5)
-    #E2.grid()
-    #wynik=scrolledtext.ScrolledText(F2, width=40, height=16)
-    #wynik.grid()
-
-    lista=Listbox(F3,width=40,height=16)
+    lista=Listbox(F3,width=40,height=16, selectmode=SINGLE)
     for imie in Hodowcy:
         lista.insert(END, imie)
     lista.grid()
 
-
-
     # Definicje przycisków
-    def kliknij():
-
-        dod = E1.get() + " " + E2.get()
-        Hodowcy.append(dod)
-        print (Hodowcy)
-        res = "Nowo dodany hodowca to: " + E1.get() +" "+ E2.get() + "\n"
-        wynik.insert(INSERT,res)
-        return
-
     def wybierz():
-        lista1 = lista.curselection()
-        E1.insert(INSERT, lista1)
-
+        lista1 = int(lista.curselection()[0]) # wyœwietlanie argumentów z listboxa
+        dane = Hodowcy[lista1].split()
+        E1.insert(INSERT, dane[0])
+        E2.insert(INSERT, dane[1])
 
     # Tworzenie przyciskow
     btn1 = Button(F4, text = "Wybierz", command=wybierz)
-    #btn2 = Button(edycja, text="Edytuj")
-    #btn3 = Button(edycja, text="Usuñ Hodowce")
+    btn2 = Button(F5, text="Zapisz zmiane")
+    btn3 = Button(F12, text="Odœwie¿")
 
     # Ulozenie przyciskow
     btn1.grid()
-    #btn2.grid( column = 1, row = 1 )
-    #btn3.grid( column = 1, row = 2 )
+    btn2.grid()
+    btn3.grid()
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -178,15 +187,64 @@ def usunHodowce():
     usun_label = tk.Label(usun)
     usun_label.grid()
 
-    F1 = Frame(usun, borderwidth=2, relief='ridge')
+    F1 = Frame(usun, borderwidth=2, relief='ridge')  # Nazwa Hodowcy
     F1.grid(column=0, row=0)
-    F2 = Frame(usun, borderwidth=2, relief='ridge')
-    F2.grid(column=1, row=0)
-    F3 = Frame(usun, borderwidth=2, relief='ridge')
-    F3.grid(column=0, row=1)
-    F4 = Frame(usun, borderwidth=2, relief='ridge')
-    F4.grid(column=1, row=1)
+    F9 = Frame(usun, borderwidth=2, relief="ridge") # odœwie¿
+    F9.grid(column=0, row=1)
+    F2 = Frame(usun, borderwidth=2, relief='ridge')  # Entry imie
+    F2.grid(column=4, row=2)
+    F3 = Frame(usun, borderwidth=2, relief='ridge')  # Listbox
+    F3.grid(column=0, row=2)
+    F4 = Frame(usun, borderwidth=2, relief='ridge')  # wybierz
+    F4.grid(column=2, row=2)
+    F5 = Frame(usun, borderwidth=2, relief='ridge')  # Zapisz
+    F5.grid(column=7, row=2)
+    F6 = Frame(usun, borderwidth=2)  # 2 strza³ka
+    F6.grid(column=3, row=2)
+    F7 = Frame(usun, borderwidth=2)  # 1 strza³ka
+    F7.grid(column=1, row=2)
+    F8 = Frame(usun, borderwidth=2)  # 3 strza³ka
+    F8.grid(column=6, row=2)
+    F10 = Frame(usun, borderwidth=2, relief='ridge')  # Zapisz
+    F10.grid(column=0,row=3)
 
+    L1 = Label(F1, text="Lista Hodowców")
+    L1.grid()
+    E1 = Entry(F2, bd=5)
+    E1.grid()
+    L2 = Label(F6, text="--->")
+    L2.grid()
+    L3 = Label(F7, text="--->")
+    L3.grid()
+    L4 = Label(F8, text="--->")
+    L4.grid()
+
+    lista = Listbox(F3, width=40, height=16, selectmode=SINGLE)
+    for imie in Hodowcy:
+        lista.insert(END, imie)
+    lista.grid()
+
+    #Definicje przycisków
+    def usuwanie():
+
+    def zamknij():
+        msg =messagebox.askquestion("Wyjœcie","Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if msg == 'yes':
+            usun.destroy()
+        else:
+            return
+
+    # Tworzenie przyciskow
+    btn1 = Button(F4, text="Wybierz")
+    btn2 = Button(F5, text="Usuñ Hodowce",command=)
+    btn3 = Button(F9, text="Odœwie¿")
+    btn4 = Button(F10, text="Zamknij",command=zamknij)
+
+    # Ulozenie przyciskow
+    btn1.grid()
+    btn2.grid()
+    btn3.grid()
+    btn4.grid()
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -275,7 +333,6 @@ root_label = tk.Label(root)
 root_label.grid()
 
 # Menu
-
 menu = Menu(root)
 root.config(menu = menu)
 filemenu = tk.Menu(menu)
@@ -318,7 +375,6 @@ oblicz.add_command(label="Wspó³czynnik pokrewieñsta", command=pokrewienstwo)
 oblicz.add_command(label="Wspó³czynnik utraty przodków", command=utrata)
 
 # Wyœwietlanie drzewa
-
 tree = Menu(menu)
 menu.add_cascade(label = "Drzewo", menu=tree)
 tree.add_command(label="Wyœwetl drzewo rodowodowe osobnika",command = Wtree )
