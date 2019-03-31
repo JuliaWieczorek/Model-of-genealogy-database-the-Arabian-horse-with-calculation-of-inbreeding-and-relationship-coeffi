@@ -1,4 +1,4 @@
-# -*- coding: cp1250 -*-
+#-*- coding: cp1250 -*-
 
 #import baza
 #import sqlite3
@@ -56,6 +56,8 @@ def dodajHodowce():
     F7.grid(column=2, row=1, rowspan=10)
     F8 = Frame(dodaj, borderwidth=2, relief='ridge')
     F8.grid(column=2, row=0)
+    F10 = Frame(dodaj, borderwidth=2, relief='ridge')  # Zamknij
+    F10.grid(column=0, row=5)
 
     L1 = Label(F1, text="Imiê Hodowcy")
     L1.grid()
@@ -89,13 +91,23 @@ def dodajHodowce():
         j=+1
         return
 
+    def zamknij():
+        msg =messagebox.askquestion("Wyjœcie","Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if msg == 'yes':
+            usun.destroy()
+        else:
+            return
+
     # Tworzenie przyciskow
     btn1 = Button(F5, text="Dodaj nowego Hodowce", command=kliknij)
     btn2 = Button(F8, text="Wyœwietl spis hodowców", command=show)
+    btn4 = Button(F10, text="Zamknij", command=zamknij)
+
 
     # Ulozenie przyciskow
     btn1.grid()
     btn2.grid()
+    btn4.grid()
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -135,6 +147,8 @@ def edytujHodowce():
     F11.grid(column=5, row=1)
     F12 = Frame(edycja, borderwidth=2)  # Odœwie¿
     F12.grid(column=0, row=1)
+    F13 = Frame(edycja, borderwidth=2, relief='ridge')  # Zamknij
+    F13.grid(column=0, row=3)
 
     L1 = Label(F1, text="HODOWCY")
     L1.grid()
@@ -165,15 +179,25 @@ def edytujHodowce():
         E1.insert(INSERT, dane[0])
         E2.insert(INSERT, dane[1])
 
+    def zamknij():
+        msg =messagebox.askquestion("Wyjœcie","Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if msg == 'yes':
+            usun.destroy()
+        else:
+            return
+
     # Tworzenie przyciskow
     btn1 = Button(F4, text = "Wybierz", command=wybierz)
     btn2 = Button(F5, text="Zapisz zmiane")
     btn3 = Button(F12, text="Odœwie¿")
+    btn4 = Button(F13, text="Zamknij", command=zamknij)
+
 
     # Ulozenie przyciskow
     btn1.grid()
     btn2.grid()
     btn3.grid()
+    btn4.grid()
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -205,7 +229,7 @@ def usunHodowce():
     F7.grid(column=1, row=2)
     F8 = Frame(usun, borderwidth=2)  # 3 strza³ka
     F8.grid(column=6, row=2)
-    F10 = Frame(usun, borderwidth=2, relief='ridge')  # Zapisz
+    F10 = Frame(usun, borderwidth=2, relief='ridge')  # Zamknij
     F10.grid(column=0,row=3)
 
     L1 = Label(F1, text="Lista Hodowców")
@@ -225,7 +249,18 @@ def usunHodowce():
     lista.grid()
 
     #Definicje przycisków
+    def wybierz():
+        lista1 = int(lista.curselection()[0]) # wyœwietlanie argumentów z listboxa
+        dane = Hodowcy[lista1].split()
+
     def usuwanie():
+        msg = messagebox.askquestion("Usuwanie", "Czy jesteœ pewny, ¿e chcesz usun¹æ tego hodowce?", icon="warning")
+        if msg == 'yes':
+            print("To usunie hodowce")
+        else:
+            print("To wróci do wyboru hodowcy")
+            return
+
 
     def zamknij():
         msg =messagebox.askquestion("Wyjœcie","Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
@@ -236,7 +271,7 @@ def usunHodowce():
 
     # Tworzenie przyciskow
     btn1 = Button(F4, text="Wybierz")
-    btn2 = Button(F5, text="Usuñ Hodowce",command=)
+    btn2 = Button(F5, text="Usuñ Hodowce",command=usuwanie)
     btn3 = Button(F9, text="Odœwie¿")
     btn4 = Button(F10, text="Zamknij",command=zamknij)
 
