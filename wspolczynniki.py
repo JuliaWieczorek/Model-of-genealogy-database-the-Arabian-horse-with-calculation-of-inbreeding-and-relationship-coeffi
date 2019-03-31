@@ -5,6 +5,9 @@ import math
 import baza_danych
 
 class Oblicz(object):
+    conn = sqlite3.connect('baza.db')
+    # conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
 
     def __main__(self):
         self.menu()
@@ -25,8 +28,8 @@ class Oblicz(object):
                     self.op == '9' or self.op == '11':
                 self.nzw1 = input('Wybierz osobnika: ')
             elif self.op == '7' or self.op == '10' or self.op == '6':
-                self.nzw1 = input('Wybierz pierwszego konia: ')
-                self.nzw2 = input('Wybierz drugiego konia: ')
+                self.nzw1 = input('Wybierz pierwszego osobnika: ')
+                self.nzw2 = input('Wybierz drugiego osobnika: ')
             self.wybranaFkcja = self.funkcje.get(self.op, self.blad)
             self.nazwaWybranejFkcji = self.nazwyFunkcji.get(self.op, self.blad)
             print("::::wybrales funkcje {nazwa}::::\n {wynik}".format(nazwa=self.nazwaWybranejFkcji,
@@ -35,60 +38,57 @@ class Oblicz(object):
             self.op = input("Co wybierzesz?-> ")
 
     def all_osobniki(self):
-        baza_danych.Baza.open(self)
-        for self.all in baza_danych.Baza.open.cur.execute('SELECT nazwa FROM osobniki'):
+        for self.all in baza_danych.Baza.cur.execute('SELECT nazwa FROM osobniki'):
             print(self.all)
-        baza_danych.Baza.close(self)
 
-    def find_child(self, id1):
-        self.id1 = id1
+    def find_child(self, nazwa):
+        self.nazwa = nazwa
         self.list_of_child = []
-        baza_danych.Baza.open(self)
-        for row in baza_danych.Baza.open.cur.execute('SELECT id_os1 FROM RELACJE WHERE id_os2=?', (self.id1,)):
-            self.nzw = baza_danych.Baza.id_nazwa(self, row)
-            self.list_of_child.append(tuple(self.nzw))
+        self.nzw = baza_danych.Baza.nazwa_id(self, self.nazwa)
+        for self.row in baza_danych.Baza.cur.execute('SELECT id_os1 FROM RELACJE WHERE id_os2=?', (self.nzw,)):
+            self.child = baza_danych.Baza.id_nazwa(self, self.row)
+            self.list_of_child.append(self.child)
         print('Lista dzieci osobnika:', self.list_of_child)
         if len(self.list_of_child) > 0:
             self.count_child = len(self.list_of_child)
             print('Ten osobnik ma %i dzieci' % self.count_child)
-        baza_danych.Baza.close(self)
+        return self.list_of_child
 
-    def find_parent(self, id1):
-        self.id = id1
+    def find_parent(self, nazwa):
+        self.nazwa = nazwa
         self.list_of_parents = []
-        baza_danych.Baza.open(self)
-        for self.row in baza_danych.Baza.open.cur.execute('SELECT id_os2 FROM relacje WHERE id_os1=?', (self.id)):
-            self.list_of_parents.append(tuple(self.row))
-        baza_danych.Baza.close(self)
+        self.nazwa1 = baza_danych.Baza.nazwa_id(self, self.nazwa)
+        for self.row in baza_danych.Baza.cur.execute('SELECT id_os2 FROM relacje WHERE id_os1=?', (self.nazwa1,)):
+            self.parent = baza_danych.Baza.id_nazwa(self, self.row)
+            self.list_of_parents.append(self.parent)
         return self.list_of_parents
 
-    def find_grand(self, id1):
-        self.id1 = id1
+    def find_grand(self, nazwa):
+        self.nazwa = nazwa
         self.lista = []
-        baza_danych.Baza.open(self)
-        for self.row in baza_danych.Baza.open.cur.execute(
-                'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)',
-                [self.id1]):
-            self.lista.append(self.row)
-        baza_danych.Baza.close(self)
+        self.nazwa1 = baza_danych.Baza.nazwa_id(self, self.nazwa)
+        for self.row in baza_danych.Baza.cur.execute(
+                'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)',(self.nazwa1,)):
+            self.grand = baza_danych.Baza.id_nazwa(self, self.row)
+            self.lista.append(self.grand)
         return self.lista
 
-    def find_pra(self, id1):
-        self.id1 = id1
+    def find_pra(self, nazwa:str):
+        self.nazwa = nazwa
         self.lista = []
-        baza_danych.Baza.open(self)
-        for self.row in baza_danych.Baza.open.cur.execute(
+        self.nazwa1 = baza_danych.Baza.nazwa_id(self, self.nazwa)
+        for self.row in baza_danych.Baza.cur.execute(
                 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?))',
-                [self.id1]):
-            self.lista.append(self.row)
-        baza_danych.Baza.close(self)
+                [self.nazwa1]):
+            self.pra = baza_danych.Baza.id_nazwa(self, self.row)
+            self.lista.append(self.pra)
         return self.lista
 
-    def tree(self, nzw):
-        self.nzw = nzw
-        self.a = self.find_parent(self.nzw)
-        self.b = self.find_grand(self.nzw)
-        self.c = self.find_pra(self.nzw)
+    def tree(self, nazwa):
+        self.nazwa = nazwa
+        self.a = self.find_parent(self.nazwa)
+        self.b = self.find_grand(self.nazwa)
+        self.c = self.find_pra(self.nazwa)
         self.ListTree = []
         for self.i in self.a:
             self.ListTree.append(self.i)
@@ -109,11 +109,11 @@ class Oblicz(object):
         self.ListTree.append(self.c)
         return self.ListTree
 
-    def wspolny_przodek(self, nzw1, nzw2):
-        self.nzw1 = nzw1
-        self.nzw2 = nzw2
-        self.x = self.tree(self.nzw1)
-        self.y = self.tree(self.nzw2)
+    def wspolny_przodek(self, nazwa1, nazwa2):
+        self.nazwa1 = nazwa1
+        self.nazwa2 = nazwa2
+        self.x = self.tree(self.nazwa1)
+        self.y = self.tree(self.nazwa2)
         self.wsp = set(self.x) & set(self.y)
         return self.wsp
 
@@ -387,7 +387,7 @@ class Oblicz(object):
         self.C = self.find_grand(self.nzw1)
         self.D = self.find_grand(self.nzw2)
         self.E = self.find_pra(self.nzw1)
-        self.F = self.find_pra(self.nzw2)
+        self.Fe = self.find_pra(self.nzw2)
         if self.A or self.B:
             if (self.A == self.B):
                 if len(self.A) == 2:
@@ -432,8 +432,8 @@ class Oblicz(object):
                         if (self.c == self.cos):
                             self.wsp_b += 4
                         self.full.append(self.wsp_b)
-            if self.E or self.F:
-                if (self.E == self.F):
+            if self.E or self.Fe:
+                if (self.E == self.Fe):
                     for self.e in range(len(self.E)):
                         self.e = self.E.pop(0)
                         self.e = str(self.e[0])
@@ -441,8 +441,8 @@ class Oblicz(object):
                             self.wsp_c += 6
                         self.full.append(self.wsp_c)
 
-        self.z = max(len(self.A), len(self.B), len(self.C), len(self.D), len(self.E), len(self.F))
-        lista = [self.A, self.B, self.C, self.D, self.E, self.F]
+        self.z = max(len(self.A), len(self.B), len(self.C), len(self.D), len(self.E), len(self.Fe))
+        lista = [self.A, self.B, self.C, self.D, self.E, self.Fe]
         for self.l in self.lista:
             for self.l in self.lista:
                 if len(self.l) < self.z:
@@ -523,8 +523,8 @@ class Oblicz(object):
                             self.e = self.E.pop()
                             if (self.e == self.cos):
                                 self.le += 1
-                        for self.f in range(len(self.F)):
-                            self.f = self.F.pop(0)
+                        for self.f in range(len(self.Fe)):
+                            self.f = self.Fe.pop(0)
                             if (self.f == self.cos):
                                 self.lf += 1
                         if self.le == 4 and self.lf == 4:
@@ -733,8 +733,8 @@ class Oblicz(object):
                         self.e = self.E.pop()
                         if (self.e == self.cos):
                             self.le += 1
-                    for self.f in range(len(self.F)):
-                        self.f = self.F.pop(0)
+                    for self.f in range(len(self.Fe)):
+                        self.f = self.Fe.pop(0)
                         if (self.f == self.cos):
                             self.lf += 1
 
@@ -891,8 +891,8 @@ class Oblicz(object):
                         self.e = self.E.pop()
                         if (self.e == self.cos):
                             self.le += 1
-                    for self.f in range(len(self.F)):
-                        self.f = self.F.pop(0)
+                    for self.f in range(len(self.Fe)):
+                        self.f = self.Fe.pop(0)
                         if (self.f == self.cos):
                             self.lf += 1
                     if ((self.lc == 2) and (self.ld == 2) and (self.le == 2) and (self.lf == 2)):
@@ -1229,10 +1229,8 @@ class Oblicz(object):
         self.nzw = nzw
         self.x = self.find_parent(self.nzw)
         if len(self.x) == 2:
-            self.a1 = self.x[0]
-            self.rodzic1 = str(self.a1[0])
-            self.b1 = self.x[1]
-            self.rodzic2 = str(self.b1[0])
+            self.rodzic1 = self.x[0]
+            self.rodzic2 = self.x[1]
         else:
             self.F = 0
             return self.F
@@ -1287,10 +1285,9 @@ class Oblicz(object):
         if self.x:
             for self.i in range(len(self.x)):
                 self.w = []
-                self.ii = self.x.pop()
-                self.ic = str(self.ii[0])
+                self.ic = self.x.pop()
                 self.F = self.inbred(self.ic)
-                self.k = self.sciezka_konkretna(self.nzw1, self.nzw2, self.ii)
+                self.k = self.sciezka_konkretna(self.nzw1, self.nzw2, self.ic)
                 for self.i in range(self.k.count(0)):
                     self.k.remove(0)
                 if len(self.k) > 0:
@@ -1321,10 +1318,10 @@ class Oblicz(object):
         self.nzw = nzw
         self.x = self.find_parent(self.nzw)
         if len(self.x) == 2:
-            self.a1 = self.x[0]
-            self.rodzic1 = str(self.a1[0])
-            self.b1 = self.x[1]
-            self.rodzic2 = str(self.b1[0])
+            self.rodzic1 = self.x[0]
+            # self.rodzic1 = str(self.a1[0])
+            self.rodzic2 = self.x[1]
+            # self.rodzic2 = str(self.b1[0])
         else:
             self.F = 0
             return self.F

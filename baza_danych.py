@@ -10,13 +10,16 @@ import planarity
 
 
 class Baza(object):
+    conn = sqlite3.connect('baza.db')
+    # conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
 
     def open(self):
-        self.conn = sqlite3.connect('baza.db')
+        # self.conn = sqlite3.connect('baza.db')
         self.conn.row_factory = sqlite3.Row
         self.cur = self.conn.cursor()
 
-    def close(self):
+    def __del__(self):
         self.conn.commit()
         self.cur.close()
         self.conn.close()
@@ -182,12 +185,9 @@ class Baza(object):
 
     def id_nazwa(self, id):
         """Funkcja zamieniająca id w nazwe osobnika"""
-        # self.open()
         self.id = id
-        for row in self.cur.execute("SELECT nazwa FROM osobniki WHERE id_os=?", (self.id,)):
+        for row in self.cur.execute("SELECT nazwa FROM osobniki WHERE id_os=?", self.id):
             self.nazwa = row[0]
-            print(self.nazwa)
-        # self.close()
         return self.nazwa
 
     def nazwa_id(self, nazwa):
@@ -195,7 +195,6 @@ class Baza(object):
         self.nazwa = nazwa
         for row in self.cur.execute("SELECT id_os FROM osobniki WHERE nazwa=?", (self.nazwa,)):
             self.id = row[0]
-            print(self.id)
         return self.id
 
     def dodaj_gatunki(self):
@@ -249,11 +248,11 @@ class Baza(object):
 
     '''
 
-# jula = Baza()
+jula = Baza()
 # jula.czytajrelacje()
 # jula.segregujPoPlci()
 # jula.relacjepoimionach()
-# jula.nazwa_id('CARO')
+jula.nazwa_id('CARO')
 # jula.id_nazwa(2)
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
