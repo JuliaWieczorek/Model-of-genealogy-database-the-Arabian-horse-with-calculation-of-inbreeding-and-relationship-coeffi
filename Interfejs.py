@@ -11,6 +11,7 @@ from tkinter import Listbox
 #from tkinter import Scrollbar
 
 Hodowcy=['Cezary Bober', 'Julia Wieczorek', 'Mateusz Markowski', 'Alicja Dera']
+Osobniki=['KARO','FARO','DONIO','DEMO','HAPPY','SETO']
 # DEFINICJE
 ######################################################################################################################
 
@@ -91,17 +92,17 @@ def dodajHodowce():
         j=+1
         return
 
-    def zamknij():
+    def zamknij(): # zmodyfikowaæ i dodaæ do przycisku
         msg =messagebox.askquestion("Wyjœcie","Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
         if msg == 'yes':
-            usun.destroy()
+            dodaj.destroy
         else:
             return
 
     # Tworzenie przyciskow
     btn1 = Button(F5, text="Dodaj nowego Hodowce", command=kliknij)
     btn2 = Button(F8, text="Wyœwietl spis hodowców", command=show)
-    btn4 = Button(F10, text="Zamknij", command=zamknij)
+    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
 
 
     # Ulozenie przyciskow
@@ -179,10 +180,10 @@ def edytujHodowce():
         E1.insert(INSERT, dane[0])
         E2.insert(INSERT, dane[1])
 
-    def zamknij():
+    def zamknij(): # zmodyfikowaæ i dodaæ do przycisku
         msg =messagebox.askquestion("Wyjœcie","Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
         if msg == 'yes':
-            usun.destroy()
+            edycja.destroy
         else:
             return
 
@@ -190,7 +191,7 @@ def edytujHodowce():
     btn1 = Button(F4, text = "Wybierz", command=wybierz)
     btn2 = Button(F5, text="Zapisz zmiane")
     btn3 = Button(F12, text="Odœwie¿")
-    btn4 = Button(F13, text="Zamknij", command=zamknij)
+    btn4 = Button(F13, text="Zamknij", command=edycja.destroy)
 
 
     # Ulozenie przyciskow
@@ -262,7 +263,7 @@ def usunHodowce():
             return
 
 
-    def zamknij():
+    def zamknij(): # zmodyfikowaæ i dodaæ do przycisku
         msg =messagebox.askquestion("Wyjœcie","Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
         if msg == 'yes':
             usun.destroy()
@@ -273,7 +274,7 @@ def usunHodowce():
     btn1 = Button(F4, text="Wybierz")
     btn2 = Button(F5, text="Usuñ Hodowce",command=usuwanie)
     btn3 = Button(F9, text="Odœwie¿")
-    btn4 = Button(F10, text="Zamknij",command=zamknij)
+    btn4 = Button(F10, text="Zamknij",command=usun.destroy)
 
     # Ulozenie przyciskow
     btn1.grid()
@@ -293,12 +294,22 @@ def Wtree():
     tree_label = Label(tree)
     tree_label.grid()
 
-    L1 = Label(tree, text="Nazwa Osobnika")
-    L1.grid(column=2, row=0)
-    E1 = Entry(tree, bd=5)
-    E1.grid(column=3, row=0)
+    F1 = Frame(tree, borderwidth=2, relief='ridge')
+    F1.grid(column=0, row=0)
+    F2 = Frame(tree, borderwidth=2, relief='ridge')
+    F2.grid(column=0, row=1)
+    F3 = Frame(tree, borderwidth=2, relief='ridge')
+    F3.grid(column=1, row=1)
+    F4 = Frame(tree, borderwidth=2, relief='ridge')
+    F4.grid(column=2, row=1)
 
-    show = scrolledtext.ScrolledText(tree, width=60, height=40)
+    L1 = Label(F1, text="Lista nazw osobników")
+    L1.grid()
+    L2 = Label(F3,text="Wybrano osobnika o nazwie:")
+    E1 = Entry(F4, bd=5)
+    E1.grid()
+
+    show = Listbox(F2, width=60, height=40,selectmode=SINGLE)
     show.grid(column=1, row=0)
 
     # Definicje przyciskow
@@ -318,6 +329,21 @@ def avgpokrewienstwo():
     avg.title("Œredni wspólczynnik pokrewieñstwa")
     avg_label = Label(avg)
     avg_label.grid()
+
+    F1 = Frame(avg, borderwidth=2, relief='ridge')
+    F1.grid(column=0, row=0)
+    F2 = Frame(avg, borderwidth=2, relief='ridge')
+    F2.grid(column=0, row=1)
+
+    L1 = Label(F1, text="Lista Osobników")
+    L1.grid()
+
+    lista = Listbox(F2, width=40, height=16, selectmode=SINGLE)
+    for nazwa in Osobniki:
+        lista.insert(END, nazwa)
+    lista.grid()
+
+
 
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
