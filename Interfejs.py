@@ -88,6 +88,7 @@ def dodajHodowce():
         if j < len(Hodowcy):
             for imie in Hodowcy:
                 res = imie + "\n"
+                lista.delete('0.0', END)
                 lista.insert(INSERT, res)
         j=+1
         return
