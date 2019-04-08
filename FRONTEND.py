@@ -19,6 +19,64 @@ class FRONTEND(object):
     # DEFINICJE
     ######################################################################################################################
 
+    def __init__(self):
+        # okno root
+        self.root = Tk()  # root widget - musi zostaæ stworzony przed innymi widgetami
+        self.root.geometry("1400x500+0+0")
+        self.root.title("Pracownia Informatyczna")  # tytu³ naszej tabeli root
+        self.root_label = tk.Label(self.root)
+        self.root_label.grid()
+
+        # Menu
+        self.menu = Menu(self.root)
+        self.root.config(menu=self.menu)
+        self.filemenu = tk.Menu(self.menu)
+        # Plik
+        self.menu.add_cascade(label="Plik", menu=self.filemenu)
+        self.filemenu.add_command(label="Otwórz", command=self.baseopen)
+        self.filemenu.add_command(label="Edycja struktury")
+        self.filemenu.add_command(label="Zamknij baze", command=self.baseclose)
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label="Zamknij program", command=self.root.destroy)
+
+        # Edycja
+        self.edycja = Menu(self.menu)
+        self.gatunek = Menu(self.menu)
+        self.osobnik = Menu(self.menu)
+        self.hodowca = Menu(self.menu)
+        self.menu.add_cascade(label="Edycja", menu=self.edycja)
+
+        self.edycja.add_cascade(label="Gatunek", menu=self.gatunek)
+        self.gatunek.add_command(label="Dodaj nowy gatunek")
+        self.gatunek.add_command(label="Usuñ istniej¹cy gatunek")
+        self.gatunek.add_command(label="Edytuj istniej¹cy gatunek")
+
+        self.edycja.add_cascade(label="Osobnik", menu=self.osobnik)
+        self.osobnik.add_command(label="Dodaj nowego osobnika")
+        self.osobnik.add_command(label="Usuñ istniej¹cego osobnika")
+        self.osobnik.add_command(label="Edytuj istniej¹cego osobnika")
+
+        self.edycja.add_cascade(label="Hodowca", menu=self.hodowca)
+        self.hodowca.add_command(label="Dodaj nowego hodowce", command=dodajHodowce)
+        self.hodowca.add_command(label="Usuñ istniej¹cego hodowce", command=usunHodowce)
+        self.hodowca.add_command(label="Edytuj istniej¹cego hodowce", command=edytujHodowce)
+
+        # Obliczenia
+        self.oblicz = Menu(self.menu)
+        self.menu.add_cascade(label="Wspó³czynniki", menu=self.oblicz)
+        self.oblicz.add_command(label="Œredni wspó³czynnik pokrewieñstwa", command=avgpokrewienstwo)
+        self.oblicz.add_command(label="Wspó³czynnik inbredu", command=imbred)
+        self.oblicz.add_command(label="Wspó³czynnik pokrewieñsta", command=pokrewienstwo)
+        self.oblicz.add_command(label="Wspó³czynnik utraty przodków", command=utrata)
+
+        # Wyœwietlanie drzewa
+        self.tree = Menu(self.menu)
+        self.menu.add_cascade(label="Drzewo", menu=self.tree)
+        self.tree.add_command(label="Wyœwetl drzewo rodowodowe osobnika", command=Wtree)
+
+        self.root.mainloop()  # zamkniêcie pêtli
+
+
     # ---------------------------------------------------------------------------------------------------------------------
     # Otwieranie bazy danych i zamykanie
     def baseopen(self):  # To chyba dzia³a
@@ -39,8 +97,9 @@ class FRONTEND(object):
     # To do:
     ''' po³¹cz go z funkcjami spraw ¿eby listy siê czyœci³y przed kolejnym wyœwietleniem'''
 
-    def dodajHodowce(self):
-        # Wygl¹d okna
+class dodajHodowce(object):
+    # Wygl¹d okna
+    def __init__(self):
         self.dodaj = Tk()
         self.dodaj.geometry("700x400+0+0")
         self.dodaj.title("Dodaj Nowego Hodowce")
@@ -81,40 +140,44 @@ class FRONTEND(object):
         self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
         self.lista.grid()
 
-        # Definicje przycisków
-        def kliknij(self):
-            self.dod = self.E1.get() + " " + self.E2.get()
-            self.Hodowcy.append(self.dod)
-            self.res = "Dodano hodowce: " + self.E1.get() + " " + self.E2.get() + "\n"
-            self.wynik.insert(INSERT, self.res)
-            return
-
-        def show(self):
-            self.j = 0
-            if self.j < len(self.Hodowcy):
-                for self.imie in self.Hodowcy:
-                    self.res = self.imie + "\n"
-                    self.lista.delete('0.0', END) # dzia³a ale nie tak jak ma
-                    self.lista.insert(INSERT, self.res)
-            self.j = +1
-            return
-
-        def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
-            self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
-            if self.msg == 'yes':
-                self.dodaj.destroy
-            else:
-                return
+        ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
 
         # Tworzenie przyciskow
-        self.btn1 = Button(self.F5, text="Dodaj nowego Hodowce", command=kliknij)
-        self.btn2 = Button(self.F8, text="Wyœwietl spis hodowców", command=show)
+        self.btn1 = Button(self.F5, text="Dodaj nowego Hodowce", command=self.kliknij)
+        self.btn2 = Button(self.F8, text="Wyœwietl spis hodowców", command=self.show)
         self.btn4 = Button(self.F10, text="Zamknij", command=self.dodaj.destroy)
 
         # Ulozenie przyciskow
         self.btn1.grid()
         self.btn2.grid()
         self.btn4.grid()
+
+    # Definicje przycisków
+    def kliknij(self):
+        self.dod = self.E1.get() + " " + self.E2.get()
+        FRONTEND.Hodowcy.append(self.dod)
+        self.res = "Dodano hodowce: " + self.E1.get() + " " + self.E2.get() + "\n"
+        self.wynik.insert(INSERT, self.res)
+        return
+
+    def show(self):
+        self.j = 0
+        if self.j < len(FRONTEND.Hodowcy):
+            for self.imie in FRONTEND.Hodowcy:
+                self.res = self.imie + "\n"
+                self.lista.option_clear() # dzia³a ale nie tak jak ma
+                self.lista.insert(INSERT, self.res)
+        self.j = +1
+        return
+
+    def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
+        self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if self.msg == 'yes':
+            self.dodaj.destroy
+        else:
+            return
+
+    
 
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -123,7 +186,10 @@ class FRONTEND(object):
     # To do:
     ''' Pozmieniaj nazwy i dostosuj wygl¹d okna i po³¹cz go z funkcjami'''
 
-    def edytujHodowce(self):
+class edytujHodowce(object):
+    
+    def __init__(self):
+
         # Wygl¹d okna
         self.edycja = Tk()
         self.edycja.geometry("800x350+0+0")
@@ -176,26 +242,13 @@ class FRONTEND(object):
         self.L5.grid()
 
         self.lista = Listbox(self.F3, width=40, height=16, selectmode=SINGLE)
-        for self.imie in self.Hodowcy:
+        for self.imie in FRONTEND.Hodowcy:
             self.lista.insert(END, self.imie)
         self.lista.grid()
 
-        # Definicje przycisków
-        def wybierz(self):
-            self.lista1 = int(self.lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
-            self.dane = self.Hodowcy[self.lista1].split()
-            self.E1.insert(INSERT, self.dane[0])
-            self.E2.insert(INSERT, self.dane[1])
-
-        def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
-            self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
-            if self.msg == 'yes':
-                self.edycja.destroy
-            else:
-                return
-
+        #znowu zmienione przez Juleczke- ta czesc byla pod def zamknij()
         # Tworzenie przyciskow
-        self.btn1 = Button(self.F4, text="Wybierz", command=wybierz)
+        self.btn1 = Button(self.F4, text="Wybierz", command=self.wybierz)
         self.btn2 = Button(self.F5, text="Zapisz zmiane")
         self.btn3 = Button(self.F12, text="Odœwie¿")
         self.btn4 = Button(self.F13, text="Zamknij", command=self.edycja.destroy)
@@ -206,11 +259,29 @@ class FRONTEND(object):
         self.btn3.grid()
         self.btn4.grid()
 
+
+        # Definicje przycisków
+    def wybierz(self):
+        self.lista1 = int(self.lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
+        self.dane = FRONTEND.Hodowcy[self.lista1].split()
+        self.E1.insert(INSERT, self.dane[0])
+        self.E2.insert(INSERT, self.dane[1])
+
+    def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
+        self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if self.msg == 'yes':
+            self.edycja.destroy
+        else:
+            return
+
+    
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Usuwanie Hodowcy
-    def usunHodowce(self):
+class usunHodowce(object):
+
+    def __init__(self):
         # Wygl¹d okna
         self.usun = Tk()
         self.usun.geometry("700x400+0+0")
@@ -251,33 +322,15 @@ class FRONTEND(object):
         self.L4.grid()
 
         self.lista = Listbox(self.F3, width=40, height=16, selectmode=SINGLE)
-        for self.imie in self.Hodowcy:
+        for self.imie in FRONTEND.Hodowcy:
             self.lista.insert(END, self.imie)
         self.lista.grid()
 
-        # Definicje przycisków
-        def wybierz(self):
-            self.lista1 = int(self.lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
-            self.dane = self.Hodowcy[self.lista1].split()
-
-        def usuwanie(self):
-            self.msg = messagebox.askquestion("Usuwanie", "Czy jesteœ pewny, ¿e chcesz usun¹æ tego hodowce?", icon="warning")
-            if self.msg == 'yes':
-                print("To usunie hodowce")
-            else:
-                print("To wróci do wyboru hodowcy")
-                return
-
-        def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
-            self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
-            if self.msg == 'yes':
-                self.usun.destroy()
-            else:
-                return
+        #zmienione przez Juleczke
 
         # Tworzenie przyciskow
         self.btn1 = Button(self.F4, text="Wybierz")
-        self.btn2 = Button(self.F5, text="Usuñ Hodowce", command=usuwanie)
+        self.btn2 = Button(self.F5, text="Usuñ Hodowce", command=self.usuwanie)
         self.btn3 = Button(self.F9, text="Odœwie¿")
         self.btn4 = Button(self.F10, text="Zamknij", command=self.usun.destroy)
 
@@ -287,12 +340,36 @@ class FRONTEND(object):
         self.btn3.grid()
         self.btn4.grid()
 
+    # Definicje przycisków
+    def wybierz(self):
+        self.lista1 = int(self.lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
+        self.dane = FRONTEND.Hodowcy[self.lista1].split()
+
+    def usuwanie(self):
+        self.msg = messagebox.askquestion("Usuwanie", "Czy jesteœ pewny, ¿e chcesz usun¹æ tego hodowce?", icon="warning")
+        if self.msg == 'yes':
+            print("To usunie hodowce")
+        else:
+            print("To wróci do wyboru hodowcy")
+            return
+
+    def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
+        self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if self.msg == 'yes':
+            self.usun.destroy()
+        else:
+            return
+
+    
+
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Wyœwietlanie drzewa
-    def Wtree(self):
-        # Widget
+class Wtree(object):
+
+    # Widget
+    def __init__(self):
         self.tree = Tk()
         self.tree.geometry("700x400+0+0")
         self.tree.title("Drzewo rodowodowe")
@@ -328,7 +405,9 @@ class FRONTEND(object):
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Œredni wspó³czynnik pokrewieñstwa
-    def avgpokrewienstwo(self):
+class avgpokrewienstwo(object):
+
+    def __init__(self):
         # Widget
         self.avg = Tk()
         self.avg.geometry("700x400+0+0")
@@ -345,7 +424,7 @@ class FRONTEND(object):
         self.L1.grid()
 
         self.lista = Listbox(self.F2, width=40, height=16, selectmode=SINGLE)
-        for self.nazwa in self.Osobniki:
+        for self.nazwa in FRONTEND.Osobniki:
             self.lista.insert(END, self.nazwa)
         self.lista.grid()
 
@@ -353,7 +432,9 @@ class FRONTEND(object):
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Wspó³czynnik imbredu
-    def imbred(self):
+class imbred(object):
+
+    def __init__(self):
         # Widget
         self.wsimb = Tk()
         self.wsimb.geometry("700x400+0+0")
@@ -365,7 +446,9 @@ class FRONTEND(object):
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Wspó³czynnik pokrewieñstwa
-    def pokrewienstwo(self):
+class pokrewienstwo(object):
+
+    def __init__(self):
         # Widget
         self.wspok = Tk()
         self.wspok.geometry("700x400")
@@ -377,7 +460,9 @@ class FRONTEND(object):
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Wspó³czynnik utraty przodków
-    def utrata(self):
+class utrata(object):
+
+    def __init__(self):
         # Widget
         self.wsutraty = Tk()
         self.wsutraty.geometry("700x400+0+0")
@@ -387,61 +472,5 @@ class FRONTEND(object):
 
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     #######################################################################################################################
-    def __init__(self):
-        # okno root
-        self.root = Tk()  # root widget - musi zostaæ stworzony przed innymi widgetami
-        self.root.geometry("1400x500+0+0")
-        self.root.title("Pracownia Informatyczna")  # tytu³ naszej tabeli root
-        self.root_label = tk.Label(self.root)
-        self.root_label.grid()
-
-        # Menu
-        self.menu = Menu(self.root)
-        self.root.config(menu=self.menu)
-        self.filemenu = tk.Menu(self.menu)
-        # Plik
-        self.menu.add_cascade(label="Plik", menu=self.filemenu)
-        self.filemenu.add_command(label="Otwórz", command=self.baseopen)
-        self.filemenu.add_command(label="Edycja struktury")
-        self.filemenu.add_command(label="Zamknij baze", command=self.baseclose)
-        self.filemenu.add_separator()
-        self.filemenu.add_command(label="Zamknij program", command=self.root.destroy)
-
-        # Edycja
-        self.edycja = Menu(self.menu)
-        self.gatunek = Menu(self.menu)
-        self.osobnik = Menu(self.menu)
-        self.hodowca = Menu(self.menu)
-        self.menu.add_cascade(label="Edycja", menu=self.edycja)
-
-        self.edycja.add_cascade(label="Gatunek", menu=self.gatunek)
-        self.gatunek.add_command(label="Dodaj nowy gatunek")
-        self.gatunek.add_command(label="Usuñ istniej¹cy gatunek")
-        self.gatunek.add_command(label="Edytuj istniej¹cy gatunek")
-
-        self.edycja.add_cascade(label="Osobnik", menu=self.osobnik)
-        self.osobnik.add_command(label="Dodaj nowego osobnika")
-        self.osobnik.add_command(label="Usuñ istniej¹cego osobnika")
-        self.osobnik.add_command(label="Edytuj istniej¹cego osobnika")
-
-        self.edycja.add_cascade(label="Hodowca", menu=self.hodowca)
-        self.hodowca.add_command(label="Dodaj nowego hodowce", command=self.dodajHodowce)
-        self.hodowca.add_command(label="Usuñ istniej¹cego hodowce", command=self.usunHodowce)
-        self.hodowca.add_command(label="Edytuj istniej¹cego hodowce", command=self.edytujHodowce)
-
-        # Obliczenia
-        self.oblicz = Menu(self.menu)
-        self.menu.add_cascade(label="Wspó³czynniki", menu=self.oblicz)
-        self.oblicz.add_command(label="Œredni wspó³czynnik pokrewieñstwa", command=self.avgpokrewienstwo)
-        self.oblicz.add_command(label="Wspó³czynnik inbredu", command=self.imbred)
-        self.oblicz.add_command(label="Wspó³czynnik pokrewieñsta", command=self.pokrewienstwo)
-        self.oblicz.add_command(label="Wspó³czynnik utraty przodków", command=self.utrata)
-
-        # Wyœwietlanie drzewa
-        self.tree = Menu(self.menu)
-        self.menu.add_cascade(label="Drzewo", menu=self.tree)
-        self.tree.add_command(label="Wyœwetl drzewo rodowodowe osobnika", command=self.Wtree)
-
-        self.root.mainloop()  # zamkniêcie pêtli
-
+    
 baza=FRONTEND()
