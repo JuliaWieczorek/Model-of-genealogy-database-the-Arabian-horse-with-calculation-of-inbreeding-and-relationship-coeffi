@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
-import planarity
+#import planarity
 
 # conn = sqlite3.connect('baza.db')
 # conn.row_factory = sqlite3.Row
@@ -30,8 +30,9 @@ class Baza(object):
         self.cur.execute(" SELECT id_os, nazwa, plec FROM OSOBNIKI ")
         self.osobnicy = self.cur.fetchall()
         for self.osobnik in self.osobnicy:
-            self.dane = (self.osobnik['id_os'], self.osobnik['nazwa'], self.osobnik['plec'])
+            self.dane = (self.osobnik[0], self.osobnik[1], self.osobnik[2])
             self.lista.append(self.dane)
+        print(self.lista)
         return self.lista
 
     def czytajrelacje(self):
@@ -252,8 +253,8 @@ jula = Baza()
 # jula.czytajrelacje()
 # jula.segregujPoPlci()
 # jula.relacjepoimionach()
-jula.nazwa_id('CARO')
+# jula.nazwa_id('CARO')
 # jula.id_nazwa(2)
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
-
+jula.czytajdane()

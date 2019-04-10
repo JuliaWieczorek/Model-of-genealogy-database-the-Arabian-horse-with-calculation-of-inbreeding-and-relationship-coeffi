@@ -1,12 +1,18 @@
 # -*- coding: cp1250 -*-
 import tkinter as tk
 # import baza
-# import sqlite3
+import sqlite3
 from tkinter import *
 from tkinter import Listbox
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
+import baza_danych
+
+conn = sqlite3.connect('baza.db')
+conn.row_factory = sqlite3.Row
+cur = conn.cursor()
+
 # from tkinter import Scrollbar
 class FRONTEND(object):
     Hodowcy = ['Cezary Bober', 'Julia Wieczorek', 'Mateusz Markowski', 'Alicja Dera']
@@ -382,7 +388,7 @@ class dodajOsobnika(object):
 
         # Tworzenie przyciskow
         self.btn1 = Button(self.F5, text="Dodaj nowego Osobnika", command=self.kliknij)
-        self.btn2 = Button(self.F8, text="Wyświetl liste osobników", command=self.show)
+        self.btn2 = Button(self.F8, text="Wyświetl liste osobników", command=self.show) # baza_danych.Baza.czytajdane(self.lista.insert(INSERT, baza_danych.Baza.czytajdane.dane))
         self.btn4 = Button(self.F10, text="Zamknij", command=self.dodaj.destroy)
 
         # Ulozenie przyciskow
@@ -400,10 +406,10 @@ class dodajOsobnika(object):
 
     def show(self):
         self.j = 0
-        if self.j < len(FRONTEND.Osobniki):
+        if self.j < len(FRONTEND.Osobniki): #baza_danych.Baza.czytajdane.lista
             for self.imie in FRONTEND.Osobniki:
                 self.res = self.imie + "\n"
-                self.lista.option_clear()  # działa ale nie tak jak ma
+                #self.lista.option_clear()  # działa ale nie tak jak ma
                 self.lista.insert(INSERT, self.res)
         self.j = +1
         return
