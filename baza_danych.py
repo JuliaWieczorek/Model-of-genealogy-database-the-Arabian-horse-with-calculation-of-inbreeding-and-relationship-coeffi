@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
-#import planarity
+import planarity
 
 # conn = sqlite3.connect('baza.db')
 # conn.row_factory = sqlite3.Row
@@ -19,21 +19,25 @@ class Baza(object):
         self.conn.row_factory = sqlite3.Row
         self.cur = self.conn.cursor()
 
-    def __del__(self):
-        self.conn.commit()
-        self.cur.close()
-        self.conn.close()
-
     def czytajdane(self):
         """Funkcja pobiera i wyświetla dane z bazy."""
+        self.conn = sqlite3.connect('baza.db')
+        self.conn.row_factory = sqlite3.Row
+        self.cur = self.conn.cursor()
         self.lista = []
         self.cur.execute(" SELECT id_os, nazwa, plec FROM OSOBNIKI ")
         self.osobnicy = self.cur.fetchall()
         for self.osobnik in self.osobnicy:
-            self.dane = (self.osobnik[0], self.osobnik[1], self.osobnik[2])
+            self.dane = (self.osobnik['id_os'], self.osobnik['nazwa'], self.osobnik['plec'])
             self.lista.append(self.dane)
-        print(self.lista)
+        self.conn.commit()
+        self.cur.close()
+        self.conn.close()
         return self.lista
+
+    def dane(self):
+        self.dane = self.czytajdane()
+        return self.dane
 
     def czytajrelacje(self):
         """ Funkcja pobiera i wyświetla dane z encji relacja """
@@ -257,4 +261,5 @@ jula = Baza()
 # jula.id_nazwa(2)
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
-jula.czytajdane()
+
+

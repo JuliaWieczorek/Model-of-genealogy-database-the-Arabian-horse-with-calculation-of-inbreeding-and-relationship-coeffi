@@ -8,10 +8,13 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
 from tkinter import Listbox
-#from tkinter import Scrollbar
+import baza_danych
 
-Hodowcy=['Cezary Bober', 'Julia Wieczorek', 'Mateusz Markowski', 'Alicja Dera']
-Osobniki=['KARO','FARO','DONIO','DEMO','HAPPY','SETO']
+#from tkinter import Scrollbar
+class Interfejs(object):
+    def __main__(self):
+        Hodowcy = baza_danych.Baza.czytajhodowcow(self)
+        Osobniki = baza_danych.Baza.czytajdane(self)
 # DEFINICJE
 ######################################################################################################################
 
