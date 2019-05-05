@@ -123,8 +123,13 @@ class dodajGatunek(object):
 
         self.wynik = scrolledtext.ScrolledText(self.F6, width=40, height=10)
         self.wynik.grid()
-        self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
-        self.lista.grid()
+        #self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
+        #self.lista.grid()
+
+        self.listatree = ttk.Treeview(self.F7, height=16, columns=('Indeks', 'Gatunek'))
+        self.listatree.grid()
+        self.listatree.heading('#0', text="Index")
+        self.listatree.heading('#1', text="Gatunek")
 
         ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
         # Tworzenie przyciskow
@@ -137,6 +142,25 @@ class dodajGatunek(object):
         self.btn2.grid()
         self.btn4.grid()
 
+
+    ###
+    def czytajgatunki(self):
+        """ Funkcja pobiera i wyœwietla dane z gatunki"""
+        self.conn = sqlite3.connect('baza.db')
+        self.conn.row_factory = sqlite3.Row
+        self.cur = self.conn.cursor()
+        self.cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
+        self.gatunek = self.cur.fetchall()
+        self.lista = []
+        for self.gat in self.gatunek:
+            gatu = (self.gat['id_gat'], self.gat['gatunek'])
+            self.lista.append(gatu)
+        self.conn.commit()
+        self.cur.close()
+        self.conn.close()
+        return self.lista
+    ###
+
     # Definicje przycisków
     def kliknij(self):
         self.dod = self.E1.get()
@@ -145,16 +169,24 @@ class dodajGatunek(object):
         self.wynik.insert(INSERT, self.res)
         return
 
+    #def show(self):
+     #   self.j = 0
+      #  if self.j < len(FRONTEND.Gatunki):
+       #     for self.imie in FRONTEND.Gatunki:
+        #        self.res = self.imie + "\n"
+         #       self.lista.option_clear()  # dzia³a ale nie tak jak ma
+          #      self.lista.insert(INSERT, self.res)
+        #self.j = +1
+        #return
+    ###
     def show(self):
         self.j = 0
-        if self.j < len(FRONTEND.Gatunki):
-            for self.imie in FRONTEND.Gatunki:
-                self.res = self.imie + "\n"
-                self.lista.option_clear()  # dzia³a ale nie tak jak ma
-                self.lista.insert(INSERT, self.res)
+        if self.j < len(self.czytajgatunki()):
+            for self.lista in self.czytajgatunki():
+                self.listatree.insert('', 0, text=self.lista[0], values=(self.lista[1]))
         self.j = +1
         return
-
+    ###
     def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
         self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
         if self.msg == 'yes':
@@ -658,8 +690,14 @@ class dodajHodowce(object):
 
         self.wynik = scrolledtext.ScrolledText(self.F6, width=40, height=10)
         self.wynik.grid()
-        self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
-        self.lista.grid()
+        #self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
+        #self.lista.grid()
+
+        self.listatree = ttk.Treeview(self.F7, height=16, columns=('Indeks', 'Imie', 'Nazwisko'))
+        self.listatree.grid()
+        self.listatree.heading('#0', text="Index")
+        self.listatree.heading('#1', text="Imie")
+        self.listatree.heading('#2', text="Nazwisko")
 
         ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
 
@@ -683,13 +721,27 @@ class dodajHodowce(object):
 
     def show(self):
         self.j = 0
-        if self.j < len(FRONTEND.Hodowcy):
-            for self.imie in FRONTEND.Hodowcy:
-                self.res = self.imie + "\n"
-                self.lista.option_clear()  # dzia³a ale nie tak jak ma
-                self.lista.insert(INSERT, self.res)
+        if self.j < len(self.czytajhodowcow()):
+            for self.lista in self.czytajhodowcow():
+                self.listatree.insert('', 0, text=self.lista[0], values=(self.lista[1], self.lista[2]))
         self.j = +1
         return
+
+    def czytajhodowcow(self):
+        """Funckja wczytuj¹ca wszystkich hodowców z bazy"""
+        self.conn = sqlite3.connect('baza.db')
+        self.conn.row_factory = sqlite3.Row
+        self.cur = self.conn.cursor()
+        self.cur.execute(" SELECT id_hod, imie, nazwisko FROM HODOWCY")
+        self.hodowca = self.cur.fetchall()
+        self.lista = []
+        for self.hod in self.hodowca:
+            hodor = (self.hod['id_hod'], self.hod['imie'], self.hod['nazwisko'])
+            self.lista.append(hodor)
+        self.conn.commit()
+        self.cur.close()
+        self.conn.close()
+        return self.lista
 
     def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
         self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")

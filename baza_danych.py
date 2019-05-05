@@ -49,6 +49,9 @@ class Baza(object):
 
     def czytajgatunki(self):
         """ Funkcja pobiera i wyświetla dane z gatunki"""
+        self.conn = sqlite3.connect('baza.db')
+        self.conn.row_factory = sqlite3.Row
+        self.cur = self.conn.cursor()
         self.cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
         self.gatunek = self.cur.fetchall()
         self.lista = []
@@ -56,18 +59,25 @@ class Baza(object):
             print(self.gat['id_gat'], self.gat['gatunek'])
             self.lista.append(self.gat['gatunek'])
             print(self.lista)
-        print()
+        self.conn.commit()
+        self.cur.close()
+        self.conn.close()
         return self.lista
 
     def czytajhodowcow(self):
         """Funckja wczytująca wszystkich hodowców z bazy"""
+        self.conn = sqlite3.connect('baza.db')
+        self.conn.row_factory = sqlite3.Row
+        self.cur = self.conn.cursor()
         self.cur.execute(" SELECT id_hod, imie, nazwisko FROM HODOWCY")
         self.hodowca = self.cur.fetchall()
         self.lista = []
         for self.hod in self.hodowca:
-            print(self.hod['id_hod'], self.hod['imie'], self.hod['nazwisko'])
-            self.lista.append(self.hod['id_hod'], self.hod['imie'], self.hod['nazwisko'])
-        print()
+            hodor = (self.hod['id_hod'], self.hod['imie'], self.hod['nazwisko'])
+            self.lista.append(hodor)
+        self.conn.commit()
+        self.cur.close()
+        self.conn.close()
         return self.lista
 
     def czytajosobniki_hodocy(self):
