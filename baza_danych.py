@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
-import planarity
+#import planarity
 
 # conn = sqlite3.connect('baza.db')
 # conn.row_factory = sqlite3.Row

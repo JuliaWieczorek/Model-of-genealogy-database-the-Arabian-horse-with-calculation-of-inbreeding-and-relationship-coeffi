@@ -9,7 +9,7 @@ from tkinter import Listbox
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
-# from tkinter import Scrollbar
+
 class FRONTEND(object):
     Hodowcy = ['Cezary Bober', 'Julia Wieczorek', 'Mateusz Markowski', 'Alicja Dera']
     Osobniki = ['KARO', 'FARO', 'DONIO', 'DEMO', 'HAPPY', 'SETO']
@@ -123,8 +123,6 @@ class dodajGatunek(object):
 
         self.wynik = scrolledtext.ScrolledText(self.F6, width=40, height=10)
         self.wynik.grid()
-        #self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
-        #self.lista.grid()
 
         self.listatree = ttk.Treeview(self.F7, height=16, columns=('Indeks', 'Gatunek'))
         self.listatree.grid()
