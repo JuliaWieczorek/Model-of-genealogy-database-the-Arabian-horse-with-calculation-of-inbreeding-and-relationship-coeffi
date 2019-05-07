@@ -29,13 +29,13 @@ def baseopen():  # To chyba dzia³a
 def baseclose(db):  # to nie dzia³a jeszcze
     db.close()
     print("widzisz to to dzia³a")
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    # ---------------------------------------------------------------------------------------------------------------------
-    # Gatunek
-    # Wygl¹d okna
-
+# ---------------------------------------------------------------------------------------------------------------------
+# Gatunek
+# Wygl¹d okna
 def dodajGatunek():
+
     dodaj = Tk()
     dodaj.geometry("700x400+0+0")
     dodaj.title("Dodaj Nowy Gatunek")
@@ -76,8 +76,6 @@ def dodajGatunek():
     listatree.heading('#0', text="Index")
     listatree.heading('#1', text="Gatunek")
 
-
-    ###
     def czytajgatunki():
         """ Funkcja pobiera i wyœwietla dane z gatunki"""
         conn = sqlite3.connect('baza.db')
@@ -94,9 +92,6 @@ def dodajGatunek():
         conn.close()
         return lista
 
-
-    ###
-
     # Definicje przycisków
     def kliknij():
         dod = E1.get()
@@ -104,18 +99,6 @@ def dodajGatunek():
         res = "Dodano gatunek: " + E1.get() + "\n"
         wynik.insert(INSERT, res)
         return
-
-        # def show(self):
-        #   self.j = 0
-        #  if self.j < len(FRONTEND.Gatunki):
-        #     for self.imie in FRONTEND.Gatunki:
-        #        self.res = self.imie + "\n"
-        #       self.lista.option_clear()  # dzia³a ale nie tak jak ma
-        #      self.lista.insert(INSERT, self.res)
-        # self.j = +1
-        # return
-        ###
-
 
     def show():
         j = 0
@@ -125,8 +108,6 @@ def dodajGatunek():
         j = +1
         return
 
-
-    ###
     def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
         msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
         if msg == 'yes':
@@ -145,11 +126,11 @@ def dodajGatunek():
     btn2.grid()
     btn4.grid()
 
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    # ---------------------------------------------------------------------------------------------------------------------
-    # edycja Gatunku
-    # Wygl¹d okna
+# ---------------------------------------------------------------------------------------------------------------------
+# edycja Gatunku
+# Wygl¹d okna
 def edytujGatunek():
     edycja = Tk()
     edycja.geometry("800x350+0+0")
