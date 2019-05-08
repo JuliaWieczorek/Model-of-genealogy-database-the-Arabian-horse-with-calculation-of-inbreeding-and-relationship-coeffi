@@ -322,25 +322,35 @@ def dodajOsobnika():
     F1.grid(column=0, row=1)
     F2 = Frame(dodaj, borderwidth=2, relief='ridge')
     F2.grid(column=1, row=1)
+    F11 = Frame(dodaj, borderwidth=2, relief='ridge')
+    F11.grid(column=0, row=2)
+    F12 = Frame(dodaj, borderwidth=2, relief='ridge')
+    F12.grid(column=1, row=2)
     F3 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F3.grid(column=0, row=2)
+    F3.grid(column=0, row=3)
     F4 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F4.grid(column=1, row=2)
+    F4.grid(column=1, row=3)
     F5 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F5.grid(column=0, row=3, columnspan=2)
+    F5.grid(column=0, row=4, columnspan=2)
     F6 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F6.grid(column=0, row=4, columnspan=2)
+    F6.grid(column=0, row=5, columnspan=2)
     F7 = Frame(dodaj, borderwidth=2, relief='ridge')
     F7.grid(column=2, row=1, rowspan=10)
     F8 = Frame(dodaj, borderwidth=2, relief='ridge')
     F8.grid(column=2, row=0)
     F10 = Frame(dodaj, borderwidth=2, relief='ridge')  # Zamknij
-    F10.grid(column=0, row=5)
+    F10.grid(column=0, row=6)
 
-    L1 = Label(F1, text="Nazwa Osobnika")
+    L1 = Label(F1, text="Nazwa Osobnika:")
     L1.grid()
     E1 = Entry(F2, bd=5)
     E1.grid()
+    L2 = Label(F11 , text="P³eæ:")
+    L2.grid()
+    E2 = Radiobutton(F12, text='Samiec', value=1)
+    E2.grid()
+    E3 = Radiobutton(F12, text='Samica', value=2)
+    E3.grid()
 
     # self.L2 = Label(self.F3, text="Nazwisko Hodowcy")
     # self.L2.grid()
@@ -356,17 +366,6 @@ def dodajOsobnika():
     listatree.heading('#2', text="P³eæ")
 
     ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
-
-    # Tworzenie przyciskow
-    btn1 = Button(F5, text="Dodaj nowego Osobnika", command=kliknij)
-    btn2 = Button(F8, text="Wyœwietl liste osobników", command=show)
-    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn4.grid()
-
 
     ###
     def czytajdane():
@@ -411,6 +410,16 @@ def dodajOsobnika():
             dodaj.destroy
         else:
             return
+
+    # Tworzenie przyciskow
+    btn1 = Button(F5, text="Dodaj nowego Osobnika", command=kliknij)
+    btn2 = Button(F8, text="Wyœwietl liste osobników", command=show)
+    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
+
+    # Ulozenie przyciskow
+    btn1.grid()
+    btn2.grid()
+    btn4.grid()
 
 
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -599,7 +608,6 @@ def usunOsobnika():
 ''' po³¹cz go z funkcjami spraw ¿eby listy siê czyœci³y przed kolejnym wyœwietleniem'''
 
 # Wygl¹d okna
-
 def dodajHodowce():
     dodaj = Tk()
     dodaj.geometry("700x400+0+0")
@@ -641,33 +649,21 @@ def dodajHodowce():
     # self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
     # self.lista.grid()
 
-    listatree = ttk.Treeview(F7, height=16, columns=('Indeks', 'Imie', 'Nazwisko'))
+    listatree = ttk.Treeview(F7, height=20, columns=('',''))
     listatree.grid()
     listatree.heading('#0', text="Index")
     listatree.heading('#1', text="Imie")
     listatree.heading('#2', text="Nazwisko")
 
     ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
-
-    # Tworzenie przyciskow
-    btn1 = Button(F5, text="Dodaj nowego Hodowce", command=kliknij)
-    btn2 = Button(F8, text="Wyœwietl spis hodowców", command=show)
-    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn4.grid()
-
-
     # Definicje przycisków
     def kliknij():
         dod = E1.get() + " " + E2.get()
-        Hodowcy.append(dod)
+        #Hodowcy.append(dod)
+
         res = "Dodano hodowce: " + E1.get() + " " + E2.get() + "\n"
         wynik.insert(INSERT, res)
         return
-
 
     def show():
         j = 0
@@ -676,7 +672,6 @@ def dodajHodowce():
                 listatree.insert('', 0, text=lista[0], values=(lista[1], lista[2]))
         j = +1
         return
-
 
     def czytajhodowcow():
         """Funckja wczytuj¹ca wszystkich hodowców z bazy"""
@@ -700,6 +695,16 @@ def dodajHodowce():
                 dodaj.destroy
             else:
                 return
+
+        # Tworzenie przyciskow
+        btn1 = Button(F5, text="Dodaj nowego Hodowce", command=kliknij)
+        btn2 = Button(F8, text="Wyœwietl spis hodowców", command=show)
+        btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
+
+        # Ulozenie przyciskow
+        btn1.grid()
+        btn2.grid()
+        btn4.grid()
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -760,14 +765,16 @@ def edytujHodowce():
     L5 = Label(F11, text="Nazwisko")
     L5.grid()
 
-    lista = Listbox(F3, width=40, height=16, selectmode=SINGLE)
-    for imie in Hodowcy:
-        lista.insert(END, imie)
-    lista.grid()
+    listatree = ttk.Treeview(F3, height=14, columns=('Indeks', 'Imie', 'Nazwisko'))
+    listatree.grid()
+    listatree.heading('#0', text="Index")
+    listatree.heading('#1', text="Imie")
+    listatree.heading('#2', text="Nazwisko")
+
 
     # znowu zmienione przez Juleczke- ta czesc byla pod def zamknij()
     # Tworzenie przyciskow
-    btn1 = Button(F4, text="Wybierz", command=wybierz)
+    btn1 = Button(F4, text="Wybierz", command=show)
     btn2 = Button(F5, text="Zapisz zmiane")
     btn3 = Button(F12, text="Odœwie¿")
     btn4 = Button(F13, text="Zamknij", command=edycja.destroy)
@@ -780,12 +787,35 @@ def edytujHodowce():
 
 
     # Definicje przycisków
+    def czytajhodowcow():
+        """Funckja wczytuj¹ca wszystkich hodowców z bazy"""
+        conn = sqlite3.connect('baza.db')
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute(" SELECT id_hod, imie, nazwisko FROM HODOWCY")
+        hodowca = cur.fetchall()
+        lista = []
+        for hod in hodowca:
+            hodor = (hod['id_hod'], hod['imie'], hod['nazwisko'])
+            lista.append(hodor)
+        conn.commit()
+        cur.close()
+        conn.close()
+        return lista
 
-    def wybierz():
+    def show():
+        j = 0
+        if j < len(czytajhodowcow()):
+            for lista in czytajhodowcow():
+                listatree.insert('', 0, text=lista[0], values=(lista[1], lista[2]))
+        j = +1
+        return
+
+    '''def wybierz():
         lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
         dane = Hodowcy[lista1].split()
         E1.insert(INSERT, dane[0])
-        E2.insert(INSERT, dane[1])
+        E2.insert(INSERT, dane[1])'''
 
 
     def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
