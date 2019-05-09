@@ -6,11 +6,11 @@ class Product:
 
     db_name = "baza.db"
 
-    def __init__(self, wind):
-        self.wind = wind
-        self.wind.title('GATUNKI')
+    def __init__(self, root):
+        self.root = root
+        self.root.title('GATUNKI')
 
-        frame = LabelFrame(self.wind, text = "Add new record")
+        frame = LabelFrame(self.root, text = "Add new record")
         frame.grid(row = 0, column = 0)
 
         Label(frame, text = "Name: ").grid(row = 1, column = 1)
@@ -105,28 +105,28 @@ class Product:
             return
         old_name = self.tree.item(self.tree.selection())['text']
 
-        self.edit_wind = Toplevel()
-        self.edit_wind.title('Editing')
+        self.edit_root = Toplevel()
+        self.edit_root.title('Editing')
 
-        Label(self.edit_wind, text = 'Old name:').grid(row = 0, column =1)
-        Entry(self.edit_wind, textvariable = StringVar(self.edit_wind, value = old_name), state = 'readonly').grid(row = 0, column = 2)
-        Label(self.edit_wind, text = 'New name:').grid(row = 1, column = 1)
-        new_name = Entry(self.edit_wind)
+        Label(self.edit_root, text = 'Old name:').grid(row = 0, column =1)
+        Entry(self.edit_root, textvariable = StringVar(self.edit_root, value = old_name), state = 'readonly').grid(row = 0, column = 2)
+        Label(self.edit_root, text = 'New name:').grid(row = 1, column = 1)
+        new_name = Entry(self.edit_root)
         new_name.grid(row = 1, column = 2)
 
-        Button(self.edit_wind, text = 'Save changes',
+        Button(self.edit_root, text = 'Save changes',
                command = lambda: self.edit_records(new_name.get(), old_name)).grid(row=4, column=2, sticky=W)
-        self.edit_wind.mainloop()
+        self.edit_root.mainloop()
 
     def edit_records(self, new_name, name):
         query = 'UPDATE gatunki SET gatunek = ? WHERE gatunek = ?'
         parameters = (new_name, name)
         self.run_query(query, parameters)
-        self.edit_wind.destroy()
+        self.edit_root.destroy()
         self.message['text'] = 'Record {} changed.'.format(name)
         self.viewing_record()
 
 if __name__ == '__main__':
-    wind = Tk()
-    application = Product(wind)
-    wind.mainloop()
+    root = Tk()
+    application = Product(root)
+    root.mainloop()

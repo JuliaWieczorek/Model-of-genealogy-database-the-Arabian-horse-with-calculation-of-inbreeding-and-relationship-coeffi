@@ -6,11 +6,11 @@ class Product:
 
     db_name = "baza.db"
 
-    def __init__(self, wind):
-        self.wind = wind
-        self.wind.title('OSOBNIKI')
+    def __init__(self, root):
+        self.root = root
+        self.root.title('OSOBNIKI')
 
-        frame = LabelFrame(self.wind, text = "Add new record")
+        frame = LabelFrame(self.root, text = "Add new record")
         frame.grid(row = 0, column = 1)
 
         Label(frame, text = "Name: ").grid(row = 1, column = 1)
@@ -157,49 +157,49 @@ class Product:
         old_lbreeder = self.tree.item(self.tree.selection())['values'][3]
 
 
-        self.edit_wind = Toplevel()
-        self.edit_wind.title('Editing')
+        self.edit_root = Toplevel()
+        self.edit_root.title('Editing')
 
-        Label(self.edit_wind, text = 'Old name:').grid(row = 0, column =1)
-        Entry(self.edit_wind, textvariable = StringVar(self.edit_wind, value = old_name), state = 'readonly').grid(row = 0, column = 2)
-        Label(self.edit_wind, text = 'New name:').grid(row = 1, column = 1)
-        new_name = Entry(self.edit_wind)
+        Label(self.edit_root, text = 'Old name:').grid(row = 0, column =1)
+        Entry(self.edit_root, textvariable = StringVar(self.edit_root, value = old_name), state = 'readonly').grid(row = 0, column = 2)
+        Label(self.edit_root, text = 'New name:').grid(row = 1, column = 1)
+        new_name = Entry(self.edit_root)
         new_name.grid(row = 1, column = 2)
 
-        Label(self.edit_wind, text='Old gender:').grid(row=2, column=1)
-        Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=old_gender), state='readonly').grid(row=2, column=2)
-        Label(self.edit_wind, text='New gender:').grid(row=3, column=1)
-        new_gender = Entry(self.edit_wind)
+        Label(self.edit_root, text='Old gender:').grid(row=2, column=1)
+        Entry(self.edit_root, textvariable=StringVar(self.edit_root, value=old_gender), state='readonly').grid(row=2, column=2)
+        Label(self.edit_root, text='New gender:').grid(row=3, column=1)
+        new_gender = Entry(self.edit_root)
         new_gender.grid(row=3, column=2)
 
-        Label(self.edit_wind, text='Old species:').grid(row=4, column=1)
-        Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=old_species), state='readonly').grid(row=4,
+        Label(self.edit_root, text='Old species:').grid(row=4, column=1)
+        Entry(self.edit_root, textvariable=StringVar(self.edit_root, value=old_species), state='readonly').grid(row=4,
                                                                                                                column=2)
-        Label(self.edit_wind, text='New species:').grid(row=5, column=1)
-        new_species = Entry(self.edit_wind)
+        Label(self.edit_root, text='New species:').grid(row=5, column=1)
+        new_species = Entry(self.edit_root)
         new_species.grid(row=5, column=2)
 
-        Label(self.edit_wind, text='Old first name breeder:').grid(row=6, column=1)
-        Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=old_fbreeder), state='readonly').grid(row=6,
+        Label(self.edit_root, text='Old first name breeder:').grid(row=6, column=1)
+        Entry(self.edit_root, textvariable=StringVar(self.edit_root, value=old_fbreeder), state='readonly').grid(row=6,
                                                                                                                column=2)
-        Label(self.edit_wind, text='New first name breeder:').grid(row=7, column=1)
-        new_fbreeder = Entry(self.edit_wind)
+        Label(self.edit_root, text='New first name breeder:').grid(row=7, column=1)
+        new_fbreeder = Entry(self.edit_root)
         new_fbreeder.grid(row=7, column=2)
 
-        Label(self.edit_wind, text='Old last name breeder:').grid(row=8, column=1)
-        Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=old_lbreeder), state='readonly').grid(row=8,
+        Label(self.edit_root, text='Old last name breeder:').grid(row=8, column=1)
+        Entry(self.edit_root, textvariable=StringVar(self.edit_root, value=old_lbreeder), state='readonly').grid(row=8,
                                                                                                                 column=2)
-        Label(self.edit_wind, text='New last name breeder:').grid(row=9, column=1)
-        new_lbreeder = Entry(self.edit_wind)
+        Label(self.edit_root, text='New last name breeder:').grid(row=9, column=1)
+        new_lbreeder = Entry(self.edit_root)
         new_lbreeder.grid(row=9, column=2)
 
-        Button(self.edit_wind, text = 'Save changes',
+        Button(self.edit_root, text = 'Save changes',
                command = lambda: self.edit_records(new_name.get(), old_name,
                                                    new_gender.get(), old_gender,
                                                    new_species.get(), old_species,
                                                    new_fbreeder.get(), old_fbreeder,
                                                    new_lbreeder.get(), old_lbreeder)).grid(row=10, column=2, sticky=W)
-        self.edit_wind.mainloop()
+        self.edit_root.mainloop()
 
     def edit_records(self, new_name, old_name, new_gender, old_gender, new_species, old_species, new_fbreeder, old_fbreeder, new_lbreeder, old_lbreeder):
         query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'
@@ -227,11 +227,11 @@ class Product:
         query = 'UPDATE osobniki SET nazwa = ?, plec = ?, id_gat = ?, id_hod =? WHERE nazwa = ? AND plec = ? AND id_gat = ? AND id_hod = ?'
         parameters = (new_name, new_gender, new_id_species, new_id_breeder, old_name, old_gender, old_id_species, old_id_breeder)
         self.run_query(query, parameters)
-        self.edit_wind.destroy()
+        self.edit_root.destroy()
         self.message['text'] = 'Record {} changed.'.format(old_name)
         self.viewing_record()
 
 if __name__ == '__main__':
-    wind = Tk()
-    application = Product(wind)
-    wind.mainloop()
+    root = Tk()
+    application = Product(root)
+    root.mainloop()
