@@ -356,19 +356,6 @@ def dodajOsobnika():
     listatree.heading('#2', text="P³eæ")
 
     ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
-
-    # Tworzenie przyciskow
-    btn1 = Button(F5, text="Dodaj nowego Osobnika", command=kliknij)
-    btn2 = Button(F8, text="Wyœwietl liste osobników", command=show)
-    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn4.grid()
-
-
-    ###
     def czytajdane():
         """Funkcja pobiera i wyœwietla dane z bazy."""
         conn = sqlite3.connect('baza.db')
@@ -411,6 +398,19 @@ def dodajOsobnika():
             dodaj.destroy
         else:
             return
+    # Tworzenie przyciskow
+    btn1 = Button(F5, text="Dodaj nowego Osobnika", command=kliknij)
+    btn2 = Button(F8, text="Wyœwietl liste osobników", command=show)
+    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
+
+    # Ulozenie przyciskow
+    btn1.grid()
+    btn2.grid()
+    btn4.grid()
+
+
+    ###
+
 
 
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -475,6 +475,19 @@ def edytujOsobnika():
     lista.grid()
 
     # znowu zmienione przez Juleczke- ta czesc byla pod def zamknij()
+    def wybierz():
+        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
+        dane = Osobniki[lista1].split()
+        E1.insert(INSERT, dane[0])
+        # self.E2.insert(INSERT, self.dane[1])
+
+
+    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
+        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if msg == 'yes':
+            edycja.destroy
+        else:
+            return
     # Tworzenie przyciskow
     btn1 = Button(F4, text="Wybierz", command=wybierz)
     btn2 = Button(F5, text="Zapisz zmiane")
@@ -490,19 +503,7 @@ def edytujOsobnika():
 
     # Definicje przycisków
 
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
-        dane = Osobniki[lista1].split()
-        E1.insert(INSERT, dane[0])
-        # self.E2.insert(INSERT, self.dane[1])
 
-
-    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
-        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
-        if msg == 'yes':
-            edycja.destroy
-        else:
-            return
 
 
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -555,6 +556,26 @@ def usunOsobnika():
     lista.grid()
 
     # zmienione przez Juleczke
+    # Definicje przycisków
+    def wybierz():
+        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
+        dane = Osobniki[lista1].split()
+
+    def usuwanie():
+        msg = messagebox.askquestion("Usuwanie", "Czy jesteœ pewny, ¿e chcesz usun¹æ tego hodowce?",
+                                     icon="warning")
+        if msg == 'yes':
+            print("To usunie hodowce")
+        else:
+            print("To wróci do wyboru hodowcy")
+            return
+
+    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
+        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if msg == 'yes':
+            usun.destroy()
+        else:
+            return
 
     # Tworzenie przyciskow
     btn1 = Button(F4, text="Wybierz")
@@ -569,28 +590,7 @@ def usunOsobnika():
     btn4.grid()
 
 
-    # Definicje przycisków
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
-        dane = Osobniki[lista1].split()
 
-
-    def usuwanie():
-        msg = messagebox.askquestion("Usuwanie", "Czy jesteœ pewny, ¿e chcesz usun¹æ tego hodowce?",
-                                     icon="warning")
-        if msg == 'yes':
-            print("To usunie hodowce")
-        else:
-            print("To wróci do wyboru hodowcy")
-            return
-
-
-    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
-        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
-        if msg == 'yes':
-            usun.destroy()
-        else:
-            return
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -601,6 +601,10 @@ def usunOsobnika():
 # Wygl¹d okna
 
 def dodajHodowce():
+
+    #zmienne
+    imie = StringVar()
+    nazwisko = StringVar()
     dodaj = Tk()
     dodaj.geometry("700x400+0+0")
     dodaj.title("Dodaj Nowego Hodowce")
@@ -630,6 +634,8 @@ def dodajHodowce():
     L1.grid()
     E1 = Entry(F2, bd=5)
     E1.grid()
+    txt_result = Label(F2)
+    txt_result.grid()
 
     L2 = Label(F3, text="Nazwisko Hodowcy")
     L2.grid()
@@ -648,26 +654,13 @@ def dodajHodowce():
     listatree.heading('#2', text="Nazwisko")
 
     ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
-
-    # Tworzenie przyciskow
-    btn1 = Button(F5, text="Dodaj nowego Hodowce", command=kliknij)
-    btn2 = Button(F8, text="Wyœwietl spis hodowców", command=show)
-    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn4.grid()
-
-
     # Definicje przycisków
-    def kliknij():
-        dod = E1.get() + " " + E2.get()
-        Hodowcy.append(dod)
-        res = "Dodano hodowce: " + E1.get() + " " + E2.get() + "\n"
-        wynik.insert(INSERT, res)
-        return
-
+    #def kliknij():
+    #    dod = E1.get() + " " + E2.get()
+    #    Hodowcy.append(dod)
+    #    res = "Dodano hodowce: " + E1.get() + " " + E2.get() + "\n"
+    #    wynik.insert(INSERT, res)
+    #    return
 
     def show():
         j = 0
@@ -676,7 +669,6 @@ def dodajHodowce():
                 listatree.insert('', 0, text=lista[0], values=(lista[1], lista[2]))
         j = +1
         return
-
 
     def czytajhodowcow():
         """Funckja wczytuj¹ca wszystkich hodowców z bazy"""
@@ -700,6 +692,42 @@ def dodajHodowce():
                 dodaj.destroy
             else:
                 return
+
+    def CreateBreeder():
+        if imie.get() == "" or nazwisko.get() == "" :
+            txt_result.config(text="Please complete the required field!", fg="red")
+        else:
+            #Database()
+            hod = czytajhodowcow()
+            id = len(hod)
+            conn = sqlite3.connect('baza.db')
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO HODOWCY (id_hod, imie, nazwisko) VALUES(?, ?, ?)",
+                (id+1, str(imie.get()), str(nazwisko.get())))
+            conn.commit()
+            #INDEX.set("")
+            imie.set("")
+            nazwisko.set("")
+            cur.close()
+            conn.close()
+            res = "Dodano hodowce: " + E1.get() + " " + E2.get() + "\n"
+            wynik.insert(INSERT, res)
+            txt_result.config(text="Created a data!", fg="green")
+
+    # Tworzenie przyciskow
+    btn1 = Button(F5, text="Dodaj nowego Hodowce", command=CreateBreeder())
+    btn2 = Button(F8, text="Wyœwietl spis hodowców", command=show)
+    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
+
+    # Ulozenie przyciskow
+    btn1.grid()
+    btn2.grid()
+    btn4.grid()
+
+
+
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -766,6 +794,20 @@ def edytujHodowce():
     lista.grid()
 
     # znowu zmienione przez Juleczke- ta czesc byla pod def zamknij()
+    # Definicje przycisków
+
+    def wybierz():
+        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
+        dane = Hodowcy[lista1].split()
+        E1.insert(INSERT, dane[0])
+        E2.insert(INSERT, dane[1])
+
+    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
+        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if msg == 'yes':
+            edycja.destroy
+        else:
+            return
     # Tworzenie przyciskow
     btn1 = Button(F4, text="Wybierz", command=wybierz)
     btn2 = Button(F5, text="Zapisz zmiane")
@@ -779,21 +821,7 @@ def edytujHodowce():
     btn4.grid()
 
 
-    # Definicje przycisków
 
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
-        dane = Hodowcy[lista1].split()
-        E1.insert(INSERT, dane[0])
-        E2.insert(INSERT, dane[1])
-
-
-    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
-        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
-        if msg == 'yes':
-            edycja.destroy
-        else:
-            return
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -846,6 +874,27 @@ def usunHodowce():
 
     # zmienione przez Juleczke
 
+    # Definicje przycisków
+    def wybierz():
+        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
+        dane = Hodowcy[lista1].split()
+
+    def usuwanie():
+        msg = messagebox.askquestion("Usuwanie", "Czy jesteœ pewny, ¿e chcesz usun¹æ tego hodowce?",
+                                     icon="warning")
+        if msg == 'yes':
+            print("To usunie hodowce")
+        else:
+            print("To wróci do wyboru hodowcy")
+            return
+
+    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
+        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if msg == 'yes':
+            usun.destroy()
+        else:
+            return
+
     # Tworzenie przyciskow
     btn1 = Button(F4, text="Wybierz")
     btn2 = Button(F5, text="Usuñ Hodowce", command=usuwanie)
@@ -859,28 +908,7 @@ def usunHodowce():
     btn4.grid()
 
 
-    # Definicje przycisków
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyœwietlanie argumentów z listboxa
-        dane = Hodowcy[lista1].split()
 
-
-    def usuwanie():
-        msg = messagebox.askquestion("Usuwanie", "Czy jesteœ pewny, ¿e chcesz usun¹æ tego hodowce?",
-                                     icon="warning")
-        if msg == 'yes':
-            print("To usunie hodowce")
-        else:
-            print("To wróci do wyboru hodowcy")
-            return
-
-
-    def zamknij():  # zmodyfikowaæ i dodaæ do przycisku
-        msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
-        if msg == 'yes':
-            usun.destroy()
-        else:
-            return
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
