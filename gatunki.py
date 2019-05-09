@@ -79,6 +79,18 @@ class Product:
 
         self.message['text'] = ''
         name = self.tree.item(self.tree.selection())['text']
+
+        query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'  # znalezienie id hodowcy
+        db_rows = self.run_query(query1, (name,))
+        for row in db_rows:
+            id = row
+
+        query2 = 'DELETE FROM OSOBNIKI_HODOWCY WHERE id_gat = ?'  # usunięcie hodowcy z relacji osobniki_hodowcy
+        self.run_query(query2, id)
+
+        query3 = 'DELETE FROM OSOBNIKI WHERE id_gat = ?'  # usunięcie hodowcy z relacji osobniki
+        self.run_query(query3, id)
+
         query = 'DELETE FROM gatunki WHERE gatunek = ?'
         self.run_query(query, (name, ))
         self.message['text'] = 'Record {} deleted.'.format(name)
