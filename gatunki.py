@@ -8,7 +8,7 @@ class Product:
 
     def __init__(self, wind):
         self.wind = wind
-        self.wind.title('GATUNKI')
+        #self.wind.title('GATUNKI')
 
         frame = LabelFrame(self.wind, text = "Add new record")
         frame.grid(row = 0, column = 0)

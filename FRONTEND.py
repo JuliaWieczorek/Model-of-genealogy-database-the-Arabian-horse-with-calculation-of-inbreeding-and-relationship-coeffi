@@ -24,6 +24,107 @@ class FRONTEND(object):
         self.root_label = tk.Label(self.root)
         self.root_label.grid()
 
+#++++++++++++++++++++++++++++++++TEST+++++++++++++++++++++++++++++++++++++++++++++++
+        self.zakladka=ttk.Notebook(self.root)
+        self.tab1 = Frame(self.zakladka)
+        self.tab2 = Frame(self.zakladka)
+        self.zakladka.add(self.tab1, text="Strona G³ówna")
+        self.zakladka.add(self.tab2, text="Archiwum")
+        self.tresc1 = Label(self.tab1)
+        self.tresc1.grid(row=0, column=0)
+        self.zakladka.grid()
+
+        self.F1 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F1.grid(column=0, row=1)
+        self.F2 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F2.grid(column=1, row=1)
+        self.F3 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F3.grid(column=0, row=2)
+        self.F4 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F4.grid(column=1, row=2)
+        self.F5 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F5.grid(column=0, row=3, columnspan=2)
+        self.F6 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F6.grid(column=0, row=4, columnspan=2)
+        self.F7 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F7.grid(column=2, row=1, rowspan=10)
+        self.F8 = Frame(self.tab1, borderwidth=2, relief='ridge')
+        self.F8.grid(column=2, row=0)
+        self.F10 = Frame(self.tab1, borderwidth=2, relief='ridge')  # Zamknij
+        self.F10.grid(column=0, row=5)
+
+        self.L1 = Label(self.F1, text="Nazwa Gatunku")
+        self.L1.grid()
+        self.E1 = Entry(self.F2, bd=5)
+        self.E1.grid()
+
+        self.wynik = scrolledtext.ScrolledText(self.F6, width=40, height=10)
+        self.wynik.grid()
+
+        self.listatree = ttk.Treeview(self.F7, height=16, columns=('Indeks', 'Gatunek'))
+        self.listatree.grid()
+        self.listatree.heading('#0', text="Index")
+        self.listatree.heading('#1', text="Gatunek")
+
+        ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
+        # Tworzenie przyciskow
+        self.btn1 = Button(self.F5, text="Dodaj nowy gatunek", command=self.kliknij)
+        self.btn2 = Button(self.F8, text="Wyœwietl liste gatunków", command=self.show)
+        self.btn4 = Button(self.F10, text="Zamknij", command=self.tab1.destroy)
+
+        # Ulozenie przyciskow
+        self.btn1.grid()
+        self.btn2.grid()
+        self.btn4.grid()
+
+        ###
+
+    def czytajgatunki(self):
+        """ Funkcja pobiera i wyœwietla dane z gatunki"""
+        self.conn = sqlite3.connect('baza.db')
+        self.conn.row_factory = sqlite3.Row
+        self.cur = self.conn.cursor()
+        self.cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
+        self.gatunek = self.cur.fetchall()
+        self.lista = []
+        for self.gat in self.gatunek:
+            gatu = (self.gat['id_gat'], self.gat['gatunek'])
+            self.lista.append(gatu)
+        self.conn.commit()
+        self.cur.close()
+        self.conn.close()
+        return self.lista
+        ###
+
+        # Definicje przycisków
+
+    def kliknij(self):
+        self.dod = self.E1.get()
+        FRONTEND.Gatunki.append(self.dod)
+        self.res = "Dodano gatunek: " + self.E1.get() + "\n"
+        self.wynik.insert(INSERT, self.res)
+        return
+
+    def show(self):
+        self.j = 0
+        if self.j < len(self.czytajgatunki()):
+            for self.lista in self.czytajgatunki():
+                self.listatree.insert('', 0, text=self.lista[0], values=(self.lista[1]))
+        self.j = +1
+        return
+
+    def zamknij(self):  # zmodyfikowaæ i dodaæ do przycisku
+        self.msg = messagebox.askquestion("Wyjœcie", "Czy jesteœ pewny, ¿e chcesz zamkn¹æ to okno?", icon="warning")
+        if self.msg == 'yes':
+            self.dodaj.destroy
+        else:
+            return
+
+
+
+#=========================================KONIEC_TESTU=================================
+
+
         # Menu
         self.menu = Menu(self.root)
         self.root.config(menu=self.menu)

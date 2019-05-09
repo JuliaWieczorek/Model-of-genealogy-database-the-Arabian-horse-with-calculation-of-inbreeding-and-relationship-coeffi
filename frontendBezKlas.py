@@ -1,6 +1,9 @@
 # -*- coding: cp1250 -*-
 import tkinter as tk
 import sqlite3
+import gatunki
+import hodowcy
+import osobniki
 from tkinter import *
 from tkinter import ttk
 from tkinter import Listbox
@@ -1037,7 +1040,7 @@ hodowca = Menu(menu)
 menu.add_cascade(label="Edycja", menu=edycja)
 
 edycja.add_cascade(label="Gatunek", menu=gatunek)
-gatunek.add_command(label="Dodaj nowy gatunek", command=dodajGatunek)
+gatunek.add_command(label="Dodaj nowy gatunek", command=gatunki)
 gatunek.add_command(label="Usuń istniejący gatunek", command=usunGatunek)
 gatunek.add_command(label="Edytuj istniejący gatunek", command=edytujGatunek)
 
@@ -1063,6 +1066,143 @@ oblicz.add_command(label="Współczynnik utraty przodków", command=utrata)
 tree = Menu(menu)
 menu.add_cascade(label="Drzewo", menu=tree)
 tree.add_command(label="Wyśwetl drzewo rodowodowe osobnika", command=Wtree)
+
+#=================================ZAKLADKI==========================================
+
+zakladki=ttk.Notebook(root)
+zakladki.grid()
+#---------------------------------------------------------------------------------------
+tab1= Frame(zakladki)
+zakladki.add(tab1, text="Gatunek")
+'''
+
+def run_query(query, parameters=()):
+    with sqlite3.connect(db_name) as conn:
+        cursor = conn.cursor()
+        query_result = cursor.execute(query, parameters)
+        conn.commit()
+    return query_result
+
+
+def viewing_record():
+    records = treeZak1.get_children()
+    for element in records:
+        treeZak1.delete(element)
+    query = 'SELECT gatunek FROM gatunki ORDER BY id_gat DESC'
+    db_rows = run_query(query)
+    for row in db_rows:
+        treeZak1.insert('', 0, text=row[0])
+
+
+def lenrecord():
+    query = 'SELECT * FROM gatunki ORDER BY id_gat DESC'
+    db_rows = run_query(query)
+    lista = []
+    for row in db_rows:
+        lista.append(row)
+    return len(lista)
+
+
+def validation():
+    return len(name.get()) != 0
+
+
+def adding():
+    if validation():
+        l = lenrecord()
+        query = 'INSERT INTO gatunki VALUES (?, ?)'
+        parameters = (l + 1, name.get())
+        run_query(query, parameters)
+        message['text'] = 'Record {} added'.format(name.get())
+        name.delete(0, END)
+    else:
+        message['text'] = 'name filed or gender field is empty'
+    viewing_record()
+
+
+def deleting():
+    message['text'] = ''
+    try:
+        treeZak1.item(treeZak1.selection())['text'][0]
+    except IndexError as e:
+        message['text'] = 'Please, select record!'
+        return
+
+    message['text'] = ''
+    name = treeZak1.item(treeZak1.selection())['text']
+    query = 'DELETE FROM gatunki WHERE gatunek = ?'
+    run_query(query, (name,))
+    message['text'] = 'Record {} deleted.'.format(name)
+    viewing_record()
+
+
+def editing():
+    message['text'] = ''
+    try:
+        treeZak1.item(treeZak1.selection())['text']
+    except IndexError as e:
+        message['text'] = 'Please, select record!'
+        return
+    old_name = treeZak1.item(treeZak1.selection())['text']
+
+    edit_wind = Toplevel()
+    edit_wind.title('Editing')
+
+    Label(edit_wind, text='Old name:').grid(row=0, column=1)
+    Entry(edit_wind, textvariable=StringVar(edit_wind, value=old_name), state='readonly').grid(row=0,
+                                                                                                         column=2)
+    Label(edit_wind, text='New name:').grid(row=1, column=1)
+    new_name = Entry(edit_wind)
+    new_name.grid(row=1, column=2)
+
+    Button(edit_wind, text='Save changes',
+           command=lambda: edit_records(new_name.get(), old_name)).grid(row=4, column=2, sticky=W)
+    edit_wind.mainloop()
+
+
+def edit_records(new_name, name):
+    query = 'UPDATE gatunki SET gatunek = ? WHERE gatunek = ?'
+    parameters = (new_name, name)
+    run_query(query, parameters)
+    edit_wind.destroy()
+    message['text'] = 'Record {} changed.'.format(name)
+    viewing_record()
+
+db_name = "baza.db"
+frame = LabelFrame(tab1, text = "Add new record")
+frame.grid(row = 0, column = 0)
+
+Label(frame, text = "Name: ").grid(row = 1, column = 1)
+name = Entry(frame)
+name.grid(row = 1, column = 2)
+
+ttk.Button(frame, text = 'Add record', command = adding).grid(row = 3, column = 2)
+message = Label(text = '', fg = 'red')
+message.grid(row = 3, column = 0, columnspan = 2)
+
+treeZak1 = ttk.Treeview(height = 10, columns ='')
+treeZak1.grid(row = 4, column = 0, columnspan = 2)
+treeZak1.heading('#0', text = 'Name', anchor = W)
+
+ttk.Button(text = 'Delete record', command = deleting).grid(row = 5, column = 0)
+ttk.Button(text = 'Edit record', command = editing).grid(row = 5, column = 1)
+
+viewing_record()
+
+'''
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#---------------------------------------------------------------------------------------
+tab2=Frame(zakladki)
+zakladki.add(tab2, text="Osobniki")
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#---------------------------------------------------------------------------------------
+tab3=Frame(zakladki)
+zakladki.add(tab3, text="Hodowcy")
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#=====================KONIEC_ZAKLADEK================================================================================
 
 root.mainloop()  # zamknięcie pętli
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
