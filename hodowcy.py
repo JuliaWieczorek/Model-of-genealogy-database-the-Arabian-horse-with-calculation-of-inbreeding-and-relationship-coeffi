@@ -10,29 +10,29 @@ class Product:
         self.wind = wind
         self.wind.title('HODOWCY')
 
-        frame = LabelFrame(self.wind, text = "Add new record")
+        frame = LabelFrame(self.wind, text = "Dodaj nowy rekord")
         frame.grid(row = 0, column = 1)
 
-        Label(frame, text = "First Name: ").grid(row = 1, column = 1)
+        Label(frame, text = "Imię: ").grid(row = 1, column = 1)
         self.fname = Entry(frame)
         self.fname.grid(row = 1, column = 2)
 
-        Label(frame, text = "Second Name: ").grid(row = 2, column = 1)
+        Label(frame, text = "Nazwisko: ").grid(row = 2, column = 1)
         self.sname = Entry(frame)
         self.sname.grid(row = 2, column = 2)
 
-        ttk.Button(frame, text = 'Add record', command = self.adding).grid(row = 3, column = 2)
+        ttk.Button(frame, text = 'Dodaj', command = self.adding).grid(row = 3, column = 2)
         self.message = Label(text = '', fg = 'red')
         self.message.grid(row = 3, column = 0)
 
         self.tree = ttk.Treeview(height = 10, columns =2)
         self.tree.grid(row = 4, column = 0, columnspan = 2)
         self.tree.grid(row = 4, column = 0, columnspan = 2)
-        self.tree.heading('#0', text = 'ID', anchor = W)
-        self.tree.heading(2, text = 'Name', anchor = W)
+        self.tree.heading('#0', text = 'Imię', anchor = W)
+        self.tree.heading(2, text = 'Nazwisko', anchor = W)
 
-        ttk.Button(text = 'Delete record', command = self.deleting).grid(row = 5, column = 0)
-        ttk.Button(text = 'Edit record', command = self.editing).grid(row = 5, column = 1)
+        ttk.Button(text = 'Usuń', command = self.deleting).grid(row = 5, column = 0)
+        ttk.Button(text = 'Edytuj', command = self.editing).grid(row = 5, column = 1)
 
         self.viewing_record()
 
@@ -69,11 +69,11 @@ class Product:
             query = 'INSERT INTO hodowcy VALUES (?, ?, ?)'
             parameters = (l+1, self.fname.get(), self.sname.get())
             self.run_query(query, parameters)
-            self.message['text'] = 'Record {} added'.format(self.fname.get())
+            self.message['text'] = 'Rekord {} został dodany'.format(self.fname.get())
             self.fname.delete(0, END)
             self.sname.delete(0, END)
         else:
-            self.message['text'] = 'name filed or gender field is empty'
+            self.message['text'] = 'Uzupełnij pola!'
         self.viewing_record()
 
     def deleting(self):
@@ -81,7 +81,7 @@ class Product:
         try:
             self.tree.item(self.tree.selection())['values'][0]
         except IndexError as e:
-            self.message['text'] = 'Please, select record!'
+            self.message['text'] = 'Proszę, wybierz rekord!'
             return
 
         self.message['text'] = ''
@@ -102,7 +102,7 @@ class Product:
         query = 'DELETE FROM hodowcy WHERE imie = ?'    #usuniecie hodowcy z relacji hodowcy
         self.run_query(query, (name, ))
 
-        self.message['text'] = 'Record {} deleted.'.format(name)
+        self.message['text'] = 'Rekord {} został usunięty.'.format(name)
         self.viewing_record()
 
     def editing(self):
@@ -110,27 +110,27 @@ class Product:
         try:
             self.tree.item(self.tree.selection())['values'][0]
         except IndexError as e:
-            self.message['text'] = 'Please, select record!'
+            self.message['text'] = 'Proszę, wybierz rekord!'
             return
         old_name = self.tree.item(self.tree.selection())['text']
         old_second_name = self.tree.item(self.tree.selection())['values'][0]
 
         self.edit_root = Toplevel()
-        self.edit_root.title('Editing')
+        self.edit_root.title('Edycja')
 
-        Label(self.edit_root, text = 'Old name:').grid(row = 0, column =1)
+        Label(self.edit_root, text = 'Stare imie:').grid(row = 0, column =1)
         Entry(self.edit_root, textvariable = StringVar(self.edit_root, value = old_name), state = 'readonly').grid(row = 0, column = 2)
-        Label(self.edit_root, text = 'New name:').grid(row = 1, column = 1)
+        Label(self.edit_root, text = 'Nowe imie:').grid(row = 1, column = 1)
         new_name = Entry(self.edit_root)
         new_name.grid(row = 1, column = 2)
 
-        Label(self.edit_root, text='Old second name:').grid(row=2, column=1)
+        Label(self.edit_root, text='Stare nazwisko:').grid(row=2, column=1)
         Entry(self.edit_root, textvariable=StringVar(self.edit_root, value=old_second_name), state='readonly').grid(row=2, column=2)
-        Label(self.edit_root, text='New second name:').grid(row=3, column=1)
+        Label(self.edit_root, text='Nowe nazwisko:').grid(row=3, column=1)
         new_second_name = Entry(self.edit_root)
         new_second_name.grid(row=3, column=2)
 
-        Button(self.edit_root, text = 'Save changes',
+        Button(self.edit_root, text = 'Zapisz zmiany',
                command = lambda: self.edit_records(new_name.get(), old_name, new_second_name.get(), old_second_name)).grid(row=4, column=2, sticky=W)
         self.edit_root.mainloop()
 
@@ -139,7 +139,7 @@ class Product:
         parameters = (new_name, new_second_name, name, old_second_name)
         self.run_query(query, parameters)
         self.edit_root.destroy()
-        self.message['text'] = 'Record {} changed.'.format(name)
+        self.message['text'] = 'Rekord {} został zedytowany.'.format(name)
         self.viewing_record()
 
 if __name__ == '__main__':
