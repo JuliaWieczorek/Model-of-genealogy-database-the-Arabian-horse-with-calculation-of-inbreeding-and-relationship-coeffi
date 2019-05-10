@@ -60,11 +60,20 @@ class Product:
     def adding(self):
         if self.validation():
             l = self.lenrecord()
-            query = 'INSERT INTO gatunki VALUES (?, ?)'
-            parameters = (l+1, self.name.get())
-            self.run_query(query, parameters)
-            self.message['text'] = 'Record {} added'.format(self.name.get())
-            self.name.delete(0, END)
+            name = self.name.get()
+            lista = []
+            query1 = 'SELECT gatunek FROM gatunki'
+            db_rows = self.run_query(query1)
+            for row in db_rows:
+                lista.append(row[0])
+            if name in lista:
+                self.message['text'] = 'name field is repeated'
+            else:
+                query = 'INSERT INTO gatunki VALUES (?, ?)'
+                parameters = (l+1, name)
+                self.run_query(query, parameters)
+                self.message['text'] = 'Record {} added'.format(self.name.get())
+                self.name.delete(0, END)
         else:
             self.message['text'] = 'name filed or gender field is empty'
         self.viewing_record()
@@ -84,9 +93,6 @@ class Product:
         db_rows = self.run_query(query1, (name,))
         for row in db_rows:
             id = row
-
-        query2 = 'DELETE FROM OSOBNIKI_HODOWCY WHERE id_gat = ?'  # usunięcie hodowcy z relacji osobniki_hodowcy
-        self.run_query(query2, id)
 
         query3 = 'DELETE FROM OSOBNIKI WHERE id_gat = ?'  # usunięcie hodowcy z relacji osobniki
         self.run_query(query3, id)

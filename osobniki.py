@@ -85,31 +85,42 @@ class Product:
 
     def adding(self):
         if self.validation():
+            lista = []
+            id1 = 0
             gatunek = self.species.get()
             query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'  # znalezienie id gatunku
             db_rows = self.run_query(query1, (gatunek,))
             for row1 in db_rows:
                 id1 = row1[0]
+                lista.append(id1)
 
-            imie = self.fbreeder.get()
-            nazwisko = self.lbreeder.get()
-            query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
-            parameters = (imie, nazwisko)
-            db_rows = self.run_query(query2, parameters)
-            for row2 in db_rows:
-                id2 = row2[0]
+            if id1 in lista:
+                imie = self.fbreeder.get()
+                nazwisko = self.lbreeder.get()
+                query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
+                parameters = (imie, nazwisko)
+                lista1 = []
+                id2 = 0
+                db_rows = self.run_query(query2, parameters)
+                for row2 in db_rows:
+                    id2 = row2[0]
+                    lista1.append(id2)
 
-            l = self.lenrecord()
-            query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
-            parameters = (l+1, self.name.get(), self.gender.get(), id1, id2)
-            self.run_query(query, parameters)
-            self.message['text'] = 'Record {} added'.format(self.name.get())
-            self.name.delete(0, END)
-            self.gender.delete(0, END)
-            self.species.delete(0, END)
-            self.fbreeder.delete(0, END)
-            self.lbreeder.delete(0, END)
-
+                if id2 in lista1:
+                    l = self.lenrecord()
+                    query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
+                    parameters = (l+1, self.name.get(), self.gender.get(), id1, id2)
+                    self.run_query(query, parameters)
+                    self.message['text'] = 'Record {} added'.format(self.name.get())
+                    self.name.delete(0, END)
+                    self.gender.delete(0, END)
+                    self.species.delete(0, END)
+                    self.fbreeder.delete(0, END)
+                    self.lbreeder.delete(0, END)
+                else:
+                    self.message['text'] = 'name breeder is failed'
+            else:
+                self.message['text'] = 'species filed is failed'
         else:
             self.message['text'] = 'name filed or gender field is empty'
         self.viewing_record()
