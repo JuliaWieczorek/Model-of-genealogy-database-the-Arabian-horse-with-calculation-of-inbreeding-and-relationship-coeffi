@@ -47,8 +47,8 @@ class Product:
 
 
 
-        ttk.Button(text = 'Delete record', command = self.deleting).grid(row = 8, column = 0)
-        ttk.Button(text = 'Edit record', command = self.editing).grid(row = 8, column = 1)
+        ttk.Button(text = 'Delete record', command = self.deleting).grid(row = 8, column = 0, columnspan = 2)
+        ttk.Button(text = 'Edit record', command = self.editing).grid(row = 8, column = 1, columnspan = 2)
 
         self.viewing_record()
 
@@ -85,33 +85,49 @@ class Product:
 
     def adding(self):
         if self.validation():
+            lista = []
+            id1 = 0
             gatunek = self.species.get()
             query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'  # znalezienie id gatunku
             db_rows = self.run_query(query1, (gatunek,))
             for row1 in db_rows:
                 id1 = row1[0]
+                lista.append(id1)
 
-            imie = self.fbreeder.get()
-            nazwisko = self.lbreeder.get()
-            query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
-            parameters = (imie, nazwisko)
-            db_rows = self.run_query(query2, parameters)
-            for row2 in db_rows:
-                id2 = row2[0]
 
-            l = self.lenrecord()
-            query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
-            parameters = (l+1, self.name.get(), self.gender.get(), id1, id2)
-            self.run_query(query, parameters)
-            self.message['text'] = 'Record {} added'.format(self.name.get())
-            self.name.delete(0, END)
-            self.gender.delete(0, END)
-            self.species.delete(0, END)
-            self.fbreeder.delete(0, END)
-            self.lbreeder.delete(0, END)
+            if id1 in lista:
 
+                imie = self.fbreeder.get()
+                nazwisko = self.lbreeder.get()
+                query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
+                parameters = (imie, nazwisko)
+                lista1 = []
+                id2 = 0
+                db_rows = self.run_query(query2, parameters)
+                for row2 in db_rows:
+                    id2 = row2[0]
+                    lista1.append(id2)
+
+                if id2 in lista1:
+
+                    l = self.lenrecord()
+                    query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
+                    parameters = (l+1, self.name.get(), self.gender.get(), id1, id2)
+                    self.run_query(query, parameters)
+                    self.message['text'] = 'Record {} added'.format(self.name.get())
+                    self.name.delete(0, END)
+                    self.gender.delete(0, END)
+                    self.species.delete(0, END)
+                    self.fbreeder.delete(0, END)
+                    self.lbreeder.delete(0, END)
+
+                else:
+                    self.message['text'] = 'Brak hodowcy w systemie'
+            else:
+                self.message['text'] = 'Brak gatunku w systemie'
         else:
-            self.message['text'] = 'name filed or gender field is empty'
+            self.message['text'] = 'Uzupełnij pola'
+
         self.viewing_record()
 
     def deleting(self):
@@ -119,7 +135,7 @@ class Product:
         try:
             self.tree.item(self.tree.selection())['values'][0]
         except IndexError as e:
-            self.message['text'] = 'Please, select record!'
+            self.message['text'] = 'Proszę, wybierz rekord!'
             return
 
         self.message['text'] = ''

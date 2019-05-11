@@ -13,11 +13,11 @@ class Product:
         frame = LabelFrame(self.wind, text = "Dodaj nowy rekord")
         frame.grid(row = 0, column = 1)
 
-        Label(frame, text = "Imię: ").grid(row = 1, column = 1)
+        Label(frame, text = "Imię: ").grid(row = 1, column = 0, columnspan = 2)
         self.fname = Entry(frame)
         self.fname.grid(row = 1, column = 2)
 
-        Label(frame, text = "Nazwisko: ").grid(row = 2, column = 1)
+        Label(frame, text = "Nazwisko: ").grid(row = 2, column = 0, columnspan = 2)
         self.sname = Entry(frame)
         self.sname.grid(row = 2, column = 2)
 

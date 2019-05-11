@@ -1,5 +1,7 @@
 # -*- coding: cp1250 -*-
 import tkinter as tk
+#import baza
+#import baza_danych
 import sqlite3
 import gatunki
 import hodowcy
@@ -11,10 +13,6 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
 
-# from tkinter import Scrollbar
-Hodowcy = ['Cezary Bober', 'Julia Wieczorek', 'Mateusz Markowski', 'Alicja Dera']
-Osobniki = ['KARO', 'FARO', 'DONIO', 'DEMO', 'HAPPY', 'SETO']
-Gatunki = ['Psy', 'Koty']
 # DEFINICJE
 ######################################################################################################################
 
@@ -35,891 +33,9 @@ def baseclose(db):  # to nie działa jeszcze
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Gatunek
-# Wygląd okna
-def dodajGatunek():
-
-    dodaj = Tk()
-    dodaj.geometry("700x400+0+0")
-    dodaj.title("Dodaj Nowy Gatunek")
-    dodaj_label = tk.Label(dodaj)
-    dodaj_label.grid()
-
-    F1 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F1.grid(column=0, row=1)
-    F2 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F2.grid(column=1, row=1)
-    F3 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F3.grid(column=0, row=2)
-    F4 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F4.grid(column=1, row=2)
-    F5 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F5.grid(column=0, row=3, columnspan=2)
-    F6 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F6.grid(column=0, row=4, columnspan=2)
-    F7 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F7.grid(column=2, row=1, rowspan=10)
-    F8 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F8.grid(column=2, row=0)
-    F10 = Frame(dodaj, borderwidth=2, relief='ridge')  # Zamknij
-    F10.grid(column=0, row=5)
-
-    L1 = Label(F1, text="Nazwa Gatunku")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-
-    wynik = scrolledtext.ScrolledText(F6, width=40, height=10)
-    wynik.grid()
-    # self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
-    # self.lista.grid()
-
-    listatree = ttk.Treeview(F7, height=16, columns=('Indeks', 'Gatunek'))
-    listatree.grid()
-    listatree.heading('#0', text="Index")
-    listatree.heading('#1', text="Gatunek")
-
-    def czytajgatunki():
-        """ Funkcja pobiera i wyświetla dane z gatunki"""
-        conn = sqlite3.connect('baza.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT id_gat, gatunek FROM GATUNKI")
-        gatunek = cur.fetchall()
-        lista = []
-        for gat in gatunek:
-            gatu = (gat['id_gat'], gat['gatunek'])
-            lista.append(gatu)
-        conn.commit()
-        cur.close()
-        conn.close()
-        return lista
-
-    # Definicje przycisków
-    def kliknij():
-        dod = E1.get()
-        Gatunki.append(dod)
-        res = "Dodano gatunek: " + E1.get() + "\n"
-        wynik.insert(INSERT, res)
-        return
-
-    def show():
-        j = 0
-        if j < len(czytajgatunki()):
-            for lista in czytajgatunki():
-                listatree.insert('', 0, text=lista[0], values=(lista[1]))
-        j = +1
-        return
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            dodaj.destroy
-        else:
-            return
-
-    ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
-    # Tworzenie przyciskow
-    btn1 = Button(F5, text="Dodaj nowy gatunek", command=kliknij)
-    btn2 = Button(F8, text="Wyświetl liste gatunków", command=show)
-    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn4.grid()
-
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ---------------------------------------------------------------------------------------------------------------------
-# edycja Gatunku
-# Wygląd okna
-def edytujGatunek():
-    edycja = Tk()
-    edycja.geometry("800x350+0+0")
-    edycja.title("Edycja Gatunku")
-    edycja_label = tk.Label(edycja)
-    edycja_label.grid()
-
-    F1 = Frame(edycja, borderwidth=2, relief='ridge')  # Nazwa Gatunku
-    F1.grid(column=0, row=0)
-    F2 = Frame(edycja, borderwidth=2, relief='ridge')  # Entry imie
-    F2.grid(column=4, row=2)
-    F3 = Frame(edycja, borderwidth=2, relief='ridge')  # Listbox
-    F3.grid(column=0, row=2)
-    F4 = Frame(edycja, borderwidth=2, relief='ridge')  # wybierz
-    F4.grid(column=2, row=2)
-    F5 = Frame(edycja, borderwidth=2, relief='ridge')  # Zapisz
-    F5.grid(column=7, row=2)
-    F6 = Frame(edycja, borderwidth=2)  # 2 strzałka
-    F6.grid(column=3, row=2)
-    F7 = Frame(edycja, borderwidth=2)  # 1 strzałka
-    F7.grid(column=1, row=2)
-    F8 = Frame(edycja, borderwidth=2)  # 3 strzałka
-    F8.grid(column=6, row=2)
-    F9 = Frame(edycja, borderwidth=2, relief='ridge')  # Entry nazwisko
-    F9.grid(column=5, row=2)
-    F10 = Frame(edycja, borderwidth=2)  # Nazwa Imie
-    F10.grid(column=4, row=1)
-    F11 = Frame(edycja, borderwidth=2)  # Nazwa Nazwisko
-    F11.grid(column=5, row=1)
-    F12 = Frame(edycja, borderwidth=2)  # Odśwież
-    F12.grid(column=0, row=1)
-    F13 = Frame(edycja, borderwidth=2, relief='ridge')  # Zamknij
-    F13.grid(column=0, row=3)
-
-    L1 = Label(F1, text="Gatunki")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-    E2 = Entry(F9, bd=5)
-    E2.grid()
-    L2 = Label(F6, text="--->")
-    L2.grid()
-    L3 = Label(F7, text="--->")
-    L3.grid()
-    L4 = Label(F8, text="--->")
-    L4.grid()
-    L5 = Label(F10, text="Nazwa")
-    L5.grid()
-    # self.L5 = Label(self.F11, text="Nazwisko")
-    # self.L5.grid()
-
-    lista = Listbox(F3, width=40, height=16, selectmode=SINGLE)
-    for imie in Gatunki:
-        lista.insert(END, imie)
-    lista.grid()
-
-    # Definicje przycisków
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyświetlanie argumentów z listboxa
-        dane = Gatunki[lista1]
-        E1.insert(INSERT, dane[0])
-        # self.E2.insert(INSERT, self.dane[1])
-
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            edycja.destroy
-        else:
-            return
-
-    # znowu zmienione przez Juleczke- ta czesc byla pod def zamknij()
-    # Tworzenie przyciskow
-    btn1 = Button(F4, text="Wybierz", command=wybierz)
-    btn2 = Button(F5, text="Zapisz zmiane")
-    btn3 = Button(F12, text="Odśwież")
-    btn4 = Button(F13, text="Zamknij", command=edycja.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn3.grid()
-    btn4.grid()
-
-
-
-
-
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    # Usuwanie gatunku
-    # Wygląd okna
-def usunGatunek():
-    usun = Tk()
-    usun.geometry("700x400+0+0")
-    usun.title("Usuwanie Gatunku")
-    usun_label = tk.Label(usun)
-    usun_label.grid()
-
-    F1 = Frame(usun, borderwidth=2, relief='ridge')  # Nazwa Hodowcy
-    F1.grid(column=0, row=0)
-    F9 = Frame(usun, borderwidth=2, relief="ridge")  # odśwież
-    F9.grid(column=0, row=1)
-    F2 = Frame(usun, borderwidth=2, relief='ridge')  # Entry imie
-    F2.grid(column=4, row=2)
-    F3 = Frame(usun, borderwidth=2, relief='ridge')  # Listbox
-    F3.grid(column=0, row=2)
-    F4 = Frame(usun, borderwidth=2, relief='ridge')  # wybierz
-    F4.grid(column=2, row=2)
-    F5 = Frame(usun, borderwidth=2, relief='ridge')  # Zapisz
-    F5.grid(column=7, row=2)
-    F6 = Frame(usun, borderwidth=2)  # 2 strzałka
-    F6.grid(column=3, row=2)
-    F7 = Frame(usun, borderwidth=2)  # 1 strzałka
-    F7.grid(column=1, row=2)
-    F8 = Frame(usun, borderwidth=2)  # 3 strzałka
-    F8.grid(column=6, row=2)
-    F10 = Frame(usun, borderwidth=2, relief='ridge')  # Zamknij
-    F10.grid(column=0, row=3)
-
-    L1 = Label(F1, text="Lista Gatunków")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-    L2 = Label(F6, text="--->")
-    L2.grid()
-    L3 = Label(F7, text="--->")
-    L3.grid()
-    L4 = Label(F8, text="--->")
-    L4.grid()
-
-    lista = Listbox(F3, width=40, height=16, selectmode=SINGLE)
-    for imie in Gatunki:
-        lista.insert(END, imie)
-    lista.grid()
-
-    # Definicje przycisków
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyświetlanie argumentów z listboxa
-        dane = Gatunki[lista1]
-
-
-    def usuwanie():
-        msg = messagebox.askquestion("Usuwanie", "Czy jesteś pewny, że chcesz usunąć tego hodowce?",
-                                     icon="warning")
-        if msg == 'yes':
-            print("To usunie hodowce")
-        else:
-            print("To wróci do wyboru hodowcy")
-            return
-
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            usun.destroy()
-        else:
-            return
-
-    # zmienione przez Juleczke
-    # Tworzenie przyciskow
-    btn1 = Button(F4, text="Wybierz")
-    btn2 = Button(F5, text="Usuń Gatunek", command=usuwanie)
-    btn3 = Button(F9, text="Odśwież")
-    btn4 = Button(F10, text="Zamknij", command=usun.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn3.grid()
-    btn4.grid()
-
-
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    # Dodawanie Osobnika
-    # Wygląd okna
-def dodajOsobnika():
-    dodaj = Tk()
-    dodaj.geometry("700x400+0+0")
-    dodaj.title("Dodaj Nowego Osobnika")
-    dodaj_label = tk.Label(dodaj)
-    dodaj_label.grid()
-
-    F1 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F1.grid(column=0, row=1)
-    F2 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F2.grid(column=1, row=1)
-    F11 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F11.grid(column=0, row=2)
-    F12 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F12.grid(column=1, row=2)
-    F3 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F3.grid(column=0, row=3)
-    F4 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F4.grid(column=1, row=3)
-    F5 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F5.grid(column=0, row=4, columnspan=2)
-    F6 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F6.grid(column=0, row=5, columnspan=2)
-    F7 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F7.grid(column=2, row=1, rowspan=10)
-    F8 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F8.grid(column=2, row=0)
-    F10 = Frame(dodaj, borderwidth=2, relief='ridge')  # Zamknij
-    F10.grid(column=0, row=6)
-
-    L1 = Label(F1, text="Nazwa Osobnika:")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-    L2 = Label(F11 , text="Płeć:")
-    L2.grid()
-    E2 = Radiobutton(F12, text='Samiec', value=1)
-    E2.grid()
-    E3 = Radiobutton(F12, text='Samica', value=2)
-    E3.grid()
-
-    # self.L2 = Label(self.F3, text="Nazwisko Hodowcy")
-    # self.L2.grid()
-    # self.E2 = Entry(self.F4, bd=5)
-    # self.E2.grid()
-
-    wynik = scrolledtext.ScrolledText(F6, width=40, height=10)
-    wynik.grid()
-    listatree = ttk.Treeview(F7, height=16, columns=('Indeks', 'Nazwa', 'plec'))
-    listatree.grid()
-    listatree.heading('#0', text="Index")
-    listatree.heading('#1', text="Nazwa")
-    listatree.heading('#2', text="Płeć")
-
-    ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
-
-    ###
-    def czytajdane():
-        """Funkcja pobiera i wyświetla dane z bazy."""
-        conn = sqlite3.connect('baza.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        lista = []
-        cur.execute(" SELECT id_os, nazwa, plec FROM OSOBNIKI ")
-        osobnicy = cur.fetchall()
-        for osobnik in osobnicy:
-            dane = (osobnik['id_os'], osobnik['nazwa'], osobnik['plec'])
-            lista.append(dane)
-        conn.commit()
-        cur.close()
-        conn.close()
-        return lista
-
-
-    ###
-    # Definicje przycisków
-    def kliknij():
-        dod = E1.get()
-        Osobniki.append(dod)
-        res = "Dodano Osobnika: " + E1.get() + "\n"
-        wynik.insert(INSERT, res)
-        return
-
-
-    def show():
-        j = 0
-        if j < len(czytajdane()):
-            for lista in czytajdane():
-                listatree.insert('', 0, text=lista[0], values=(lista[1], lista[2]))
-        j = +1
-        return
-
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            dodaj.destroy
-        else:
-            return
-
-    # Tworzenie przyciskow
-    btn1 = Button(F5, text="Dodaj nowego Osobnika", command=kliknij)
-    btn2 = Button(F8, text="Wyświetl liste osobników", command=show)
-    btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn4.grid()
-
-
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    # Edycja Osobnika
-    # Wygląd okna
-def edytujOsobnika():
-    edycja = Tk()
-    edycja.geometry("800x350+0+0")
-    edycja.title("Edycja Osobnika")
-    edycja_label = tk.Label(edycja)
-    edycja_label.grid()
-
-    F1 = Frame(edycja, borderwidth=2, relief='ridge')  # Nazwa Hodowcy
-    F1.grid(column=0, row=0)
-    F2 = Frame(edycja, borderwidth=2, relief='ridge')  # Entry imie
-    F2.grid(column=4, row=2)
-    F3 = Frame(edycja, borderwidth=2, relief='ridge')  # Listbox
-    F3.grid(column=0, row=2)
-    F4 = Frame(edycja, borderwidth=2, relief='ridge')  # wybierz
-    F4.grid(column=2, row=2)
-    F5 = Frame(edycja, borderwidth=2, relief='ridge')  # Zapisz
-    F5.grid(column=7, row=2)
-    F6 = Frame(edycja, borderwidth=2)  # 2 strzałka
-    F6.grid(column=3, row=2)
-    F7 = Frame(edycja, borderwidth=2)  # 1 strzałka
-    F7.grid(column=1, row=2)
-    F8 = Frame(edycja, borderwidth=2)  # 3 strzałka
-    F8.grid(column=6, row=2)
-    F9 = Frame(edycja, borderwidth=2, relief='ridge')  # Entry nazwisko
-    F9.grid(column=5, row=2)
-    F10 = Frame(edycja, borderwidth=2)  # Nazwa Imie
-    F10.grid(column=4, row=1)
-    F11 = Frame(edycja, borderwidth=2)  # Nazwa Nazwisko
-    F11.grid(column=5, row=1)
-    F12 = Frame(edycja, borderwidth=2)  # Odśwież
-    F12.grid(column=0, row=1)
-    F13 = Frame(edycja, borderwidth=2, relief='ridge')  # Zamknij
-    F13.grid(column=0, row=3)
-
-    L1 = Label(F1, text="Osobniki")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-    # self.E2 = Entry(self.F9, bd=5)
-    # self.E2.grid()
-    L2 = Label(F6, text="--->")
-    L2.grid()
-    L3 = Label(F7, text="--->")
-    L3.grid()
-    L4 = Label(F8, text="--->")
-    L4.grid()
-    L5 = Label(F10, text="Nazwa")
-    L5.grid()
-    # self.L5 = Label(self.F11, text="Nazwisko")
-    # self.L5.grid()
-
-    lista = Listbox(F3, width=40, height=16, selectmode=SINGLE)
-    for imie in Osobniki:
-        lista.insert(END, imie)
-    lista.grid()
-
-    # znowu zmienione przez Juleczke- ta czesc byla pod def zamknij()
-    # Tworzenie przyciskow
-    btn1 = Button(F4, text="Wybierz", command=wybierz)
-    btn2 = Button(F5, text="Zapisz zmiane")
-    btn3 = Button(F12, text="Odśwież")
-    btn4 = Button(F13, text="Zamknij", command=edycja.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn3.grid()
-    btn4.grid()
-
-
-    # Definicje przycisków
-
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyświetlanie argumentów z listboxa
-        dane = Osobniki[lista1].split()
-        E1.insert(INSERT, dane[0])
-        # self.E2.insert(INSERT, self.dane[1])
-
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            edycja.destroy
-        else:
-            return
-
-
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    # ---------------------------------------------------------------------------------------------------------------------
-    # Usuwanie Osobnika
-    # Wygląd okna
-def usunOsobnika():
-    usun = Tk()
-    usun.geometry("700x400+0+0")
-    usun.title("Usuwanie Osobnika")
-    usun_label = tk.Label(usun)
-    usun_label.grid()
-
-    F1 = Frame(usun, borderwidth=2, relief='ridge')  # Nazwa Hodowcy
-    F1.grid(column=0, row=0)
-    F9 = Frame(usun, borderwidth=2, relief="ridge")  # odśwież
-    F9.grid(column=0, row=1)
-    F2 = Frame(usun, borderwidth=2, relief='ridge')  # Entry imie
-    F2.grid(column=4, row=2)
-    F3 = Frame(usun, borderwidth=2, relief='ridge')  # Listbox
-    F3.grid(column=0, row=2)
-    F4 = Frame(usun, borderwidth=2, relief='ridge')  # wybierz
-    F4.grid(column=2, row=2)
-    F5 = Frame(usun, borderwidth=2, relief='ridge')  # Zapisz
-    F5.grid(column=7, row=2)
-    F6 = Frame(usun, borderwidth=2)  # 2 strzałka
-    F6.grid(column=3, row=2)
-    F7 = Frame(usun, borderwidth=2)  # 1 strzałka
-    F7.grid(column=1, row=2)
-    F8 = Frame(usun, borderwidth=2)  # 3 strzałka
-    F8.grid(column=6, row=2)
-    F10 = Frame(usun, borderwidth=2, relief='ridge')  # Zamknij
-    F10.grid(column=0, row=3)
-
-    L1 = Label(F1, text="Lista Osobników")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-    L2 = Label(F6, text="--->")
-    L2.grid()
-    L3 = Label(F7, text="--->")
-    L3.grid()
-    L4 = Label(F8, text="--->")
-    L4.grid()
-
-    lista = Listbox(F3, width=40, height=16, selectmode=SINGLE)
-    for imie in Osobniki:
-        lista.insert(END, imie)
-    lista.grid()
-
-    # zmienione przez Juleczke
-
-    # Tworzenie przyciskow
-    btn1 = Button(F4, text="Wybierz")
-    btn2 = Button(F5, text="Usuń Osobnika", command=usuwanie)
-    btn3 = Button(F9, text="Odśwież")
-    btn4 = Button(F10, text="Zamknij", command=usun.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn3.grid()
-    btn4.grid()
-
-
-    # Definicje przycisków
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyświetlanie argumentów z listboxa
-        dane = Osobniki[lista1].split()
-
-
-    def usuwanie():
-        msg = messagebox.askquestion("Usuwanie", "Czy jesteś pewny, że chcesz usunąć tego hodowce?",
-                                     icon="warning")
-        if msg == 'yes':
-            print("To usunie hodowce")
-        else:
-            print("To wróci do wyboru hodowcy")
-            return
-
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            usun.destroy()
-        else:
-            return
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Dodaj Nowego Hodowce
-# To do:
-''' połącz go z funkcjami spraw żeby listy się czyściły przed kolejnym wyświetleniem'''
-
-# Wygląd okna
-def dodajHodowce():
-    dodaj = Tk()
-    dodaj.geometry("700x400+0+0")
-    dodaj.title("Dodaj Nowego Hodowce")
-    dodaj_label = tk.Label(dodaj)
-    dodaj_label.grid()
-
-    F1 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F1.grid(column=0, row=1)
-    F2 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F2.grid(column=1, row=1)
-    F3 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F3.grid(column=0, row=2)
-    F4 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F4.grid(column=1, row=2)
-    F5 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F5.grid(column=0, row=3, columnspan=2)
-    F6 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F6.grid(column=0, row=4, columnspan=2)
-    F7 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F7.grid(column=2, row=1, rowspan=10)
-    F8 = Frame(dodaj, borderwidth=2, relief='ridge')
-    F8.grid(column=2, row=0)
-    F10 = Frame(dodaj, borderwidth=2, relief='ridge')  # Zamknij
-    F10.grid(column=0, row=5)
-
-    L1 = Label(F1, text="Imię Hodowcy")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-
-    L2 = Label(F3, text="Nazwisko Hodowcy")
-    L2.grid()
-    E2 = Entry(F4, bd=5)
-    E2.grid()
-
-    wynik = scrolledtext.ScrolledText(F6, width=40, height=10)
-    wynik.grid()
-    # self.lista = scrolledtext.ScrolledText(self.F7, width=40, height=16)
-    # self.lista.grid()
-
-    listatree = ttk.Treeview(F7, height=20, columns=('',''))
-    listatree.grid()
-    listatree.heading('#0', text="Index")
-    listatree.heading('#1', text="Imie")
-    listatree.heading('#2', text="Nazwisko")
-
-    ##zmienione przez Juleczke! wczesniej bylo pod def zamknij()
-    # Definicje przycisków
-    def kliknij():
-        dod = E1.get() + " " + E2.get()
-        #Hodowcy.append(dod)
-
-        res = "Dodano hodowce: " + E1.get() + " " + E2.get() + "\n"
-        wynik.insert(INSERT, res)
-        return
-
-    def show():
-        j = 0
-        if j < len(czytajhodowcow()):
-            for lista in czytajhodowcow():
-                listatree.insert('', 0, text=lista[0], values=(lista[1], lista[2]))
-        j = +1
-        return
-
-    def czytajhodowcow():
-        """Funckja wczytująca wszystkich hodowców z bazy"""
-        conn = sqlite3.connect('baza.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute(" SELECT id_hod, imie, nazwisko FROM HODOWCY")
-        hodowca = cur.fetchall()
-        lista = []
-        for hod in hodowca:
-            hodor = (hod['id_hod'], hod['imie'], hod['nazwisko'])
-            lista.append(hodor)
-        conn.commit()
-        cur.close()
-        conn.close()
-        return lista
-
-        def zamknij():  # zmodyfikować i dodać do przycisku
-            msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-            if msg == 'yes':
-                dodaj.destroy
-            else:
-                return
-
-        # Tworzenie przyciskow
-        btn1 = Button(F5, text="Dodaj nowego Hodowce", command=kliknij)
-        btn2 = Button(F8, text="Wyświetl spis hodowców", command=show)
-        btn4 = Button(F10, text="Zamknij", command=dodaj.destroy)
-
-        # Ulozenie przyciskow
-        btn1.grid()
-        btn2.grid()
-        btn4.grid()
-
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Edycja Hodowcy
-# To do:
-''' Pozmieniaj nazwy i dostosuj wygląd okna i połącz go z funkcjami'''
-# Wygląd okna
-
-def edytujHodowce():
-    edycja = Tk()
-    edycja.geometry("800x350+0+0")
-    edycja.title("Edycja Hodowcy")
-    edycja_label = tk.Label(edycja)
-    edycja_label.grid()
-
-    F1 = Frame(edycja, borderwidth=2, relief='ridge')  # Nazwa Hodowcy
-    F1.grid(column=0, row=0)
-    F2 = Frame(edycja, borderwidth=2, relief='ridge')  # Entry imie
-    F2.grid(column=4, row=2)
-    F3 = Frame(edycja, borderwidth=2, relief='ridge')  # Listbox
-    F3.grid(column=0, row=2)
-    F4 = Frame(edycja, borderwidth=2, relief='ridge')  # wybierz
-    F4.grid(column=2, row=2)
-    F5 = Frame(edycja, borderwidth=2, relief='ridge')  # Zapisz
-    F5.grid(column=7, row=2)
-    F6 = Frame(edycja, borderwidth=2)  # 2 strzałka
-    F6.grid(column=3, row=2)
-    F7 = Frame(edycja, borderwidth=2)  # 1 strzałka
-    F7.grid(column=1, row=2)
-    F8 = Frame(edycja, borderwidth=2)  # 3 strzałka
-    F8.grid(column=6, row=2)
-    F9 = Frame(edycja, borderwidth=2, relief='ridge')  # Entry nazwisko
-    F9.grid(column=5, row=2)
-    F10 = Frame(edycja, borderwidth=2)  # Nazwa Imie
-    F10.grid(column=4, row=1)
-    F11 = Frame(edycja, borderwidth=2)  # Nazwa Nazwisko
-    F11.grid(column=5, row=1)
-    F12 = Frame(edycja, borderwidth=2)  # Odśwież
-    F12.grid(column=0, row=1)
-    F13 = Frame(edycja, borderwidth=2, relief='ridge')  # Zamknij
-    F13.grid(column=0, row=3)
-
-    L1 = Label(F1, text="HODOWCY")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-    E2 = Entry(F9, bd=5)
-    E2.grid()
-    L2 = Label(F6, text="--->")
-    L2.grid()
-    L3 = Label(F7, text="--->")
-    L3.grid()
-    L4 = Label(F8, text="--->")
-    L4.grid()
-    L5 = Label(F10, text="Imie")
-    L5.grid()
-    L5 = Label(F11, text="Nazwisko")
-    L5.grid()
-
-    listatree = ttk.Treeview(F3, height=14, columns=('Indeks', 'Imie', 'Nazwisko'))
-    listatree.grid()
-    listatree.heading('#0', text="Index")
-    listatree.heading('#1', text="Imie")
-    listatree.heading('#2', text="Nazwisko")
-
-
-    # znowu zmienione przez Juleczke- ta czesc byla pod def zamknij()
-    # Tworzenie przyciskow
-    btn1 = Button(F4, text="Wybierz", command=show)
-    btn2 = Button(F5, text="Zapisz zmiane")
-    btn3 = Button(F12, text="Odśwież")
-    btn4 = Button(F13, text="Zamknij", command=edycja.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn3.grid()
-    btn4.grid()
-
-
-    # Definicje przycisków
-    def czytajhodowcow():
-        """Funckja wczytująca wszystkich hodowców z bazy"""
-        conn = sqlite3.connect('baza.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute(" SELECT id_hod, imie, nazwisko FROM HODOWCY")
-        hodowca = cur.fetchall()
-        lista = []
-        for hod in hodowca:
-            hodor = (hod['id_hod'], hod['imie'], hod['nazwisko'])
-            lista.append(hodor)
-        conn.commit()
-        cur.close()
-        conn.close()
-        return lista
-
-    def show():
-        j = 0
-        if j < len(czytajhodowcow()):
-            for lista in czytajhodowcow():
-                listatree.insert('', 0, text=lista[0], values=(lista[1], lista[2]))
-        j = +1
-        return
-
-    '''def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyświetlanie argumentów z listboxa
-        dane = Hodowcy[lista1].split()
-        E1.insert(INSERT, dane[0])
-        E2.insert(INSERT, dane[1])'''
-
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            edycja.destroy
-        else:
-            return
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Usuwanie Hodowcy
-# Wygląd okna
-
-def usunHodowce():
-    usun = Tk()
-    usun.geometry("700x400+0+0")
-    usun.title("Usuwanie Hodowcy")
-    usun_label = tk.Label(usun)
-    usun_label.grid()
-
-    F1 = Frame(usun, borderwidth=2, relief='ridge')  # Nazwa Hodowcy
-    F1.grid(column=0, row=0)
-    F9 = Frame(usun, borderwidth=2, relief="ridge")  # odśwież
-    F9.grid(column=0, row=1)
-    F2 = Frame(usun, borderwidth=2, relief='ridge')  # Entry imie
-    F2.grid(column=4, row=2)
-    F3 = Frame(usun, borderwidth=2, relief='ridge')  # Listbox
-    F3.grid(column=0, row=2)
-    F4 = Frame(usun, borderwidth=2, relief='ridge')  # wybierz
-    F4.grid(column=2, row=2)
-    F5 = Frame(usun, borderwidth=2, relief='ridge')  # Zapisz
-    F5.grid(column=7, row=2)
-    F6 = Frame(usun, borderwidth=2)  # 2 strzałka
-    F6.grid(column=3, row=2)
-    F7 = Frame(usun, borderwidth=2)  # 1 strzałka
-    F7.grid(column=1, row=2)
-    F8 = Frame(usun, borderwidth=2)  # 3 strzałka
-    F8.grid(column=6, row=2)
-    F10 = Frame(usun, borderwidth=2, relief='ridge')  # Zamknij
-    F10.grid(column=0, row=3)
-
-    L1 = Label(F1, text="Lista Hodowców")
-    L1.grid()
-    E1 = Entry(F2, bd=5)
-    E1.grid()
-    L2 = Label(F6, text="--->")
-    L2.grid()
-    L3 = Label(F7, text="--->")
-    L3.grid()
-    L4 = Label(F8, text="--->")
-    L4.grid()
-
-    lista = Listbox(F3, width=40, height=16, selectmode=SINGLE)
-    for imie in Hodowcy:
-        lista.insert(END, imie)
-    lista.grid()
-
-    # zmienione przez Juleczke
-
-    # Tworzenie przyciskow
-    btn1 = Button(F4, text="Wybierz")
-    btn2 = Button(F5, text="Usuń Hodowce", command=usuwanie)
-    btn3 = Button(F9, text="Odśwież")
-    btn4 = Button(F10, text="Zamknij", command=usun.destroy)
-
-    # Ulozenie przyciskow
-    btn1.grid()
-    btn2.grid()
-    btn3.grid()
-    btn4.grid()
-
-
-    # Definicje przycisków
-    def wybierz():
-        lista1 = int(lista.curselection()[0])  # wyświetlanie argumentów z listboxa
-        dane = Hodowcy[lista1].split()
-
-
-    def usuwanie():
-        msg = messagebox.askquestion("Usuwanie", "Czy jesteś pewny, że chcesz usunąć tego hodowce?",
-                                     icon="warning")
-        if msg == 'yes':
-            print("To usunie hodowce")
-        else:
-            print("To wróci do wyboru hodowcy")
-            return
-
-
-    def zamknij():  # zmodyfikować i dodać do przycisku
-        msg = messagebox.askquestion("Wyjście", "Czy jesteś pewny, że chcesz zamknąć to okno?", icon="warning")
-        if msg == 'yes':
-            usun.destroy()
-        else:
-            return
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ---------------------------------------------------------------------------------------------------------------------
 # Wyświetlanie drzewa
 # Widget
-
+'''
 def Wtree():
     tree = Tk()
     tree.geometry("700x400+0+0")
@@ -951,7 +67,7 @@ def Wtree():
     btn1 = Button(tree, text="Wyszukaj")
     # Ulozenie przyciskow
     btn1.grid(column=4, row=0)
-
+'''
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -973,9 +89,6 @@ def avgpokrewienstwo():
     L1.grid()
 
     lista = Listbox(F2, width=40, height=16, selectmode=SINGLE)
-    for nazwa in Osobniki:
-        lista.insert(END, nazwa)
-    lista.grid()
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1015,7 +128,7 @@ def utrata():
 #######################################################################################################################
 # okno root
 root = Tk()  # root widget - musi zostać stworzony przed innymi widgetami
-root.geometry("1400x500+0+0")
+root.geometry("1010x500+250+150")
 root.title("Pracownia Informatyczna")  # tytuł naszej tabeli root
 root_label = tk.Label(root)
 root_label.grid()
@@ -1032,28 +145,6 @@ filemenu.add_command(label="Zamknij baze", command=baseclose)
 filemenu.add_separator()
 filemenu.add_command(label="Zamknij program", command=root.destroy)
 
-# Edycja
-edycja = Menu(menu)
-gatunek = Menu(menu)
-osobnik = Menu(menu)
-hodowca = Menu(menu)
-menu.add_cascade(label="Edycja", menu=edycja)
-
-edycja.add_cascade(label="Gatunek", menu=gatunek)
-gatunek.add_command(label="Dodaj nowy gatunek", command=gatunki)
-gatunek.add_command(label="Usuń istniejący gatunek", command=usunGatunek)
-gatunek.add_command(label="Edytuj istniejący gatunek", command=edytujGatunek)
-
-edycja.add_cascade(label="Osobnik", menu=osobnik)
-osobnik.add_command(label="Dodaj nowego osobnika", command=dodajOsobnika)
-osobnik.add_command(label="Usuń istniejącego osobnika", command=usunOsobnika)
-osobnik.add_command(label="Edytuj istniejącego osobnika", command=edytujOsobnika)
-
-edycja.add_cascade(label="Hodowca", menu=hodowca)
-hodowca.add_command(label="Dodaj nowego hodowce", command=dodajHodowce)
-hodowca.add_command(label="Usuń istniejącego hodowce", command=usunHodowce)
-hodowca.add_command(label="Edytuj istniejącego hodowce", command=edytujHodowce)
-
 # Obliczenia
 oblicz = Menu(menu)
 menu.add_cascade(label="Współczynniki", menu=oblicz)
@@ -1063,146 +154,592 @@ oblicz.add_command(label="Współczynnik pokrewieństa", command=pokrewienstwo)
 oblicz.add_command(label="Współczynnik utraty przodków", command=utrata)
 
 # Wyświetlanie drzewa
-tree = Menu(menu)
-menu.add_cascade(label="Drzewo", menu=tree)
-tree.add_command(label="Wyśwetl drzewo rodowodowe osobnika", command=Wtree)
+#tree = Menu(menu)
+#menu.add_cascade(label="Drzewo", menu=tree)
+#tree.add_command(label="Wyśwetl drzewo rodowodowe osobnika", command=Wtree)
 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #=================================ZAKLADKI==========================================
+class RootApp(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self._frame = None
+        self.switch_frame(NoteBook)
 
-zakladki=ttk.Notebook(root)
-zakladki.grid()
-#---------------------------------------------------------------------------------------
-tab1= Frame(zakladki)
-zakladki.add(tab1, text="Gatunek")
-'''
+    def switch_frame(self, frame_class):
+        new_frame = frame_class(self)
+        if self._frame is not None:
+            self._frame.destroy()
+        self._frame = new_frame
+        self._frame.grid()
 
-def run_query(query, parameters=()):
-    with sqlite3.connect(db_name) as conn:
-        cursor = conn.cursor()
-        query_result = cursor.execute(query, parameters)
-        conn.commit()
-    return query_result
+class NoteBook(Frame):
+    def __init__(self, master):
+        Frame.__init__(self, master)
+        self.notebook = ttk.Notebook()
+        self.tab1 = Tab1(self.notebook)
+        self.tab2 = Tab2(self.notebook)
+        self.tab3 = Tab3(self.notebook)
+        self.notebook.add(self.tab1, text="Hodowcy")
+        self.notebook.add(self.tab2, text="Gatunki")
+        self.notebook.add(self.tab3, text="Osobniki")
+        self.notebook.grid()
+
+    def switch_tab1(self, frame_class):
+        new_frame = frame_class(self.notebook)
+        self.tab1.destroy()
+        self.tab1 = new_frame
+
+# Zakładka 1
+class Tab1(Frame):
+    db_name = "baza.db"
+
+    def __init__(self, master):
+        Frame.__init__(self, master)
+        self._frame = None
+        self.switch_frame(Hodowcy)
+
+    def switch_frame(self, frame_class):
+        new_frame = frame_class(self)
+        if self._frame is not None:
+            self._frame.destroy()
+        self._frame = new_frame
+        self._frame.grid()
+
+# Wygląd Zakładki 1
+class Hodowcy(Frame):
+    db_name = "baza.db"
+    def __init__(self, master):
+        Frame.__init__(self, master)
+
+        frame = LabelFrame(self.master, text="Dodaj Hodowce")
+        frame.grid(row=0, column=0, columnspan = 2)
+
+        Label(frame, text="Imię: ").grid(row=1, column=0, columnspan = 2)
+        self.fname = Entry(frame)
+        self.fname.grid(row=1, column=2)
+
+        Label(frame, text="Nazwisko: ").grid(row=2, column=1)
+        self.sname = Entry(frame)
+        self.sname.grid(row=2, column=2)
+
+        ttk.Button(frame, text='Dodaj Hodowce', command=self.adding).grid(row=3, column=2)
+        self.message = Label(text='', fg='red')
+        self.message.grid(row=3, column=0)
+
+        self.treeH = ttk.Treeview(master,height=10, columns=2)
+        self.treeH.grid(row=4, column=0, columnspan=2)
+        self.treeH.grid(row=4, column=0, columnspan=2)
+        self.treeH.heading('#0', text='ID', anchor=W)
+        self.treeH.heading(2, text='Imię', anchor=W)
+
+        ttk.Button(master, text='Usuń Hodowce', command=self.deleting).grid(row=5, column=0)
+        ttk.Button(master, text='Edytuj Hodowce', command=self.editing).grid(row=5, column=1)
+
+        self.viewing_record()
+
+    def run_query(self, query, parameters=()):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
+
+    def viewing_record(self):
+        records = self.treeH.get_children()
+        for element in records:
+            self.treeH.delete(element)
+        query = 'SELECT * FROM hodowcy ORDER BY id_hod DESC'
+        db_rows = self.run_query(query)
+        for row in db_rows:
+            self.treeH.insert('', 0, text=row[1], values=row[2])
+
+    def lenrecord(self):
+        query = 'SELECT * FROM hodowcy ORDER BY id_hod DESC'
+        db_rows = self.run_query(query)
+        lista = []
+        for row in db_rows:
+            lista.append(row)
+        return len(lista)
+
+    def validation(self):
+        return len(self.fname.get()) != 0 and len(self.sname.get()) != 0
+
+    def adding(self):
+        if self.validation():
+            l = self.lenrecord()
+            query = 'INSERT INTO hodowcy VALUES (?, ?, ?)'
+            parameters = (l + 1, self.fname.get(), self.sname.get())
+            self.run_query(query, parameters)
+            self.message['text'] = 'Record {} added'.format(self.fname.get())
+            self.fname.delete(0, END)
+            self.sname.delete(0, END)
+        else:
+            self.message['text'] = 'name filed or gender field is empty'
+        self.viewing_record()
+
+    def deleting(self):
+        self.message['text'] = ''
+        try:
+            self.treeH.item(self.treeH.selection())['values'][0]
+        except IndexError as e:
+            self.message['text'] = 'Please, select record!'
+            return
+
+        self.message['text'] = ''
+        name = self.treeH.item(self.treeH.selection())['text']
+
+        query1 = 'SELECT id_hod FROM hodowcy WHERE  imie = ?'  # znalezienie id hodowcy
+        db_rows = self.run_query(query1, (name,))
+        for row in db_rows:
+            id = row
+
+        query2 = 'DELETE FROM OSOBNIKI_HODOWCY WHERE id_hod = ?'  # usunięcie hodowcy z relacji osobniki_hodowcy
+        self.run_query(query2, id)
+
+        query3 = 'DELETE FROM OSOBNIKI WHERE id_hod = ?'  # usunięcie hodowcy z relacji osobniki
+        self.run_query(query3, id)
+
+        query = 'DELETE FROM hodowcy WHERE imie = ?'  # usuniecie hodowcy z relacji hodowcy
+        self.run_query(query, (name,))
+
+        self.message['text'] = 'Record {} deleted.'.format(name)
+        self.viewing_record()
+
+    def editing(self):
+        self.message['text'] = ''
+        try:
+            self.treeH.item(self.treeH.selection())['values'][0]
+        except IndexError as e:
+            self.message['text'] = 'Please, select record!'
+            return
+        old_name = self.treeH.item(self.treeH.selection())['text']
+        old_second_name = self.treeH.item(self.treeH.selection())['values'][0]
+
+        self.edit_master = Toplevel()
+        self.edit_master.title('Edytowanie')
+
+        Label(self.edit_master, text='Stare imię:').grid(row=0, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_name), state='readonly').grid(
+            row=0, column=2)
+        Label(self.edit_master, text='Nowe imię:').grid(row=1, column=1)
+        new_name = Entry(self.edit_master)
+        new_name.grid(row=1, column=2)
+
+        Label(self.edit_master, text='Stare nazwisko:').grid(row=2, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_second_name),
+              state='readonly').grid(row=2, column=2)
+        Label(self.edit_master, text='Nowe nazwisko:').grid(row=3, column=1)
+        new_second_name = Entry(self.edit_master)
+        new_second_name.grid(row=3, column=2)
+
+        Button(self.edit_master, text='Save changes',
+               command=lambda: self.edit_records(new_name.get(), old_name, new_second_name.get(),
+                                                 old_second_name)).grid(row=4, column=2, sticky=W)
+        self.edit_master.mainloop()
+
+    def edit_records(self, new_name, name, new_second_name, old_second_name):
+        query = 'UPDATE hodowcy SET imie = ?, nazwisko = ? WHERE imie = ? AND nazwisko = ?'
+        parameters = (new_name, new_second_name, name, old_second_name)
+        self.run_query(query, parameters)
+        self.edit_master.destroy()
+        self.message['text'] = 'Rekord {} zmieniony.'.format(name)
+        self.viewing_record()
 
 
-def viewing_record():
-    records = treeZak1.get_children()
-    for element in records:
-        treeZak1.delete(element)
-    query = 'SELECT gatunek FROM gatunki ORDER BY id_gat DESC'
-    db_rows = run_query(query)
-    for row in db_rows:
-        treeZak1.insert('', 0, text=row[0])
+# Zakładka 2
+class Tab2(Frame):
+    def __init__(self, master):
+        Frame.__init__(self, master)
+        self._frame = None
+        self.switch_frame(Gatunki)
+
+    def switch_frame(self, frame_class):
+        new_frame = frame_class(self)
+        if self._frame is not None:
+            self._frame.destroy()
+        self._frame = new_frame
+        self._frame.grid()
+
+# Wygląd zakładki 2
+class Gatunki(Frame):
+    db_name = "baza.db"
+    def __init__(self, master):
+        Frame.__init__(self, master)
+
+        frame = LabelFrame(self.master, text = "Dodaj Gatunek")
+        frame.grid(row = 0, column = 0, columnspan = 2)
+
+        Label(frame, text = "Nazwa: ").grid(row = 1, column = 1)
+        self.name = Entry(frame)
+        self.name.grid(row = 1, column = 2)
+
+        ttk.Button(frame, text = 'Dodaj Gatunek', command = self.adding).grid(row = 3, column = 2)
+        self.message = Label(text = '', fg = 'red')
+        self.message.grid(row = 3, column = 0, columnspan = 2)
+
+        self.treeG = ttk.Treeview(master,height = 10, columns ='')
+        self.treeG.grid(row = 4, column = 0, columnspan = 2)
+        self.treeG.heading('#0', text = 'Nazwa Gatunku', anchor = W)
+
+        ttk.Button(master, text = 'Usuń Gatunek', command = self.deleting).grid(row = 5, column = 0)
+        ttk.Button(master,text = 'Edytuj Gatunek', command = self.editing).grid(row = 5, column = 1, columnspan= 2)
+
+        self.viewing_record()
+
+    def run_query(self, query, parameters = ()):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
+
+    def viewing_record(self):
+        records = self.treeG.get_children()
+        for element in records:
+            self.treeG.delete(element)
+        query = 'SELECT gatunek FROM gatunki ORDER BY id_gat DESC'
+        db_rows = self.run_query(query)
+        for row in db_rows:
+            self.treeG.insert('', 0, text = row[0])
+
+    def lenrecord(self):
+        query = 'SELECT * FROM gatunki ORDER BY id_gat DESC'
+        db_rows = self.run_query(query)
+        lista = []
+        for row in db_rows:
+            lista.append(row)
+        return len(lista)
+
+    def validation(self):
+        return len(self.name.get()) != 0
+
+    def adding(self):
+        if self.validation():
+            l = self.lenrecord()
+            query = 'INSERT INTO gatunki VALUES (?, ?)'
+            parameters = (l+1, self.name.get())
+            self.run_query(query, parameters)
+            self.message['text'] = 'Gatunek {} został dodany'.format(self.name.get())
+            self.name.delete(0, END)
+        else:
+            self.message['text'] = 'Nazwa gatunku jest pusta!'
+        self.viewing_record()
+
+    def deleting(self):
+        self.message['text'] = ''
+        try:
+            self.treeG.item(self.treeG.selection())['text'][0]
+        except IndexError as e:
+            self.message['text'] = 'Proszę, wybierz rekord.'
+            return
+
+        self.message['text'] = ''
+        name = self.treeG.item(self.treeG.selection())['text']
+
+        query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'  # znalezienie id hodowcy
+        db_rows = self.run_query(query1, (name,))
+        for row in db_rows:
+            id = row
+
+        query2 = 'DELETE FROM OSOBNIKI_HODOWCY WHERE id_gat = ?'  # usunięcie hodowcy z relacji osobniki_hodowcy
+        self.run_query(query2, id)
+
+        query3 = 'DELETE FROM OSOBNIKI WHERE id_gat = ?'  # usunięcie hodowcy z relacji osobniki
+        self.run_query(query3, id)
+
+        query = 'DELETE FROM gatunki WHERE gatunek = ?'
+        self.run_query(query, (name, ))
+        self.message['text'] = 'Gatunek {} został usunięty.'.format(name)
+        self.viewing_record()
+
+    def editing(self):
+        self.message['text'] = ''
+        try:
+            self.treeG.item(self.treeG.selection())['text']
+        except IndexError as e:
+            self.message['text'] = 'Proszę, wybierz gatunek.'
+            return
+        old_name = self.treeG.item(self.treeG.selection())['text']
+
+        self.edit_master = Toplevel()
+        self.edit_master.title('Edytowanie')
+
+        Label(self.edit_master, text = 'Stara nazwa:').grid(row = 0, column =1)
+        Entry(self.edit_master, textvariable = StringVar(self.edit_master, value = old_name), state = 'readonly').grid(row = 0, column = 2)
+        Label(self.edit_master, text = 'Nowa nazwa:').grid(row = 1, column = 1)
+        new_name = Entry(self.edit_master)
+        new_name.grid(row = 1, column = 2)
+
+        Button(self.edit_master, text = 'Zmiana została zapisana',
+               command = lambda: self.edit_records(new_name.get(), old_name)).grid(row=4, column=2, sticky=W)
+        self.edit_master.mainloop()
+
+    def edit_records(self, new_name, name):
+        query = 'UPDATE gatunki SET gatunek = ? WHERE gatunek = ?'
+        parameters = (new_name, name)
+        self.run_query(query, parameters)
+        self.edit_master.destroy()
+        self.message['text'] = 'Nazwa gatunku {} została zmieniona.'.format(name)
+        self.viewing_record()
 
 
-def lenrecord():
-    query = 'SELECT * FROM gatunki ORDER BY id_gat DESC'
-    db_rows = run_query(query)
-    lista = []
-    for row in db_rows:
-        lista.append(row)
-    return len(lista)
+# Zakładka 3
+class Tab3(Frame):
+    def __init__(self, master):
+        Frame.__init__(self, master)
+        self._frame = None
+        self.switch_frame(Osobniki)
 
+    def switch_frame(self, frame_class):
+        new_frame = frame_class(self)
+        if self._frame is not None:
+            self._frame.destroy()
+        self._frame = new_frame
+        self._frame.grid()
 
-def validation():
-    return len(name.get()) != 0
+# Wygląd zakładki 3
+class Osobniki(Frame):
+    db_name = "baza.db"
 
+    def __init__(self, master):
+        Frame.__init__(self, master)
 
-def adding():
-    if validation():
-        l = lenrecord()
-        query = 'INSERT INTO gatunki VALUES (?, ?)'
-        parameters = (l + 1, name.get())
-        run_query(query, parameters)
-        message['text'] = 'Record {} added'.format(name.get())
-        name.delete(0, END)
-    else:
-        message['text'] = 'name filed or gender field is empty'
-    viewing_record()
+        frame = LabelFrame(self.master, text="Dodaj Osobnika")
+        frame.grid(row=0, column=1)
 
+        Label(frame, text="Nazwa: ").grid(row=1, column=1)
+        self.name = Entry(frame)
+        self.name.grid(row=1, column=2)
 
-def deleting():
-    message['text'] = ''
-    try:
-        treeZak1.item(treeZak1.selection())['text'][0]
-    except IndexError as e:
-        message['text'] = 'Please, select record!'
-        return
+        Label(frame, text="Płeć: ").grid(row=2, column=1)
+        self.gender = Entry(frame)
+        self.gender.grid(row=2, column=2)
 
-    message['text'] = ''
-    name = treeZak1.item(treeZak1.selection())['text']
-    query = 'DELETE FROM gatunki WHERE gatunek = ?'
-    run_query(query, (name,))
-    message['text'] = 'Record {} deleted.'.format(name)
-    viewing_record()
+        Label(frame, text="Gatunek: ").grid(row=3, column=1)
+        self.species = Entry(frame)
+        self.species.grid(row=3, column=2)
 
+        Label(frame, text="Imię Hodowcy: ").grid(row=4, column=1)
+        self.fbreeder = Entry(frame)
+        self.fbreeder.grid(row=4, column=2)
 
-def editing():
-    message['text'] = ''
-    try:
-        treeZak1.item(treeZak1.selection())['text']
-    except IndexError as e:
-        message['text'] = 'Please, select record!'
-        return
-    old_name = treeZak1.item(treeZak1.selection())['text']
+        Label(frame, text="Nazwisko Hodowcy: ").grid(row=5, column=1)
+        self.lbreeder = Entry(frame)
+        self.lbreeder.grid(row=5, column=2)
 
-    edit_wind = Toplevel()
-    edit_wind.title('Editing')
+        ttk.Button(frame, text='Dodaj nowego osobnika', command=self.adding).grid(row=6, column=1, columnspan = 2)
+        self.message = Label(text='', fg='red')
+        self.message.grid(row=6, column=0)
 
-    Label(edit_wind, text='Old name:').grid(row=0, column=1)
-    Entry(edit_wind, textvariable=StringVar(edit_wind, value=old_name), state='readonly').grid(row=0,
-                                                                                                         column=2)
-    Label(edit_wind, text='New name:').grid(row=1, column=1)
-    new_name = Entry(edit_wind)
-    new_name.grid(row=1, column=2)
+        self.treeO = ttk.Treeview(master, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
+        self.treeO.grid(row=7, column=0, columnspan=3)
+        self.treeO.heading('#0', text='Nazwa', anchor=W)
+        self.treeO.heading('#1', text='Płeć', anchor=W)
+        self.treeO.heading('#2', text='Gatunek', anchor=W)
+        self.treeO.heading('#3', text='Imię Hodowcy', anchor=W)
+        self.treeO.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
-    Button(edit_wind, text='Save changes',
-           command=lambda: edit_records(new_name.get(), old_name)).grid(row=4, column=2, sticky=W)
-    edit_wind.mainloop()
+        ttk.Button(master, text='Usuń osobnika z bazy', command=self.deleting).grid(row=8, column=0, columnspan = 2)
+        ttk.Button(master, text='Edytuj osobnika', command=self.editing).grid(row=8, column=1, columnspan = 2)
 
+        self.viewing_record()
 
-def edit_records(new_name, name):
-    query = 'UPDATE gatunki SET gatunek = ? WHERE gatunek = ?'
-    parameters = (new_name, name)
-    run_query(query, parameters)
-    edit_wind.destroy()
-    message['text'] = 'Record {} changed.'.format(name)
-    viewing_record()
+    def run_query(self, query, parameters=()):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
 
-db_name = "baza.db"
-frame = LabelFrame(tab1, text = "Add new record")
-frame.grid(row = 0, column = 0)
+    def viewing_record(self):
+        records = self.treeO.get_children()
+        for element in records:
+            self.treeO.delete(element)
+        query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
+         JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+         JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
 
-Label(frame, text = "Name: ").grid(row = 1, column = 1)
-name = Entry(frame)
-name.grid(row = 1, column = 2)
+         ORDER BY id_os DESC"""
+        db_rows = self.run_query(query)
+        for row in db_rows:
+            self.treeO.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
-ttk.Button(frame, text = 'Add record', command = adding).grid(row = 3, column = 2)
-message = Label(text = '', fg = 'red')
-message.grid(row = 3, column = 0, columnspan = 2)
+    def lenrecord(self):
+        query = 'SELECT * FROM osobniki ORDER BY id_os DESC'
+        db_rows = self.run_query(query)
+        lista = []
+        for row in db_rows:
+            lista.append(row)
+        return len(lista)
 
-treeZak1 = ttk.Treeview(height = 10, columns ='')
-treeZak1.grid(row = 4, column = 0, columnspan = 2)
-treeZak1.heading('#0', text = 'Name', anchor = W)
+    def validation(self):
+        return len(self.name.get()) != 0 and len(self.gender.get()) != 0 and len(self.species.get()) != 0 and len(
+            self.fbreeder.get()) != 0 and len(self.lbreeder.get()) != 0
 
-ttk.Button(text = 'Delete record', command = deleting).grid(row = 5, column = 0)
-ttk.Button(text = 'Edit record', command = editing).grid(row = 5, column = 1)
+    def adding(self):
+        if self.validation():
+            gatunek = self.species.get()
+            query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'  # znalezienie id gatunku
+            db_rows = self.run_query(query1, (gatunek,))
+            for row1 in db_rows:
+                id1 = row1[0]
 
-viewing_record()
+            imie = self.fbreeder.get()
+            nazwisko = self.lbreeder.get()
+            query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
+            parameters = (imie, nazwisko)
+            db_rows = self.run_query(query2, parameters)
+            for row2 in db_rows:
+                id2 = row2[0]
 
-'''
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            l = self.lenrecord()
+            query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
+            parameters = (l + 1, self.name.get(), self.gender.get(), id1, id2)
+            self.run_query(query, parameters)
+            self.message['text'] = 'Record {} added'.format(self.name.get())
+            self.name.delete(0, END)
+            self.gender.delete(0, END)
+            self.species.delete(0, END)
+            self.fbreeder.delete(0, END)
+            self.lbreeder.delete(0, END)
 
-#---------------------------------------------------------------------------------------
-tab2=Frame(zakladki)
-zakladki.add(tab2, text="Osobniki")
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        else:
+            self.message['text'] = 'name filed or gender field is empty'
+        self.viewing_record()
 
-#---------------------------------------------------------------------------------------
-tab3=Frame(zakladki)
-zakladki.add(tab3, text="Hodowcy")
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    def deleting(self):
+        self.message['text'] = ''
+        try:
+            self.treeO.item(self.treeO.selection())['values'][0]
+        except IndexError as e:
+            self.message['text'] = 'Please, select record!'
+            return
+
+        self.message['text'] = ''
+        name = self.treeO.item(self.treeO.selection())['text']
+
+        query1 = 'SELECT id_os FROM osobniki WHERE  nazwa = ?'  # znalezienie id hodowcy
+        db_rows = self.run_query(query1, (name,))
+        for row in db_rows:
+            id = row
+            id1 = row[0]
+
+        query2 = 'DELETE FROM OSOBNIKI_HODOWCY WHERE id_os = ?'  # usunięcie hodowcy z relacji osobniki_hodowcy
+        self.run_query(query2, id)
+
+        query3 = 'DELETE FROM relacje WHERE id_os1 = ? OR id_os2 = ?'  # usunięcie hodowcy z relacji osobniki_hodowcy
+        parameters = (id1, id1)
+        self.run_query(query3, parameters)
+
+        query = 'DELETE FROM osobniki WHERE nazwa = ?'
+        self.run_query(query, (name,))
+        self.message['text'] = 'Record {} deleted.'.format(name)
+        self.viewing_record()
+
+    def editing(self):
+        self.message['text'] = ''
+        try:
+            self.treeO.item(self.treeO.selection())['values'][0]
+        except IndexError as e:
+            self.message['text'] = 'Please, select record!'
+            return
+        old_name = self.treeO.item(self.treeO.selection())['text']
+        old_gender = self.treeO.item(self.treeO.selection())['values'][0]
+        old_species = self.treeO.item(self.treeO.selection())['values'][1]
+        old_fbreeder = self.treeO.item(self.treeO.selection())['values'][2]
+        old_lbreeder = self.treeO.item(self.treeO.selection())['values'][3]
+
+        self.edit_master = Toplevel()
+        self.edit_master.title('Editing')
+
+        Label(self.edit_master, text='Old name:').grid(row=0, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_name), state='readonly').grid(row=0,
+                                                                                                                 column=2)
+        Label(self.edit_master, text='New name:').grid(row=1, column=1)
+        new_name = Entry(self.edit_master)
+        new_name.grid(row=1, column=2)
+
+        Label(self.edit_master, text='Old gender:').grid(row=2, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_gender), state='readonly').grid(
+            row=2, column=2)
+        Label(self.edit_master, text='New gender:').grid(row=3, column=1)
+        new_gender = Entry(self.edit_master)
+        new_gender.grid(row=3, column=2)
+
+        Label(self.edit_master, text='Old species:').grid(row=4, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_species), state='readonly').grid(
+            row=4,
+            column=2)
+        Label(self.edit_master, text='New species:').grid(row=5, column=1)
+        new_species = Entry(self.edit_master)
+        new_species.grid(row=5, column=2)
+
+        Label(self.edit_master, text='Old first name breeder:').grid(row=6, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_fbreeder), state='readonly').grid(
+            row=6,
+            column=2)
+        Label(self.edit_master, text='New first name breeder:').grid(row=7, column=1)
+        new_fbreeder = Entry(self.edit_master)
+        new_fbreeder.grid(row=7, column=2)
+
+        Label(self.edit_master, text='Old last name breeder:').grid(row=8, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_lbreeder), state='readonly').grid(
+            row=8,
+            column=2)
+        Label(self.edit_master, text='New last name breeder:').grid(row=9, column=1)
+        new_lbreeder = Entry(self.edit_master)
+        new_lbreeder.grid(row=9, column=2)
+
+        Button(self.edit_master, text='Save changes',
+               command=lambda: self.edit_records(new_name.get(), old_name,
+                                                 new_gender.get(), old_gender,
+                                                 new_species.get(), old_species,
+                                                 new_fbreeder.get(), old_fbreeder,
+                                                 new_lbreeder.get(), old_lbreeder)).grid(row=10, column=2, sticky=W)
+        self.edit_master.mainloop()
+
+    def edit_records(self, new_name, old_name, new_gender, old_gender, new_species, old_species, new_fbreeder,
+                     old_fbreeder, new_lbreeder, old_lbreeder):
+        query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'
+        db_rows = self.run_query(query1, (old_species,))
+        for row in db_rows:
+            old_id_species = row[0]
+
+        query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'
+        db_rows = self.run_query(query1, (new_species,))
+        for row in db_rows:
+            new_id_species = row[0]
+
+        query1 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'
+        parameters = (old_fbreeder, old_lbreeder)
+        db_rows = self.run_query(query1, parameters)
+        for row in db_rows:
+            old_id_breeder = row[0]
+
+        query1 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'
+        parameters = (new_fbreeder, new_lbreeder)
+        db_rows = self.run_query(query1, parameters)
+        for row in db_rows:
+            new_id_breeder = row[0]
+
+        query = 'UPDATE osobniki SET nazwa = ?, plec = ?, id_gat = ?, id_hod =? WHERE nazwa = ? AND plec = ? AND id_gat = ? AND id_hod = ?'
+        parameters = (
+        new_name, new_gender, new_id_species, new_id_breeder, old_name, old_gender, old_id_species, old_id_breeder)
+        self.run_query(query, parameters)
+        self.edit_master.destroy()
+        self.message['text'] = 'Record {} changed.'.format(old_name)
+        self.viewing_record()
 
 #=====================KONIEC_ZAKLADEK================================================================================
 
-root.mainloop()  # zamknięcie pętli
+if __name__ == "__main__":
+    root = RootApp()
+    root.mainloop()
+
+#root.mainloop()  # zamknięcie pętli
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
