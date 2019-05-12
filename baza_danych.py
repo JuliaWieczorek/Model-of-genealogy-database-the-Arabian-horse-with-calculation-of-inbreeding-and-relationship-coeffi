@@ -264,7 +264,15 @@ class Baza(object):
 
     '''
 
+    def zapisywannieDoPliku(self, plik, tresc):
+        plik1 = open(plik, 'w')
+        plik1.write("tresc")
+        plik1.close()
 
+    def zapisywanieDoPlikuListy(self, plik, lista):
+        plik = open(plik, 'w')
+        plik.writelines(lista)
+        plik.close()
 
 jula = Baza()
 # jula.czytajrelacje()
@@ -274,6 +282,10 @@ jula = Baza()
 # jula.id_nazwa(2)
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
-jula.wsp()
+# jula.wsp()
+jula.zapisywannieDoPliku('wsp.txt', 'text')
+lista = ["bla ", "bla ", "yyy "]
+jula.zapisywanieDoPlikuListy('plik.txt', lista)
+
 
 
