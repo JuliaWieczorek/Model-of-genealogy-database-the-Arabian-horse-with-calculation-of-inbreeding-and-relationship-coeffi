@@ -33,65 +33,6 @@ def baseclose(db):  # to nie dzia³a jeszcze
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Wyœwietlanie drzewa
-# Widget
-'''
-def Wtree():
-    tree = Tk()
-    tree.geometry("700x400+0+0")
-    tree.title("Drzewo rodowodowe")
-    tree_label = Label(tree)
-    tree_label.grid()
-
-    F1 = Frame(tree, borderwidth=2, relief='ridge')
-    F1.grid(column=0, row=0)
-    F2 = Frame(tree, borderwidth=2, relief='ridge')
-    F2.grid(column=0, row=1)
-    F3 = Frame(tree, borderwidth=2, relief='ridge')
-    F3.grid(column=1, row=1)
-    F4 = Frame(tree, borderwidth=2, relief='ridge')
-    F4.grid(column=2, row=1)
-
-    L1 = Label(F1, text="Lista nazw osobników")
-    L1.grid()
-    L2 = Label(F3, text="Wybrano osobnika o nazwie:")
-    E1 = Entry(F4, bd=5)
-    E1.grid()
-
-    show = Listbox(F2, width=60, height=40, selectmode=SINGLE)
-    show.grid(column=1, row=0)
-
-    # Definicje przyciskow
-
-    # Tworzenie przyciskow
-    btn1 = Button(tree, text="Wyszukaj")
-    # Ulozenie przyciskow
-    btn1.grid(column=4, row=0)
-'''
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Œredni wspó³czynnik pokrewieñstwa
-# Widget
-def avgpokrewienstwo():
-    avg = Tk()
-    avg.geometry("700x400+0+0")
-    avg.title("Œredni wspólczynnik pokrewieñstwa")
-    avg_label = Label(avg)
-    avg_label.grid()
-
-    F1 = Frame(avg, borderwidth=2, relief='ridge')
-    F1.grid(column=0, row=0)
-    F2 = Frame(avg, borderwidth=2, relief='ridge')
-    F2.grid(column=0, row=1)
-
-    L1 = Label(F1, text="Lista Osobników")
-    L1.grid()
-
-    lista = Listbox(F2, width=40, height=16, selectmode=SINGLE)
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-# ---------------------------------------------------------------------------------------------------------------------
 # Wspó³czynnik imbredu
 # Widget
 def imbred():
@@ -107,10 +48,48 @@ def imbred():
 # Widget
 def pokrewienstwo():
     wspok = Tk()
-    wspok.geometry("700x400")
+    wspok.geometry("1500x600+0+0")
     wspok.title("Wspó³czynnik pokrewieñstwa")
     wspok_label = Label(wspok)
     wspok_label.grid()
+
+    F1 = Frame(wspok, borderwidth=2)
+    F1.grid(column=0, row=0, columnspan = 2)
+    F2 = Frame(wspok, borderwidth=2)
+    F2.grid(column=0, row=1, columnspan = 2)
+    F3 = Frame(wspok, borderwidth=2)
+    F3.grid(column=2, row=0, columnspan = 2)
+
+    L1 = Label(F1, text="Wybierz osobnika 1")
+    L1.grid(column = 0 , row = 0, columnspan = 3)
+    L2 = Label(F2, text="Wybierz osobnika 2")
+    L2.grid(column = 0 , row = 1, columnspan = 3)
+    L3 = Label(F3, text="Okienko Wynikowe")
+    L3.grid(column = 0 , row = 2)
+
+    treeO_wspok1 = ttk.Treeview(F1, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
+    treeO_wspok1.grid(row=7, column=0, columnspan=3)
+    treeO_wspok1.heading('#0', text='Nazwa', anchor=W)
+    treeO_wspok1.heading('#1', text='P³eæ', anchor=W)
+    treeO_wspok1.heading('#2', text='Gatunek', anchor=W)
+    treeO_wspok1.heading('#3', text='Imiê Hodowcy', anchor=W)
+    treeO_wspok1.heading('#4', text='Nazwisko Hodowcy', anchor=W)
+
+    treeO_wspok2 = ttk.Treeview(F2, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
+    treeO_wspok2.grid(row=7, column=0, columnspan=3)
+    treeO_wspok2.heading('#0', text='Nazwa', anchor=W)
+    treeO_wspok2.heading('#1', text='P³eæ', anchor=W)
+    treeO_wspok2.heading('#2', text='Gatunek', anchor=W)
+    treeO_wspok2.heading('#3', text='Imiê Hodowcy', anchor=W)
+    treeO_wspok2.heading('#4', text='Nazwisko Hodowcy', anchor=W)
+
+# okienko wyœwietlaj¹ce wynik
+    wynik_avg=Text(F3, width = 60, height = 12).grid()
+
+    # Przyciski
+    B1 = Button(F2, text='Oblicz œredni wspólczynnik pokrewieñstwa').grid(column = 0, row = 8, columnspan=3)
+    B2 = Button(F3, text='Zapisz wynik do pliku tekstowego').grid(column = 0, row = 4, columnspan=3)
+    B3 = Button(wspok, text='Zakoñcz').grid(column = 1, row = 10)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -139,8 +118,7 @@ root.config(menu=menu)
 filemenu = tk.Menu(menu)
 # Plik
 menu.add_cascade(label="Plik", menu=filemenu)
-filemenu.add_command(label="Otwórz", command=baseopen)
-filemenu.add_command(label="Edycja struktury")
+filemenu.add_command(label="Otwórz baze", command=baseopen)
 filemenu.add_command(label="Zamknij baze", command=baseclose)
 filemenu.add_separator()
 filemenu.add_command(label="Zamknij program", command=root.destroy)
@@ -148,15 +126,9 @@ filemenu.add_command(label="Zamknij program", command=root.destroy)
 # Obliczenia
 oblicz = Menu(menu)
 menu.add_cascade(label="Wspó³czynniki", menu=oblicz)
-oblicz.add_command(label="Œredni wspó³czynnik pokrewieñstwa", command=avgpokrewienstwo)
 oblicz.add_command(label="Wspó³czynnik inbredu", command=imbred)
 oblicz.add_command(label="Wspó³czynnik pokrewieñsta", command=pokrewienstwo)
 oblicz.add_command(label="Wspó³czynnik utraty przodków", command=utrata)
-
-# Wyœwietlanie drzewa
-#tree = Menu(menu)
-#menu.add_cascade(label="Drzewo", menu=tree)
-#tree.add_command(label="Wyœwetl drzewo rodowodowe osobnika", command=Wtree)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
