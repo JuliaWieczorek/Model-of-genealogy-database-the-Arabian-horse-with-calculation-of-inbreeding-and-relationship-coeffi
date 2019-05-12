@@ -1,7 +1,7 @@
 # -*- coding: cp1250 -*-
 import tkinter as tk
-#import baza
-#import baza_danych
+# import baza
+# import baza_danych
 import sqlite3
 import gatunki
 import hodowcy
@@ -12,6 +12,7 @@ from tkinter import Listbox
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
+
 
 # DEFINICJE
 ######################################################################################################################
@@ -30,6 +31,8 @@ def baseopen():  # To chyba działa
 def baseclose(db):  # to nie działa jeszcze
     db.close()
     print("widzisz to to działa")
+
+
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -41,6 +44,8 @@ def imbred():
     wsimb.title("Współczynnik imbredu")
     wsimb_label = Label(wsimb)
     wsimb_label.grid()
+
+
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -54,18 +59,18 @@ def pokrewienstwo():
     wspok_label.grid()
 
     F1 = Frame(wspok, borderwidth=2)
-    F1.grid(column=0, row=0, columnspan = 2)
+    F1.grid(column=0, row=0, columnspan=2)
     F2 = Frame(wspok, borderwidth=2)
-    F2.grid(column=0, row=1, columnspan = 2)
+    F2.grid(column=0, row=1, columnspan=2)
     F3 = Frame(wspok, borderwidth=2)
-    F3.grid(column=2, row=0, columnspan = 2)
+    F3.grid(column=2, row=0, columnspan=2)
 
     L1 = Label(F1, text="Wybierz osobnika 1")
-    L1.grid(column = 0 , row = 0, columnspan = 3)
+    L1.grid(column=0, row=0, columnspan=3)
     L2 = Label(F2, text="Wybierz osobnika 2")
-    L2.grid(column = 0 , row = 1, columnspan = 3)
+    L2.grid(column=0, row=1, columnspan=3)
     L3 = Label(F3, text="Okienko Wynikowe")
-    L3.grid(column = 0 , row = 2)
+    L3.grid(column=0, row=2)
 
     treeO_wspok1 = ttk.Treeview(F1, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
     treeO_wspok1.grid(row=7, column=0, columnspan=3)
@@ -83,13 +88,15 @@ def pokrewienstwo():
     treeO_wspok2.heading('#3', text='Imię Hodowcy', anchor=W)
     treeO_wspok2.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
-# okienko wyświetlające wynik
-    wynik_avg=Text(F3, width = 60, height = 12).grid()
+    # okienko wyświetlające wynik
+    wynik_avg = Text(F3, width=60, height=12).grid()
 
     # Przyciski
-    B1 = Button(F2, text='Oblicz średni wspólczynnik pokrewieństwa').grid(column = 0, row = 8, columnspan=3)
-    B2 = Button(F3, text='Zapisz wynik do pliku tekstowego').grid(column = 0, row = 4, columnspan=3)
-    B3 = Button(wspok, text='Zakończ').grid(column = 1, row = 10)
+    B1 = Button(F2, text='Oblicz średni wspólczynnik pokrewieństwa').grid(column=0, row=8, columnspan=3)
+    B2 = Button(F3, text='Zapisz wynik do pliku tekstowego').grid(column=0, row=4, columnspan=3)
+    B3 = Button(wspok, text='Zakończ').grid(column=1, row=10)
+
+
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -101,6 +108,8 @@ def utrata():
     wsutraty.title("Współczynnik utraty przodków")
     wsutraty_label = Label(wsutraty)
     wsutraty_label.grid()
+
+
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -130,12 +139,13 @@ oblicz.add_command(label="Współczynnik inbredu", command=imbred)
 oblicz.add_command(label="Współczynnik pokrewieństa", command=pokrewienstwo)
 oblicz.add_command(label="Współczynnik utraty przodków", command=utrata)
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#=================================ZAKLADKI==========================================
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# =================================ZAKLADKI==========================================
 class RootApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
@@ -148,6 +158,7 @@ class RootApp(tk.Tk):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.grid()
+
 
 class NoteBook(Frame):
     def __init__(self, master):
@@ -166,6 +177,7 @@ class NoteBook(Frame):
         self.tab1.destroy()
         self.tab1 = new_frame
 
+
 # Zakładka 1
 class Tab1(Frame):
     db_name = "baza.db"
@@ -182,16 +194,18 @@ class Tab1(Frame):
         self._frame = new_frame
         self._frame.grid()
 
+
 # Wygląd Zakładki 1
 class Hodowcy(Frame):
     db_name = "baza.db"
+
     def __init__(self, master):
         Frame.__init__(self, master)
 
         frame = LabelFrame(self.master, text="Dodaj Hodowce")
-        frame.grid(row=0, column=0, columnspan = 2)
+        frame.grid(row=0, column=0, columnspan=2)
 
-        Label(frame, text="Imię: ").grid(row=1, column=0, columnspan = 2)
+        Label(frame, text="Imię: ").grid(row=1, column=0, columnspan=2)
         self.fname = Entry(frame)
         self.fname.grid(row=1, column=2)
 
@@ -203,7 +217,7 @@ class Hodowcy(Frame):
         self.message = Label(text='', fg='red')
         self.message.grid(row=3, column=0)
 
-        self.treeH = ttk.Treeview(master,height=10, columns=2)
+        self.treeH = ttk.Treeview(master, height=10, columns=2)
         self.treeH.grid(row=4, column=0, columnspan=2)
         self.treeH.grid(row=4, column=0, columnspan=2)
         self.treeH.heading('#0', text='ID', anchor=W)
@@ -337,33 +351,35 @@ class Tab2(Frame):
         self._frame = new_frame
         self._frame.grid()
 
+
 # Wygląd zakładki 2
 class Gatunki(Frame):
     db_name = "baza.db"
+
     def __init__(self, master):
         Frame.__init__(self, master)
 
-        frame = LabelFrame(self.master, text = "Dodaj Gatunek")
-        frame.grid(row = 0, column = 0, columnspan = 2)
+        frame = LabelFrame(self.master, text="Dodaj Gatunek")
+        frame.grid(row=0, column=0, columnspan=2)
 
-        Label(frame, text = "Nazwa: ").grid(row = 1, column = 1)
+        Label(frame, text="Nazwa: ").grid(row=1, column=1)
         self.name = Entry(frame)
-        self.name.grid(row = 1, column = 2)
+        self.name.grid(row=1, column=2)
 
-        ttk.Button(frame, text = 'Dodaj Gatunek', command = self.adding).grid(row = 3, column = 2)
-        self.message = Label(text = '', fg = 'red')
-        self.message.grid(row = 3, column = 0, columnspan = 2)
+        ttk.Button(frame, text='Dodaj Gatunek', command=self.adding).grid(row=3, column=2)
+        self.message = Label(text='', fg='red')
+        self.message.grid(row=3, column=0, columnspan=2)
 
-        self.treeG = ttk.Treeview(master,height = 10, columns ='')
-        self.treeG.grid(row = 4, column = 0, columnspan = 2)
-        self.treeG.heading('#0', text = 'Nazwa Gatunku', anchor = W)
+        self.treeG = ttk.Treeview(master, height=10, columns='')
+        self.treeG.grid(row=4, column=0, columnspan=2)
+        self.treeG.heading('#0', text='Nazwa Gatunku', anchor=W)
 
-        ttk.Button(master, text = 'Usuń Gatunek', command = self.deleting).grid(row = 5, column = 0)
-        ttk.Button(master,text = 'Edytuj Gatunek', command = self.editing).grid(row = 5, column = 1, columnspan= 2)
+        ttk.Button(master, text='Usuń Gatunek', command=self.deleting).grid(row=5, column=0)
+        ttk.Button(master, text='Edytuj Gatunek', command=self.editing).grid(row=5, column=1, columnspan=2)
 
         self.viewing_record()
 
-    def run_query(self, query, parameters = ()):
+    def run_query(self, query, parameters=()):
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()
             query_result = cursor.execute(query, parameters)
@@ -377,7 +393,7 @@ class Gatunki(Frame):
         query = 'SELECT gatunek FROM gatunki ORDER BY id_gat DESC'
         db_rows = self.run_query(query)
         for row in db_rows:
-            self.treeG.insert('', 0, text = row[0])
+            self.treeG.insert('', 0, text=row[0])
 
     def lenrecord(self):
         query = 'SELECT * FROM gatunki ORDER BY id_gat DESC'
@@ -394,7 +410,7 @@ class Gatunki(Frame):
         if self.validation():
             l = self.lenrecord()
             query = 'INSERT INTO gatunki VALUES (?, ?)'
-            parameters = (l+1, self.name.get())
+            parameters = (l + 1, self.name.get())
             self.run_query(query, parameters)
             self.message['text'] = 'Gatunek {} został dodany'.format(self.name.get())
             self.name.delete(0, END)
@@ -436,7 +452,7 @@ class Gatunki(Frame):
         self.run_query(query3, id)
 
         query = 'DELETE FROM gatunki WHERE gatunek = ?'
-        self.run_query(query, (name, ))
+        self.run_query(query, (name,))
         self.message['text'] = 'Gatunek {} został usunięty.'.format(name)
         self.viewing_record()
 
@@ -452,14 +468,15 @@ class Gatunki(Frame):
         self.edit_master = Toplevel()
         self.edit_master.title('Edytowanie')
 
-        Label(self.edit_master, text = 'Stara nazwa:').grid(row = 0, column =1)
-        Entry(self.edit_master, textvariable = StringVar(self.edit_master, value = old_name), state = 'readonly').grid(row = 0, column = 2)
-        Label(self.edit_master, text = 'Nowa nazwa:').grid(row = 1, column = 1)
+        Label(self.edit_master, text='Stara nazwa:').grid(row=0, column=1)
+        Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_name), state='readonly').grid(row=0,
+                                                                                                            column=2)
+        Label(self.edit_master, text='Nowa nazwa:').grid(row=1, column=1)
         new_name = Entry(self.edit_master)
-        new_name.grid(row = 1, column = 2)
+        new_name.grid(row=1, column=2)
 
-        Button(self.edit_master, text = 'Zapisz',
-               command = lambda: self.edit_records(new_name.get(), old_name)).grid(row=4, column=2, sticky=W)
+        Button(self.edit_master, text='Zapisz',
+               command=lambda: self.edit_records(new_name.get(), old_name)).grid(row=4, column=2, sticky=W)
         self.edit_master.mainloop()
 
     def edit_records(self, new_name, name):
@@ -484,6 +501,7 @@ class Tab3(Frame):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.grid()
+
 
 # Wygląd zakładki 3
 class Osobniki(Frame):
@@ -515,7 +533,7 @@ class Osobniki(Frame):
         self.lbreeder = Entry(frame)
         self.lbreeder.grid(row=5, column=2)
 
-        ttk.Button(frame, text='Dodaj nowego osobnika', command=self.adding).grid(row=6, column=1, columnspan = 2)
+        ttk.Button(frame, text='Dodaj nowego osobnika', command=self.adding).grid(row=6, column=1, columnspan=2)
         self.message = Label(text='', fg='red')
         self.message.grid(row=6, column=0)
 
@@ -527,8 +545,8 @@ class Osobniki(Frame):
         self.treeO.heading('#3', text='Imię Hodowcy', anchor=W)
         self.treeO.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
-        ttk.Button(master, text='Usuń osobnika z bazy', command=self.deleting).grid(row=8, column=0, columnspan = 2)
-        ttk.Button(master, text='Edytuj osobnika', command=self.editing).grid(row=8, column=1, columnspan = 2)
+        ttk.Button(master, text='Usuń osobnika z bazy', command=self.deleting).grid(row=8, column=0, columnspan=2)
+        ttk.Button(master, text='Edytuj osobnika', command=self.editing).grid(row=8, column=1, columnspan=2)
 
         self.viewing_record()
 
@@ -654,7 +672,7 @@ class Osobniki(Frame):
 
         Label(self.edit_master, text='Stara nazwa:').grid(row=0, column=1)
         Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_name), state='readonly').grid(row=0,
-                                                                                                                 column=2)
+                                                                                                            column=2)
         Label(self.edit_master, text='Nowa nazwa:').grid(row=1, column=1)
         new_name = Entry(self.edit_master)
         new_name.grid(row=1, column=2)
@@ -724,17 +742,18 @@ class Osobniki(Frame):
 
         query = 'UPDATE osobniki SET nazwa = ?, plec = ?, id_gat = ?, id_hod =? WHERE nazwa = ? AND plec = ? AND id_gat = ? AND id_hod = ?'
         parameters = (
-        new_name, new_gender, new_id_species, new_id_breeder, old_name, old_gender, old_id_species, old_id_breeder)
+            new_name, new_gender, new_id_species, new_id_breeder, old_name, old_gender, old_id_species, old_id_breeder)
         self.run_query(query, parameters)
         self.edit_master.destroy()
         self.message['text'] = 'Rekord {} został zmieniony.'.format(old_name)
         self.viewing_record()
 
-#=====================KONIEC_ZAKLADEK================================================================================
+
+# =====================KONIEC_ZAKLADEK================================================================================
 
 if __name__ == "__main__":
     root = RootApp()
     root.mainloop()
 
-#root.mainloop()  # zamknięcie pętli
+# root.mainloop()  # zamknięcie pętli
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

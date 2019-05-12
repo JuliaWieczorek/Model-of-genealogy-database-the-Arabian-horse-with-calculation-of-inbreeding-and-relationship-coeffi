@@ -2,14 +2,11 @@
 
 import sqlite3
 import math
-import baza_danych
 
 class Oblicz(object):
-    conn = sqlite3.connect('baza.db')
-    # conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
+    db_name = "baza.db"
 
-    def __main__(self):
+    '''def __main__(self):
         self.menu()
         self.funkcje = {'1': self.all_osobniki, '2': self.find_child1, '3': self.find_parent1, '4': self.find_grand1,
                         '5': self.find_pra1, '6': self.wspolny_przodek1, '7': self.sciezka1, '8': self.tree1,
@@ -35,18 +32,47 @@ class Oblicz(object):
             print("::::wybrales funkcje {nazwa}::::\n {wynik}".format(nazwa=self.nazwaWybranejFkcji,
                                                                       wynik=self.wybranaFkcja()))
             self.menu()
-            self.op = input("Co wybierzesz?-> ")
+            self.op = input("Co wybierzesz?-> ")'''
+
+    def run_query(self, query, parameters=()):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
+
+    def id_nazwa(self, id):
+        """Funkcja zamieniaj¹ca id w nazwe osobnika"""
+        self.id = id
+        query = "SELECT nazwa FROM osobniki WHERE id_os=?"
+        db_rows = self.run_query(query, self.id)
+        for row in db_rows:
+            self.nazwa = row[0]
+        return self.nazwa
+
+    def nazwa_id(self, nazwa):
+        """Funkcja podaje id osobnika"""
+        self.nazwa = nazwa
+        query = "SELECT id_os FROM osobniki WHERE nazwa=?"
+        db_rows = self.run_query(query, (self.nazwa,))
+        for row in db_rows:
+            self.id = row[0]
+        return self.id
 
     def all_osobniki(self):
-        for self.all in baza_danych.Baza.cur.execute('SELECT nazwa FROM osobniki'):
+        query = 'SELECT * FROM osobniki ORDER BY id_hod DESC'
+        db_rows = self.run_query(query)
+        for self.all in db_rows:
             print(self.all)
 
     def find_child(self, nazwa):
         self.nazwa = nazwa
         self.list_of_child = []
-        self.nzw = baza_danych.Baza.nazwa_id(self, self.nazwa)
-        for self.row in baza_danych.Baza.cur.execute('SELECT id_os1 FROM RELACJE WHERE id_os2=?', (self.nzw,)):
-            self.child = baza_danych.Baza.id_nazwa(self, self.row)
+        self.nzw = self.nazwa_id(self.nazwa)
+        query = 'SELECT id_os1 FROM RELACJE WHERE id_os2=?'
+        db_rows = self.run_query(query, (self.nzw,))
+        for self.row in db_rows:
+            self.child = self.id_nazwa(self.row)
             self.list_of_child.append(self.child)
         print('Lista dzieci osobnika:', self.list_of_child)
         if len(self.list_of_child) > 0:
@@ -57,30 +83,33 @@ class Oblicz(object):
     def find_parent(self, nazwa):
         self.nazwa = nazwa
         self.list_of_parents = []
-        self.nazwa1 = baza_danych.Baza.nazwa_id(self, self.nazwa)
-        for self.row in baza_danych.Baza.cur.execute('SELECT id_os2 FROM relacje WHERE id_os1=?', (self.nazwa1,)):
-            self.parent = baza_danych.Baza.id_nazwa(self, self.row)
+        self.nazwa1 = self.nazwa_id(self.nazwa)
+        query = 'SELECT id_os2 FROM relacje WHERE id_os1=?'
+        db_rows = self.run_query(query, (self.nazwa1,))
+        for self.row in db_rows:
+            self.parent = self.id_nazwa(self.row)
             self.list_of_parents.append(self.parent)
         return self.list_of_parents
 
     def find_grand(self, nazwa):
         self.nazwa = nazwa
         self.lista = []
-        self.nazwa1 = baza_danych.Baza.nazwa_id(self, self.nazwa)
-        for self.row in baza_danych.Baza.cur.execute(
-                'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)',(self.nazwa1,)):
-            self.grand = baza_danych.Baza.id_nazwa(self, self.row)
+        self.nazwa1 = self.nazwa_id(self.nazwa)
+        query = 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)'
+        db_rows = self.run_query(query, (self.nazwa1,))
+        for self.row in db_rows:
+            self.grand = self.id_nazwa(self.row)
             self.lista.append(self.grand)
         return self.lista
 
     def find_pra(self, nazwa:str):
         self.nazwa = nazwa
         self.lista = []
-        self.nazwa1 = baza_danych.Baza.nazwa_id(self, self.nazwa)
-        for self.row in baza_danych.Baza.cur.execute(
-                'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?))',
-                [self.nazwa1]):
-            self.pra = baza_danych.Baza.id_nazwa(self, self.row)
+        self.nazwa1 = self.nazwa_id(self.nazwa)
+        query = 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?))'
+        db_rows = self.run_query(query, [self.nazwa1])
+        for self.row in db_rows:
+            self.pra = self.id_nazwa(self.row)
             self.lista.append(self.pra)
         return self.lista
 
@@ -1331,7 +1360,7 @@ class Oblicz(object):
         self.f = math.sqrt((1 + self.Fx) * (1 + self.Fy))
         self.F = (self.r / 2) * self.f
         return self.F
-
+    '''
     def blad(self):
         return 'Error menu'
 
@@ -1377,8 +1406,15 @@ class Oblicz(object):
               "8 - tree\n"
               "9 - wspó³czynnik inbredu\n"
               "10 - wspó³czynnik pokrewienstwa\n"
-              "11 - wspó³czynnik inbredu")
+              "11 - wspó³czynnik inbredu")'''
 
 
 jula = Oblicz()
-jula.__main__()
+#jula.__main__()
+#jula.all_osobniki()
+jula.find_child('KIRA')
+jula.find_parent('BRAVO')
+jula.find_grand('BRAVO')
+jula.find_pra('BRAVO')
+jula.inbred('KIRA')
+jula.inbred_pokr('KIRA')
