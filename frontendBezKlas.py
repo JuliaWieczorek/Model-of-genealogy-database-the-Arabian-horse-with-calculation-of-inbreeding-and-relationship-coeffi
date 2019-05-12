@@ -275,11 +275,11 @@ class Hodowcy(Frame):
             query = 'INSERT INTO hodowcy VALUES (?, ?, ?)'
             parameters = (l + 1, self.fname.get(), self.sname.get())
             self.run_query(query, parameters)
-            self.message['text'] = 'Record {} added'.format(self.fname.get())
+            self.message['text'] = 'Rekord {} zosta³ dodany'.format(self.fname.get())
             self.fname.delete(0, END)
             self.sname.delete(0, END)
         else:
-            self.message['text'] = 'name filed or gender field is empty'
+            self.message['text'] = 'Uzupe³nij wszystkie pola!'
         self.viewing_record()
 
     def deleting(self):
@@ -287,7 +287,7 @@ class Hodowcy(Frame):
         try:
             self.treeH.item(self.treeH.selection())['values'][0]
         except IndexError as e:
-            self.message['text'] = 'Please, select record!'
+            self.message['text'] = 'Proszê, wybierz rekod!'
             return
 
         self.message['text'] = ''
@@ -307,7 +307,7 @@ class Hodowcy(Frame):
         query = 'DELETE FROM hodowcy WHERE imie = ?'  # usuniecie hodowcy z relacji hodowcy
         self.run_query(query, (name,))
 
-        self.message['text'] = 'Record {} deleted.'.format(name)
+        self.message['text'] = 'Rekord {} zosta³ usuniêty.'.format(name)
         self.viewing_record()
 
     def editing(self):
@@ -315,13 +315,13 @@ class Hodowcy(Frame):
         try:
             self.treeH.item(self.treeH.selection())['values'][0]
         except IndexError as e:
-            self.message['text'] = 'Please, select record!'
+            self.message['text'] = 'Proszê, wybierz rekord!'
             return
         old_name = self.treeH.item(self.treeH.selection())['text']
         old_second_name = self.treeH.item(self.treeH.selection())['values'][0]
 
         self.edit_master = Toplevel()
-        self.edit_master.title('Edytowanie')
+        self.edit_master.title('Edycja')
 
         Label(self.edit_master, text='Stare imiê:').grid(row=0, column=1)
         Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_name), state='readonly').grid(
@@ -337,7 +337,7 @@ class Hodowcy(Frame):
         new_second_name = Entry(self.edit_master)
         new_second_name.grid(row=3, column=2)
 
-        Button(self.edit_master, text='Save changes',
+        Button(self.edit_master, text='Zapisz zmiany',
                command=lambda: self.edit_records(new_name.get(), old_name, new_second_name.get(),
                                                  old_second_name)).grid(row=4, column=2, sticky=W)
         self.edit_master.mainloop()
@@ -426,6 +426,20 @@ class Gatunki(Frame):
             self.run_query(query, parameters)
             self.message['text'] = 'Gatunek {} zosta³ dodany'.format(self.name.get())
             self.name.delete(0, END)
+            name = self.name.get()
+            lista = []
+            query1 = 'SELECT gatunek FROM gatunki'
+            db_rows = self.run_query(query1)
+            for row in db_rows:
+                lista.append(row[0])
+            if name in lista:
+                self.message['text'] = 'Nazwa istnieje w bazie!'
+            else:
+                query = 'INSERT INTO gatunki VALUES (?, ?)'
+                parameters = (l + 1, name)
+                self.run_query(query, parameters)
+                self.message['text'] = 'Rekord {} zost¹³ dodany.'.format(self.name.get())
+                self.name.delete(0, END)
         else:
             self.message['text'] = 'Nazwa gatunku jest pusta!'
         self.viewing_record()
@@ -445,9 +459,6 @@ class Gatunki(Frame):
         db_rows = self.run_query(query1, (name,))
         for row in db_rows:
             id = row
-
-        query2 = 'DELETE FROM OSOBNIKI_HODOWCY WHERE id_gat = ?'  # usuniêcie hodowcy z relacji osobniki_hodowcy
-        self.run_query(query2, id)
 
         query3 = 'DELETE FROM OSOBNIKI WHERE id_gat = ?'  # usuniêcie hodowcy z relacji osobniki
         self.run_query(query3, id)
@@ -475,7 +486,7 @@ class Gatunki(Frame):
         new_name = Entry(self.edit_master)
         new_name.grid(row = 1, column = 2)
 
-        Button(self.edit_master, text = 'Zmiana zosta³a zapisana',
+        Button(self.edit_master, text = 'Zapisz',
                command = lambda: self.edit_records(new_name.get(), old_name)).grid(row=4, column=2, sticky=W)
         self.edit_master.mainloop()
 
@@ -583,33 +594,45 @@ class Osobniki(Frame):
 
     def adding(self):
         if self.validation():
+            lista = []
+            id1 = 0
             gatunek = self.species.get()
             query1 = 'SELECT id_gat FROM gatunki WHERE  gatunek = ?'  # znalezienie id gatunku
             db_rows = self.run_query(query1, (gatunek,))
             for row1 in db_rows:
                 id1 = row1[0]
+                lista.append(id1)
 
-            imie = self.fbreeder.get()
-            nazwisko = self.lbreeder.get()
-            query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
-            parameters = (imie, nazwisko)
-            db_rows = self.run_query(query2, parameters)
-            for row2 in db_rows:
-                id2 = row2[0]
+            if id1 in lista:
+                imie = self.fbreeder.get()
+                nazwisko = self.lbreeder.get()
+                query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
+                parameters = (imie, nazwisko)
+                lista1 = []
+                id2 = 0
+                db_rows = self.run_query(query2, parameters)
+                for row2 in db_rows:
+                    id2 = row2[0]
+                    lista1.append(id2)
 
-            l = self.lenrecord()
-            query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
-            parameters = (l + 1, self.name.get(), self.gender.get(), id1, id2)
-            self.run_query(query, parameters)
-            self.message['text'] = 'Record {} added'.format(self.name.get())
-            self.name.delete(0, END)
-            self.gender.delete(0, END)
-            self.species.delete(0, END)
-            self.fbreeder.delete(0, END)
-            self.lbreeder.delete(0, END)
+                if id2 in lista1:
+                    l = self.lenrecord()
+                    query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
+                    parameters = (l + 1, self.name.get(), self.gender.get(), id1, id2)
+                    self.run_query(query, parameters)
+                    self.message['text'] = 'Rekord {} zosta³ dodany.'.format(self.name.get())
+                    self.name.delete(0, END)
+                    self.gender.delete(0, END)
+                    self.species.delete(0, END)
+                    self.fbreeder.delete(0, END)
+                    self.lbreeder.delete(0, END)
+                else:
+                    self.message['text'] = 'Hodowca nie istnieje'
+            else:
+                self.message['text'] = 'Brak takiego gatunku w bazie.'
 
         else:
-            self.message['text'] = 'name filed or gender field is empty'
+            self.message['text'] = 'Uzupe³nij wszystkie pola.'
         self.viewing_record()
 
     def deleting(self):
@@ -617,7 +640,7 @@ class Osobniki(Frame):
         try:
             self.treeO.item(self.treeO.selection())['values'][0]
         except IndexError as e:
-            self.message['text'] = 'Please, select record!'
+            self.message['text'] = 'Proszê, wybierz rekord!'
             return
 
         self.message['text'] = ''
@@ -638,7 +661,7 @@ class Osobniki(Frame):
 
         query = 'DELETE FROM osobniki WHERE nazwa = ?'
         self.run_query(query, (name,))
-        self.message['text'] = 'Record {} deleted.'.format(name)
+        self.message['text'] = 'Rekord {} zosta³ usuniêty.'.format(name)
         self.viewing_record()
 
     def editing(self):
@@ -646,7 +669,7 @@ class Osobniki(Frame):
         try:
             self.treeO.item(self.treeO.selection())['values'][0]
         except IndexError as e:
-            self.message['text'] = 'Please, select record!'
+            self.message['text'] = 'Proszê, wybierz rekord!'
             return
         old_name = self.treeO.item(self.treeO.selection())['text']
         old_gender = self.treeO.item(self.treeO.selection())['values'][0]
@@ -655,47 +678,47 @@ class Osobniki(Frame):
         old_lbreeder = self.treeO.item(self.treeO.selection())['values'][3]
 
         self.edit_master = Toplevel()
-        self.edit_master.title('Editing')
+        self.edit_master.title('Edycja')
 
-        Label(self.edit_master, text='Old name:').grid(row=0, column=1)
+        Label(self.edit_master, text='Stara nazwa:').grid(row=0, column=1)
         Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_name), state='readonly').grid(row=0,
                                                                                                                  column=2)
-        Label(self.edit_master, text='New name:').grid(row=1, column=1)
+        Label(self.edit_master, text='Nowa nazwa:').grid(row=1, column=1)
         new_name = Entry(self.edit_master)
         new_name.grid(row=1, column=2)
 
-        Label(self.edit_master, text='Old gender:').grid(row=2, column=1)
+        Label(self.edit_master, text='Wczeœniejsza p³eæ:').grid(row=2, column=1)
         Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_gender), state='readonly').grid(
             row=2, column=2)
-        Label(self.edit_master, text='New gender:').grid(row=3, column=1)
+        Label(self.edit_master, text='Nowa p³eæ:').grid(row=3, column=1)
         new_gender = Entry(self.edit_master)
         new_gender.grid(row=3, column=2)
 
-        Label(self.edit_master, text='Old species:').grid(row=4, column=1)
+        Label(self.edit_master, text='Wczeœniejszy gatunek:').grid(row=4, column=1)
         Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_species), state='readonly').grid(
             row=4,
             column=2)
-        Label(self.edit_master, text='New species:').grid(row=5, column=1)
+        Label(self.edit_master, text='Obecny gatunek:').grid(row=5, column=1)
         new_species = Entry(self.edit_master)
         new_species.grid(row=5, column=2)
 
-        Label(self.edit_master, text='Old first name breeder:').grid(row=6, column=1)
+        Label(self.edit_master, text='Stare imie hodowcy:').grid(row=6, column=1)
         Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_fbreeder), state='readonly').grid(
             row=6,
             column=2)
-        Label(self.edit_master, text='New first name breeder:').grid(row=7, column=1)
+        Label(self.edit_master, text='Nowe imie hodowcy:').grid(row=7, column=1)
         new_fbreeder = Entry(self.edit_master)
         new_fbreeder.grid(row=7, column=2)
 
-        Label(self.edit_master, text='Old last name breeder:').grid(row=8, column=1)
+        Label(self.edit_master, text='Stare nazwisko hodowcy:').grid(row=8, column=1)
         Entry(self.edit_master, textvariable=StringVar(self.edit_master, value=old_lbreeder), state='readonly').grid(
             row=8,
             column=2)
-        Label(self.edit_master, text='New last name breeder:').grid(row=9, column=1)
+        Label(self.edit_master, text='Nowe nazwisko hodowcy:').grid(row=9, column=1)
         new_lbreeder = Entry(self.edit_master)
         new_lbreeder.grid(row=9, column=2)
 
-        Button(self.edit_master, text='Save changes',
+        Button(self.edit_master, text='Zapisz zmiany',
                command=lambda: self.edit_records(new_name.get(), old_name,
                                                  new_gender.get(), old_gender,
                                                  new_species.get(), old_species,
@@ -732,7 +755,7 @@ class Osobniki(Frame):
         new_name, new_gender, new_id_species, new_id_breeder, old_name, old_gender, old_id_species, old_id_breeder)
         self.run_query(query, parameters)
         self.edit_master.destroy()
-        self.message['text'] = 'Record {} changed.'.format(old_name)
+        self.message['text'] = 'Rekord {} zosta³ zmieniony.'.format(old_name)
         self.viewing_record()
 
 #=====================KONIEC_ZAKLADEK================================================================================

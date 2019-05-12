@@ -70,6 +70,7 @@ class Product:
         self.viewing_record()
 
     def deleting(self):
+        global id
         self.message['text'] = ''
         try:
             self.tree.item(self.tree.selection())['text'][0]

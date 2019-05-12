@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
-#import planarity
+import planarity
+import wspolczynniki
 
 # conn = sqlite3.connect('baza.db')
 # conn.row_factory = sqlite3.Row
@@ -263,6 +264,8 @@ class Baza(object):
 
     '''
 
+
+
 jula = Baza()
 # jula.czytajrelacje()
 # jula.segregujPoPlci()
@@ -271,5 +274,6 @@ jula = Baza()
 # jula.id_nazwa(2)
 # jula.dodaj_osobniki()
 # jula.czytajgatunki()
+jula.wsp()
 
 
