@@ -39,19 +39,74 @@ def baseclose(db):  # to nie dzia³a jeszcze
 # Wspó³czynnik imbredu
 # Widget
 def imbred():
+    db_name = "baza.db"
+
     wsimb = Tk()
-    wsimb.geometry("700x400+0+0")
+    wsimb.geometry("1025x600+0+0")
     wsimb.title("Wspó³czynnik imbredu")
     wsimb_label = Label(wsimb)
     wsimb_label.grid()
 
+    F1 = Frame(wsimb, borderwidth=2)
+    F1.grid(column=0, row=0, columnspan=2)
+    F2 = Frame(wsimb, borderwidth=2)
+    F2.grid(column=0, row=1, columnspan=2)
+    F3 = Frame(wsimb, borderwidth=2)
+    F3.grid(column=2, row=0, columnspan=2)
 
+    L1 = Label(F1, text="Wybierz osobnika:")
+    L1.grid(column=0, row=0, columnspan=3)
+    L2 = Label(F2, text="Okienko Wynikowe:")
+    L2.grid(column=0, row=1, columnspan=3)
+    # L3 = Label(F3, text="Okienko Wynikowe")
+    # L3.grid(column=0, row=2)
+
+    treeO_wsimb = ttk.Treeview(F1, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
+    treeO_wsimb.grid(row=7, column=0, columnspan=3)
+    treeO_wsimb.heading('#0', text='Nazwa', anchor=W)
+    treeO_wsimb.heading('#1', text='P³eæ', anchor=W)
+    treeO_wsimb.heading('#2', text='Gatunek', anchor=W)
+    treeO_wsimb.heading('#3', text='Imiê Hodowcy', anchor=W)
+    treeO_wsimb.heading('#4', text='Nazwisko Hodowcy', anchor=W)
+
+    # okienko wyœwietlaj¹ce wynik
+    wynik_wsimb = Text(F2, width=60, height=12).grid()
+
+    # Definicje do przycisków
+    def run_query(query, parameters=()):
+        with sqlite3.connect(db_name) as conn:
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
+
+    def viewing_record():
+        records = treeO_wsimb.get_children()
+        for element in records:
+            treeO_wsimb.delete(element)
+        query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
+             JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+             JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+
+             ORDER BY id_os DESC"""
+        db_rows = run_query(query)
+        for row in db_rows:
+            treeO_wsimb.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
+
+    # Przyciski
+    B1_wsimb = Button(F1, text='Oblicz wspó³czynnik imbredu').grid(column=0, row=10, columnspan=3)
+    B2_wsimb = Button(F2, text='Zapisz wynik do pliku tekstowego').grid(column=0, row=4, columnspan=3)
+    B3_wsimb = Button(wsimb, text='Zakoñcz', command=wsimb.destroy).grid(column=0, row=10, columnspan=3)
+
+    viewing_record()
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Wspó³czynnik pokrewieñstwa
 # Widget
 def pokrewienstwo():
+    db_name = "baza.db"
+
     wspok = Tk()
     wspok.geometry("1500x600+0+0")
     wspok.title("Wspó³czynnik pokrewieñstwa")
@@ -89,28 +144,58 @@ def pokrewienstwo():
     treeO_wspok2.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
     # okienko wyœwietlaj¹ce wynik
-    wynik_avg = Text(F3, width=60, height=12).grid()
+    wynik_wspok2 = Text(F3, width=60, height=12).grid()
+
+    # Definicje do przycisków
+    def run_query(query, parameters=()):
+        with sqlite3.connect(db_name) as conn:
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
+
+    def viewing_record1():
+        records = treeO_wspok1.get_children()
+        for element in records:
+            treeO_wspok1.delete(element)
+        query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
+             JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+             JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+
+             ORDER BY id_os DESC"""
+        db_rows = run_query(query)
+        for row in db_rows:
+            treeO_wspok1.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
+
+    def viewing_record2():
+        records = treeO_wspok2.get_children()
+        for element in records:
+            treeO_wspok2.delete(element)
+        query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
+                JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+                JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+
+                ORDER BY id_os DESC"""
+        db_rows = run_query(query)
+        for row in db_rows:
+            treeO_wspok2.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
+
+    def wynikpokre():
+        pokre = wspolczynniki.Oblicz()
+        wsp = pokre.pokrewienstwo1()
+        wynik_wspok2.insert(END, wsp, ('p'))
 
     # Przyciski
     B1 = Button(F2, text='Oblicz œredni wspólczynnik pokrewieñstwa').grid(column=0, row=8, columnspan=3)
     B2 = Button(F3, text='Zapisz wynik do pliku tekstowego').grid(column=0, row=4, columnspan=3)
-    B3 = Button(wspok, text='Zakoñcz').grid(column=1, row=10)
+    B3 = Button(wspok, text='Zakoñcz', command=wspok.destroy).grid(column=1, row=10)
+
+    viewing_record1()
+    viewing_record2()
 
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-# ---------------------------------------------------------------------------------------------------------------------
-# Wspó³czynnik utraty przodków
-# Widget
-def utrata():
-    wsutraty = Tk()
-    wsutraty.geometry("700x400+0+0")
-    wsutraty.title("Wspó³czynnik utraty przodków")
-    wsutraty_label = Label(wsutraty)
-    wsutraty_label.grid()
-
-
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 #######################################################################################################################
@@ -137,14 +222,7 @@ oblicz = Menu(menu)
 menu.add_cascade(label="Wspó³czynniki", menu=oblicz)
 oblicz.add_command(label="Wspó³czynnik inbredu", command=imbred)
 oblicz.add_command(label="Wspó³czynnik pokrewieñsta", command=pokrewienstwo)
-oblicz.add_command(label="Wspó³czynnik utraty przodków", command=utrata)
 
-
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # =================================ZAKLADKI==========================================
 class RootApp(tk.Tk):
     def __init__(self):
