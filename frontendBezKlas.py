@@ -43,7 +43,7 @@ def imbred():
 
     wsimb = Tk()
     wsimb.geometry("1025x600+0+0")
-    wsimb.title("Wspó³czynnik imbredu")
+    wsimb.title("Wspó³czynnik inbredu")
     wsimb_label = Label(wsimb)
     wsimb_label.grid()
 
@@ -58,8 +58,6 @@ def imbred():
     L1.grid(column=0, row=0, columnspan=3)
     L2 = Label(F2, text="Okienko Wynikowe:")
     L2.grid(column=0, row=1, columnspan=3)
-    # L3 = Label(F3, text="Okienko Wynikowe")
-    # L3.grid(column=0, row=2)
 
     treeO_wsimb = ttk.Treeview(F1, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
     treeO_wsimb.grid(row=7, column=0, columnspan=3)
@@ -70,7 +68,8 @@ def imbred():
     treeO_wsimb.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
     # okienko wyœwietlaj¹ce wynik
-    wynik_wsimb = Text(F2, width=60, height=12).grid()
+    wynik_wsimb = Text(F2, width=60, height=12)
+    wynik_wsimb.grid()
 
     # Definicje do przycisków
     def run_query(query, parameters=()):
@@ -93,9 +92,24 @@ def imbred():
         for row in db_rows:
             treeO_wsimb.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
+    def wynikInbred():
+        #pokre = wspolczynniki.Oblicz()
+        wsp=StringVar()
+        wsp = "Dzieñ doberek"
+        wynik_wsimb.insert(END, wsp)
+
+    def zapisywanieDoPlikuInbred(plik, tresc):
+        plik1 = open(plik, 'w')
+        plik1.write(tresc)
+        plik1.close()
+
+    h="Wspo³czynnik Inbredu dla osobnika x, \n" \
+      "zosta³ oszacowany na poziomie y.\n"
+
     # Przyciski
-    B1_wsimb = Button(F1, text='Oblicz wspó³czynnik imbredu').grid(column=0, row=10, columnspan=3)
-    B2_wsimb = Button(F2, text='Zapisz wynik do pliku tekstowego').grid(column=0, row=4, columnspan=3)
+    B1_wsimb = Button(F1, text='Oblicz wspó³czynnik imbredu', command=wynikInbred).grid(column=0, row=10, columnspan=3)
+    B2_wsimb = Button(F2, text='Zapisz wynik do pliku tekstowego',
+                      command=zapisywanieDoPlikuInbred("WspolczynnikInbredu.txt", h)).grid(column=0, row=4, columnspan=3)
     B3_wsimb = Button(wsimb, text='Zakoñcz', command=wsimb.destroy).grid(column=0, row=10, columnspan=3)
 
     viewing_record()
@@ -144,7 +158,8 @@ def pokrewienstwo():
     treeO_wspok2.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
     # okienko wyœwietlaj¹ce wynik
-    wynik_wspok2 = Text(F3, width=60, height=12).grid()
+    wynik_wspok2 = Text(F3, width=60, height=12)
+    wynik_wspok2.grid()
 
     # Definicje do przycisków
     def run_query(query, parameters=()):
@@ -181,13 +196,25 @@ def pokrewienstwo():
             treeO_wspok2.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
     def wynikpokre():
-        pokre = wspolczynniki.Oblicz()
-        wsp = pokre.pokrewienstwo1()
-        wynik_wspok2.insert(END, wsp, ('p'))
+        #pokre = wspolczynniki.Oblicz()
+        wsp=StringVar()
+        wsp = "Dzieñ doberek"
+        wynik_wspok2.insert(END, wsp)
+
+    def zapisywanieDoPlikuPokre(plik, tresc):
+        # h="Bardzo fajnie dzia³a ale ni chuj nie wiem jak"
+        plik1 = open(plik, 'w')
+        plik1.write(tresc)
+        plik1.close()
+
+    pok = "Wspólczynnik pokrewieñstwa dla osobników:\n" \
+          "x oraz y \n" \
+          "wynosi: ???"
 
     # Przyciski
-    B1 = Button(F2, text='Oblicz œredni wspólczynnik pokrewieñstwa').grid(column=0, row=8, columnspan=3)
-    B2 = Button(F3, text='Zapisz wynik do pliku tekstowego').grid(column=0, row=4, columnspan=3)
+    B1 = Button(F2, text='Oblicz œredni wspólczynnik pokrewieñstwa',command=wynikpokre).grid(column=0, row=8, columnspan=3)
+    B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
+                command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4, columnspan=3)
     B3 = Button(wspok, text='Zakoñcz', command=wspok.destroy).grid(column=1, row=10)
 
     viewing_record1()
