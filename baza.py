@@ -61,8 +61,9 @@ class StrukturaBazyDanych():
 
     def data_entry_genre(self):
         """ Wpisuje dane do encji GATUNKI """
-        cur.execute("INSERT INTO GATUNKI VALUES(1,'psy')")
-        cur.execute("INSERT INTO GATUNKI VALUES(2,'koty')")
+        cur.execute("INSERT INTO GATUNKI VALUES(1,'konie')")
+        cur.execute("INSERT INTO GATUNKI VALUES(2,'psy')")
+        cur.execute("INSERT INTO GATUNKI VALUES(3,'koty')")
         conn.commit()
 
     def data_entry_relation(self):

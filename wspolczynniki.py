@@ -274,94 +274,97 @@ class Oblicz(object):
         self.nzw2 = nzw2
         self.Y = self.wspolny_przodek(self.nzw1, self.nzw2)
         self.full = []
-        for self.i in range(len(self.Y)):
-            self.cos = self.Y.pop()
-            self.wsp_a = 0
-            self.wsp_b = 0
-            self.wsp_c = 0
-            self.A = self.find_parent(self.nzw1)
-            self.B = self.find_parent(self.nzw2)
-            self.C = self.find_grand(self.nzw1)
-            self.D = self.find_grand(self.nzw2)
-            self.E = self.find_pra(self.nzw1)
-            self.F = self.find_pra(self.nzw2)
-            for self.a in self.A:
-                self.a = self.A.pop()
-                if self.a == self.cos:
-                    self.wsp_a += 1
-                    for self.b in self.B:
-                        self.b = self.B.pop()
-                        if self.b == self.cos:
-                            self.wsp_a += 1
-                        elif self.b != self.cos:
-                            break
-                    for self.d in self.D:
-                        self.d = self.D.pop()
-                        if self.d == self.cos:
-                            self.wsp_a += 2
-                        elif self.d != self.cos:
-                            break
-                    for self.f in self.F:
-                        self.f = self.F.pop()
-                        if self.f == self.cos:
-                            self.wsp_a += 3
-                        elif self.f != self.cos:
-                            break
-                elif self.a != self.cos:
-                    break
-                self.full.append(self.wsp_a)
-            for self.c in self.C:
-                self.c = self.C.pop()
-                if self.c == self.cos:
-                    self.wsp_b += 2
-                    for self.b in self.B:
-                        self.b = self.B.pop()
-                        if self.b == self.cos:
-                            self.wsp_b += 1
-                        elif self.b != self.cos:
-                            break
-                    for self.d in self.D:
-                        self.d = self.D.pop()
-                        if self.d == self.cos:
-                            self.wsp_b += 2
-                        elif self.d != self.cos:
-                            break
-                    for self.f in self.F:
-                        self.f = self.F.pop()
-                        if self.f == self.cos:
-                            self.wsp_b += 3
-                        elif self.f != self.cos:
-                            break
-                elif self.c != self.cos:
-                    break
-                self.full.append(self.wsp_b)
-            for self.e in self.E:
-                self.e = self.E.pop()
-                if self.e == self.cos:
-                    self.wsp_c += 3
-                    for self.b in self.B:
-                        self.b = self.B.pop()
-                        if self.b == self.cos:
-                            self.wsp_c += 1
-                        elif self.b != self.cos:
-                            break
-                    for self.d in self.D:
-                        self.d = self.D.pop()
-                        if self.d == self.cos:
-                            self.wsp_c += 2
-                        elif self.d != self.cos:
-                            break
-                    for self.f in self.F:
-                        self.f = self.F.pop()
-                        if self.f == self.cos:
-                            self.wsp_c += 3
-                        elif self.f != self.cos:
-                            break
-                elif self.e != self.cos:
-                    break
-                self.full.append(self.wsp_c)
-        self.full = self.full[0:len(self.full) / 2]
-        return self.full
+        if len(self.full) > 1:
+            for self.i in range(len(self.Y)):
+                self.cos = self.Y.pop()
+                self.wsp_a = 0
+                self.wsp_b = 0
+                self.wsp_c = 0
+                self.A = self.find_parent(self.nzw1)
+                self.B = self.find_parent(self.nzw2)
+                self.C = self.find_grand(self.nzw1)
+                self.D = self.find_grand(self.nzw2)
+                self.E = self.find_pra(self.nzw1)
+                self.F = self.find_pra(self.nzw2)
+                for self.a in self.A:
+                    self.a = self.A.pop()
+                    if self.a == self.cos:
+                        self.wsp_a += 1
+                        for self.b in self.B:
+                            self.b = self.B.pop()
+                            if self.b == self.cos:
+                                self.wsp_a += 1
+                            elif self.b != self.cos:
+                                break
+                        for self.d in self.D:
+                            self.d = self.D.pop()
+                            if self.d == self.cos:
+                                self.wsp_a += 2
+                            elif self.d != self.cos:
+                                break
+                        for self.f in self.F:
+                            self.f = self.F.pop()
+                            if self.f == self.cos:
+                                self.wsp_a += 3
+                            elif self.f != self.cos:
+                                break
+                    elif self.a != self.cos:
+                        break
+                    self.full.append(self.wsp_a)
+                for self.c in self.C:
+                    self.c = self.C.pop()
+                    if self.c == self.cos:
+                        self.wsp_b += 2
+                        for self.b in self.B:
+                            self.b = self.B.pop()
+                            if self.b == self.cos:
+                                self.wsp_b += 1
+                            elif self.b != self.cos:
+                                break
+                        for self.d in self.D:
+                            self.d = self.D.pop()
+                            if self.d == self.cos:
+                                self.wsp_b += 2
+                            elif self.d != self.cos:
+                                break
+                        for self.f in self.F:
+                            self.f = self.F.pop()
+                            if self.f == self.cos:
+                                self.wsp_b += 3
+                            elif self.f != self.cos:
+                                break
+                    elif self.c != self.cos:
+                        break
+                    self.full.append(self.wsp_b)
+                for self.e in self.E:
+                    self.e = self.E.pop()
+                    if self.e == self.cos:
+                        self.wsp_c += 3
+                        for self.b in self.B:
+                            self.b = self.B.pop()
+                            if self.b == self.cos:
+                                self.wsp_c += 1
+                            elif self.b != self.cos:
+                                break
+                        for self.d in self.D:
+                            self.d = self.D.pop()
+                            if self.d == self.cos:
+                                self.wsp_c += 2
+                            elif self.d != self.cos:
+                                break
+                        for self.f in self.F:
+                            self.f = self.F.pop()
+                            if self.f == self.cos:
+                                self.wsp_c += 3
+                            elif self.f != self.cos:
+                                break
+                    elif self.e != self.cos:
+                        break
+                    self.full.append(self.wsp_c)
+            self.full = self.full[0:len(self.full) / 2]
+            return self.full
+        else:
+            return self.full
 
     def sciezka_konkretna(self, nzw1, nzw2, cos):  # zamiany!
         self.nzw1 = nzw1
@@ -411,12 +414,12 @@ class Oblicz(object):
         self.ld = 0
         self.le = 0
         self.lf = 0
-        self.A = self.find_parent(self.nzw1)
-        self.B = self.find_parent(self.nzw2)
-        self.C = self.find_grand(self.nzw1)
-        self.D = self.find_grand(self.nzw2)
-        self.E = self.find_pra(self.nzw1)
-        self.Fe = self.find_pra(self.nzw2)
+        self.A = self.find_parent(self.nzw1[0])
+        self.B = self.find_parent(self.nzw2[0])
+        self.C = self.find_grand(self.nzw1[0])
+        self.D = self.find_grand(self.nzw2[0])
+        self.E = self.find_pra(self.nzw1[0])
+        self.Fe = self.find_pra(self.nzw2[0])
         if self.A or self.B:
             if (self.A == self.B):
                 if len(self.A) == 2:
@@ -1314,22 +1317,26 @@ class Oblicz(object):
         if self.x:
             for self.i in range(len(self.x)):
                 self.w = []
-                self.ic = self.x.pop()
-                self.F = self.inbred(self.ic)
-                self.k = self.sciezka_konkretna(self.nzw1, self.nzw2, self.ic)
-                for self.i in range(self.k.count(0)):
-                    self.k.remove(0)
-                if len(self.k) > 0:
-                    for self.i in range(len(self.k)):
-                        self.sz = self.k.pop()
-                        self.szy = 0.5 ** self.sz
+                if len(self.x) > 0:
+                    self.ic = self.x.pop()
+                    self.F = self.inbred(self.ic)
+                    self.k = self.sciezka_konkretna(self.nzw1, self.nzw2, self.ic)
+                    for self.i in range(self.k.count(0)):
+                        self.k.remove(0)
+                    if len(self.k) > 0:
+                        for self.i in range(len(self.k)):
+                            self.sz = self.k.pop()
+                            self.szy = 0.5 ** self.sz
+                            self.w.append(self.szy)
+                    else:
+                        self.szy = 0
                         self.w.append(self.szy)
+                    self.pi = sum(self.w)
+                    self.FF = ((self.pi) * (1 + self.F))
+                    self.FFF.append(self.FF)
                 else:
-                    self.szy = 0
-                    self.w.append(self.szy)
-                self.pi = sum(self.w)
-                self.FF = ((self.pi) * (1 + self.F))
-                self.FFF.append(self.FF)
+                    self.X = 0
+                    return 0
         if self.y:
             self.szy = 0.5 ** self.y
             self.w.append(self.szy)
@@ -1360,8 +1367,8 @@ class Oblicz(object):
         self.f = math.sqrt((1 + self.Fx) * (1 + self.Fy))
         self.F = (self.r / 2) * self.f
         return self.F
-    '''
-    def blad(self):
+
+    '''def blad(self):
         return 'Error menu'
 
     def find_child1(self):
@@ -1409,12 +1416,6 @@ class Oblicz(object):
               "11 - wspó³czynnik inbredu")'''
 
 
-jula = Oblicz()
+#jula = Oblicz()
 #jula.__main__()
 #jula.all_osobniki()
-jula.find_child('KIRA')
-jula.find_parent('BRAVO')
-jula.find_grand('BRAVO')
-jula.find_pra('BRAVO')
-jula.inbred('KIRA')
-jula.inbred_pokr('KIRA')

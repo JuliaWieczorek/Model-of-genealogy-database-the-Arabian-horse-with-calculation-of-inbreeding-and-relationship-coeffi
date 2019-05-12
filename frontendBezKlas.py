@@ -409,11 +409,6 @@ class Gatunki(Frame):
     def adding(self):
         if self.validation():
             l = self.lenrecord()
-            query = 'INSERT INTO gatunki VALUES (?, ?)'
-            parameters = (l + 1, self.name.get())
-            self.run_query(query, parameters)
-            self.message['text'] = 'Gatunek {} zosta³ dodany'.format(self.name.get())
-            self.name.delete(0, END)
             name = self.name.get()
             lista = []
             query1 = 'SELECT gatunek FROM gatunki'
