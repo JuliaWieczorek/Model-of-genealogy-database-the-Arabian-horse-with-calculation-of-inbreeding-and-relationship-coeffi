@@ -105,8 +105,12 @@ def imbred():
         plik1.write(tresc)
         plik1.close()
 
-    h="Wspo³czynnik Inbredu dla osobnika x, \n" \
-      "zosta³ oszacowany na poziomie y.\n"
+    h="Wspo³czynnik Inbredu \n" \
+      "Nazwa osobnika: {}\n" \
+      "P³eæ osobnika: {}\n" \
+      "Gatunek osobnika: {}\n" \
+      "Hodowca Osobnika: {}\n" \
+      "Wspó³czynnik Imbredu wynosi: {}\n"
 
     # Przyciski
     B1_wsimb = Button(F1, text='Oblicz wspó³czynnik imbredu', command=wynikInbred).grid(column=0, row=10, columnspan=3)
