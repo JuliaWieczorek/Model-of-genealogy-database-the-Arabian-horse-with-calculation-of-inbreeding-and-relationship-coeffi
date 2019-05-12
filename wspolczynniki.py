@@ -85,6 +85,7 @@ class Oblicz(object):
         self.list_of_parents = []
         self.nazwa1 = self.nazwa_id(self.nazwa)
         query = 'SELECT id_os2 FROM relacje WHERE id_os1=?'
+        print(self.nazwa1)
         db_rows = self.run_query(query, (self.nazwa1,))
         for self.row in db_rows:
             self.parent = self.id_nazwa(self.row)
@@ -415,7 +416,9 @@ class Oblicz(object):
         self.le = 0
         self.lf = 0
         self.A = self.find_parent(self.nzw1[0])
+        print(self.A)
         self.B = self.find_parent(self.nzw2[0])
+        print(self.B)
         self.C = self.find_grand(self.nzw1[0])
         self.D = self.find_grand(self.nzw2[0])
         self.E = self.find_pra(self.nzw1[0])
@@ -424,14 +427,14 @@ class Oblicz(object):
             if (self.A == self.B):
                 if len(self.A) == 2:
                     for self.a in range(len(self.A)):
-                        self.a = self.A.pop(0)
-                        self.aa = str(self.a[0])
+                        #self.a = self.A.pop(0)
+                        self.aa = str(self.a)
                         if (self.a == self.cos):
                             self.wsp_a += 2
                 elif len(self.A) == 1:
                     for self.a in range(len(self.A)):
-                        self.a = self.A.pop(0)
-                        self.a = str(self.a[0])
+                        #self.a = self.A.pop(0)
+                        self.a = str(self.a) #a[0]
                         if (self.a == self.cos):
                             self.wsp_a += 1
                 self.full.append(self.wsp_a)
@@ -442,10 +445,10 @@ class Oblicz(object):
             else:
                 for self.a in range(len(self.A)):
                     for self.b in range(len(self.B)):
-                        self.a = self.A.pop(0)
-                        self.aa = str(self.a[0])
-                        self.b = self.B.pop(0)
-                        self.bb = str(self.b[0])
+                        #self.a = self.A.pop(0)
+                        self.aa = str(self.a)
+                        #self.b = self.B.pop(0)
+                        self.bb = str(self.b)
                         if (self.a == self.cos) and (self.b == self.cos):
                             self.wsp_a += 2
                         elif (self.a == self.cos) or (self.b == self.cos):
@@ -459,16 +462,16 @@ class Oblicz(object):
             if self.C or self.D:
                 if (self.C == self.D):
                     for self.c in range(len(self.C)):
-                        self.c = self.C.pop(0)
-                        self.c = str(self.c[0])
+                        #self.c = self.C.pop(0)
+                        self.c = str(self.c)
                         if (self.c == self.cos):
                             self.wsp_b += 4
                         self.full.append(self.wsp_b)
             if self.E or self.Fe:
                 if (self.E == self.Fe):
                     for self.e in range(len(self.E)):
-                        self.e = self.E.pop(0)
-                        self.e = str(self.e[0])
+                        #self.e = self.E.pop(0)
+                        self.e = str(self.e)
                         if (self.e == self.cos):
                             self.wsp_c += 6
                         self.full.append(self.wsp_c)
@@ -1320,6 +1323,7 @@ class Oblicz(object):
                 if len(self.x) > 0:
                     self.ic = self.x.pop()
                     self.F = self.inbred(self.ic)
+                    print(self.nzw1, self.nzw2)
                     self.k = self.sciezka_konkretna(self.nzw1, self.nzw2, self.ic)
                     for self.i in range(self.k.count(0)):
                         self.k.remove(0)
@@ -1344,8 +1348,8 @@ class Oblicz(object):
             self.FFF.append(self.pi)
 
         self.FFFF = sum(self.FFF)
-        self.Fx = self.inbred(self.nzw1)
-        self.Fy = self.inbred(self.nzw2)
+        self.Fx = self.inbred(self.nzw1[0])
+        self.Fy = self.inbred(self.nzw2[0])
         self.f = math.sqrt((1 + self.Fx) * (1 + self.Fy))
         self.X = (self.FFFF / self.f)
         return self.X

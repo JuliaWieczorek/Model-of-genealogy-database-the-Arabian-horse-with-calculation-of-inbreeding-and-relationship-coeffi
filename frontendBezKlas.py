@@ -1,17 +1,14 @@
 # -*- coding: cp1250 -*-
 import tkinter as tk
 # import baza
-# import baza_danych
 import sqlite3
-import gatunki
-import hodowcy
-import osobniki
 from tkinter import *
 from tkinter import ttk
 from tkinter import Listbox
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
+from wspolczynniki import Oblicz
 
 
 # DEFINICJE
@@ -93,10 +90,15 @@ def imbred():
             treeO_wsimb.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
     def wynikInbred():
-        #pokre = wspolczynniki.Oblicz()
-        wsp=StringVar()
-        wsp = "Dzień doberek"
-        wynik_wsimb.insert(END, wsp)
+        try:
+            treeO_wsimb.item(treeO_wsimb.selection())['values'][0]
+        except IndexError as e:
+            return
+        nzw1 = treeO_wsimb.item(treeO_wsimb.selection())['text']
+        pokre = Oblicz()
+        wsp = pokre.inbred(nzw1)
+        text = f'Współczynnik inbredu wynosi {wsp} \n'
+        wynik_wsimb.insert(END, text, 'p')
 
     def zapisywanieDoPlikuInbred(plik, tresc):
         plik1 = open(plik, 'w')
@@ -196,10 +198,17 @@ def pokrewienstwo():
             treeO_wspok2.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
     def wynikpokre():
-        #pokre = wspolczynniki.Oblicz()
-        wsp=StringVar()
-        wsp = "Dzień doberek"
-        wynik_wspok2.insert(END, wsp)
+        try:
+            treeO_wspok1.item(treeO_wspok1.selection())['values'][0]
+            treeO_wspok2.item(treeO_wspok2.selection())['values'][0]
+        except IndexError as e:
+            return
+        nzw1 = treeO_wspok1.item(treeO_wspok1.selection())['text']
+        nzw2 = treeO_wspok2.item(treeO_wspok2.selection())['text']
+        pokre = Oblicz()
+        wsp = pokre.pokrewienstwo(nzw1, nzw2)
+        text = f'Współczynnik pokrewieństwa wynosi {wsp} \n'
+        wynik_wspok2.insert(END, text, ('p'))
 
     def zapisywanieDoPlikuPokre(plik, tresc):
         # h="Bardzo fajnie działa ale ni chuj nie wiem jak"
