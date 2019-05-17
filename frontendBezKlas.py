@@ -9,6 +9,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import scrolledtext
 from wspolczynniki import Oblicz
+from anytree import Node, RenderTree
 
 
 # DEFINICJE
@@ -106,6 +107,7 @@ def imbred():
         plik1.close()
 
     h="Wspo³czynnik Inbredu \n" \
+      "\n" \
       "Nazwa osobnika: {}\n" \
       "P³eæ osobnika: {}\n" \
       "Gatunek osobnika: {}\n" \
@@ -135,15 +137,15 @@ def pokrewienstwo():
 
     F1 = Frame(wspok, borderwidth=2)
     F1.grid(column=0, row=0, columnspan=2)
-    F2 = Frame(wspok, borderwidth=2)
-    F2.grid(column=0, row=1, columnspan=2)
+    #F2 = Frame(wspok, borderwidth=2)
+    #F2.grid(column=0, row=1, columnspan=2)
     F3 = Frame(wspok, borderwidth=2)
-    F3.grid(column=2, row=0, columnspan=2)
+    F3.grid(column=0, row=1, columnspan=2)
 
     L1 = Label(F1, text="Wybierz osobnika 1")
     L1.grid(column=0, row=0, columnspan=3)
-    L2 = Label(F2, text="Wybierz osobnika 2")
-    L2.grid(column=0, row=1, columnspan=3)
+    #L2 = Label(F2, text="Wybierz osobnika 2")
+    #L2.grid(column=0, row=1, columnspan=3)
     L3 = Label(F3, text="Okienko Wynikowe")
     L3.grid(column=0, row=2)
 
@@ -155,16 +157,8 @@ def pokrewienstwo():
     treeO_wspok1.heading('#3', text='Imiê Hodowcy', anchor=W)
     treeO_wspok1.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
-    treeO_wspok2 = ttk.Treeview(F2, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
-    treeO_wspok2.grid(row=7, column=0, columnspan=3)
-    treeO_wspok2.heading('#0', text='Nazwa', anchor=W)
-    treeO_wspok2.heading('#1', text='P³eæ', anchor=W)
-    treeO_wspok2.heading('#2', text='Gatunek', anchor=W)
-    treeO_wspok2.heading('#3', text='Imiê Hodowcy', anchor=W)
-    treeO_wspok2.heading('#4', text='Nazwisko Hodowcy', anchor=W)
-
     # okienko wyœwietlaj¹ce wynik
-    wynik_wspok2 = Text(F3, width=60, height=12)
+    wynik_wspok2 = Text(F3, width=100, height=12)
     wynik_wspok2.grid()
 
     # Definicje do przycisków
@@ -201,50 +195,290 @@ def pokrewienstwo():
         for row in db_rows:
             treeO_wspok2.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
-    def wynikpokre():
-        try:
-            treeO_wspok1.item(treeO_wspok1.selection())['values'][0]
-            treeO_wspok2.item(treeO_wspok2.selection())['values'][0]
-        except IndexError as e:
-            return
-        nzw1 = treeO_wspok1.item(treeO_wspok1.selection())['text']
-        nzw2 = treeO_wspok2.item(treeO_wspok2.selection())['text']
-        pokre = Oblicz()
-        wsp = pokre.pokrewienstwo(nzw1, nzw2)
-        text = f'Wspó³czynnik pokrewieñstwa wynosi {wsp} \n'
-        wynik_wspok2.insert(END, text, ('p'))
+    def id_nazwa(id):
+        """Funkcja zamieniaj¹ca id w nazwe osobnika"""
+        id = id
+        query = "SELECT nazwa FROM osobniki WHERE id_os=?"
+        db_rows = run_query(query, id)
+        for row in db_rows:
+            nazwa = row[0]
+        return nazwa
 
-    def zapisywanieDoPlikuPokre(plik, tresc):
-        # h="Bardzo fajnie dzia³a ale ni chuj nie wiem jak"
+    def nazwa_id(nazwa):
+        """Funkcja podaje id osobnika"""
+        nazwa = nazwa
+        query = "SELECT id_os FROM osobniki WHERE nazwa=?"
+        db_rows = run_query(query, (nazwa,))
+        for row in db_rows:
+            id = row[0]
+        return id
+
+    def find_parent(nazwa):
+        nazwa = nazwa
+        list_of_parents = []
+        nazwa1 = nazwa_id(nazwa)
+        try:
+            query = 'SELECT id_os2 FROM relacje WHERE id_os1=?'
+            db_rows = run_query(query, (nazwa1,))
+            for row in db_rows:
+                parent = id_nazwa(row)
+                list_of_parents.append(parent)
+        except ValueError:
+            pass
+        return list_of_parents
+
+    def find_grand(nazwa):
+        nazwa = nazwa
+        lista = []
+        nazwa1 = nazwa_id(nazwa)
+        query = 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)'
+        db_rows = run_query(query, (nazwa1,))
+        for row in db_rows:
+            grand = id_nazwa(row)
+            lista.append(grand)
+        return lista
+
+    def find_pra(nazwa:str):
+        nazwa = nazwa
+        lista = []
+        nazwa1 = nazwa_id(nazwa)
+        query = 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?))'
+        db_rows = run_query(query, [nazwa1])
+        for row in db_rows:
+            pra = id_nazwa(row)
+            lista.append(pra)
+        return lista
+
+
+    def tree():
+        nazwa = treeO_wspok1.item(treeO_wspok1.selection())['text']
+        a = find_parent(nazwa)
+        b = find_grand(nazwa)
+        c = find_pra(nazwa)
+        ListTree = []
+        for i in a:
+            ListTree.append(i)
+        for j in b:
+            ListTree.append(j)
+        for y in c:
+            ListTree.append(y)
+            wynik_wspok2.insert(END, ListTree, ('p'))
+
+    '''def zapisywanieDoPlikuPokre(plik, tresc):
         plik1 = open(plik, 'w')
         plik1.write(tresc)
         plik1.close()
 
-    pok = "Wspólczynnik pokrewieñstwa dla osobników:\n" \
-          "x oraz y \n" \
-          "wynosi: ???"
+    pok = "Wspólczynnik pokrewieñstwa\n" \
+          "\n" \
+          "Osobnik pierwszy:" \
+          "\n" \
+          "Nazwa: {}\n" \
+          "P³eæ: {}\n" \
+          "Gatunek: {}\n" \
+          "Hodowca: {}\n" \
+          "\n" \
+          "Osobnik drugi:\n" \
+          "\n" \
+          "Nazwa: {}\n" \
+          "P³eæ: {}\n" \
+          "Gatunek: {}\n" \
+          "Hodowca: {}\n" \
+          "\n" \
+          "Wspó³czynnik pokrewieñstwa pomiêdzy tymi osobnikami wynosi: {}\n" \''''
 
     # Przyciski
-    B1 = Button(F2, text='Oblicz œredni wspólczynnik pokrewieñstwa',command=wynikpokre).grid(column=0, row=8, columnspan=3)
-    B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
-                command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4, columnspan=3)
+    B1 = Button(F1, text='Wyœwietl spokrewnione osobniki',command=tree).grid(column=0, row=8, columnspan=3)
+    #B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
+    #            command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4, columnspan=3)
     B3 = Button(wspok, text='Zakoñcz', command=wspok.destroy).grid(column=1, row=10)
 
     viewing_record1()
-    viewing_record2()
+
 
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+#-----------------------------------------------------------------------------------------------------------------------
+# Wspó³czynnik pokrewieñstwa
+# Widget
+def avgpokrewienstwa():
+    db_name = "baza.db"
+
+    avgpok = Tk()
+    avgpok.geometry("1500x600+0+0")
+    avgpok.title("Œredni wspó³czynnik pokrewieñstwa")
+    avgpok_label = Label(avgpok)
+    avgpok_label.grid()
+
+    F1 = Frame(avgpok, borderwidth=2)
+    F1.grid(column=0, row=0, columnspan=2)
+    #F2 = Frame(avgpok, borderwidth=2)
+    #F2.grid(column=0, row=1, columnspan=2)
+    F3 = Frame(avgpok, borderwidth=2)
+    F3.grid(column=0, row=1, columnspan=2)
+
+    L1 = Label(F1, text="Wybierz osobnika")
+    L1.grid(column=0, row=0, columnspan=3)
+    #L2 = Label(F2)
+    #L2.grid(column=0, row=1, columnspan=3)
+    L3 = Label(F3, text="Okienko Wynikowe")
+    L3.grid(column=0, row=2)
+
+    treeO_avgpok = ttk.Treeview(F1, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
+    treeO_avgpok.grid(row=7, column=0, columnspan=3)
+    treeO_avgpok.heading('#0', text='Nazwa', anchor=W)
+    treeO_avgpok.heading('#1', text='P³eæ', anchor=W)
+    treeO_avgpok.heading('#2', text='Gatunek', anchor=W)
+    treeO_avgpok.heading('#3', text='Imiê Hodowcy', anchor=W)
+    treeO_avgpok.heading('#4', text='Nazwisko Hodowcy', anchor=W)
+
+    # okienko wyœwietlaj¹ce wynik
+    wynik_avgpok = Text(F3, width=100, height=12)
+    wynik_avgpok.grid()
+
+    # Definicje przycisków
+    def run_query(query, parameters=()):
+        with sqlite3.connect(db_name) as conn:
+            cursor = conn.cursor()
+            query_result = cursor.execute(query, parameters)
+            conn.commit()
+        return query_result
+
+    def viewing_record1():
+        records = treeO_avgpok.get_children()
+        for element in records:
+            treeO_avgpok.delete(element)
+        query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
+             JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+             JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+
+             ORDER BY id_os DESC"""
+        db_rows = run_query(query)
+        for row in db_rows:
+            treeO_avgpok.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
+
+    def sredni_wspolczynnik_pokrewienstwa(nazwa):
+        nazwa = treeO_wspok1.item(treeO_wspok1.selection())['text']
+        all = tree(nazwa)
+        lista = []
+        for i in all:
+            RC = pokrewienstwo(nazwa, i)
+            lista.append(RC)
+        suma = sum(self.lista)
+        length = len(all)
+        MK = suma/length
+        wynik_avgpok.insert(END, MK, ('p'))
+
+    # Przyciski
+    B1 = Button(F1, text='Oblicz œredni wspólczynnik pokrewieñstwa',
+                command=sredni_wspolczynnik_pokrewienstwa).grid(column=0, row=8, columnspan=3)
+    #B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
+    #            command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4,
+    #                                                                                          columnspan=3)
+    B3 = Button(avgpok, text='Zakoñcz', command=avgpok.destroy).grid(column=1, row=10)
+
+    #viewing_record1()
+
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Wspó³czynnik pokrewieñstwa
+# Widget
+def showTree():
+    db_name = "baza.db"
+
+    treeview = Tk()
+    treeview.geometry("1500x600+0+0")
+    treeview.title("Drzewo genealogiczne")
+    treeview_label = Label(treeview)
+    treeview_label.grid()
+
+    F1 = Frame(treeview, borderwidth=2)
+    F1.grid(column=0, row=0, columnspan=2)
+    F2 = Frame(treeview, borderwidth=2)
+    F2.grid(column=0, row=1, columnspan=2)
+    F3 = Frame(treeview, borderwidth=2)
+    F3.grid(column=2, row=0, columnspan=2)
+
+    L1 = Label(F1, text="Wybierz osobnika")
+    L1.grid(column=0, row=0, columnspan=3)
+    L2 = Label(F2)
+    L2.grid(column=0, row=0, columnspan=3, rowspan=2)
+    L3 = Label(F3)
+    L3.grid(column=0, row=2, rowspan=2)
+
+    treeO_avgpok = ttk.Treeview(F1, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
+    treeO_avgpok.grid(row=7, column=0, columnspan=3)
+    treeO_avgpok.heading('#0', text='Nazwa', anchor=W)
+    treeO_avgpok.heading('#1', text='P³eæ', anchor=W)
+    treeO_avgpok.heading('#2', text='Gatunek', anchor=W)
+    treeO_avgpok.heading('#3', text='Imiê Hodowcy', anchor=W)
+    treeO_avgpok.heading('#4', text='Nazwisko Hodowcy', anchor=W)
+
+    treeO_avgpok = Text(F3, width=60, height=30)
+    treeO_avgpok.grid(row=7, column=0, columnspan=3)
+
+    # Definicje przycisków
+    def show():
+        P1 = Node("P1")
+        P2 = Node("P2", parent=P1)
+        P3 = Node("P3", parent=P1)
+        P4 = Node("P4", parent=P2)
+        P5 = Node("P5", parent=P2)
+        P6 = Node("P6", parent=P3)
+        P7 = Node("P7", parent=P3)
+        P8 = Node("P8", parent=P4)
+        P9 = Node("P9", parent=P4)
+        P10 = Node("P10", parent=P5)
+        P11 = Node("P11", parent=P5)
+        P12 = Node("P12", parent=P6)
+        P13 = Node("P13", parent=P6)
+        P14 = Node("P14", parent=P7)
+        P15 = Node("P15", parent=P7)
+        P16 = Node("P16", parent=P8)
+        P17 = Node("P17", parent=P8)
+        P18 = Node("P18", parent=P9)
+        P19 = Node("P19", parent=P9)
+        P20 = Node("P20", parent=P10)
+        P21 = Node("P21", parent=P10)
+        P22 = Node("P22", parent=P11)
+        P23 = Node("P23", parent=P11)
+        P24 = Node("P24", parent=P12)
+        P25 = Node("P25", parent=P12)
+        P26 = Node("P26", parent=P13)
+        P27 = Node("P27", parent=P13)
+        P28 = Node("P28", parent=P14)
+        P29 = Node("P29", parent=P14)
+        P30 = Node("P30", parent=P15)
+        P31 = Node("P31", parent=P15)
+
+        for pre, fill, node in RenderTree(P1):
+            #a=print("%s%s" % (pre, node.name))
+            a=print("{1} {2}".format(pre[0]), node.name[0])
+            treeO_avgpok.insert(END, a)
+
+
+    # Przyciski
+    B1 = Button(F2, text='Wyœwietl drzewo dla wybranego osobnika', command=show).grid(column=0, row=0,
+                                                                                              columnspan=3, rowspan=2)
+    #B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
+    #            command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4,
+    #                                                                                          columnspan=3)
+    B3 = Button(treeview, text='Zakoñcz', command=treeview.destroy).grid(column=1, row=10)
+
+    #viewing_record1()
+
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 #######################################################################################################################
 # okno root
 root = Tk()  # root widget - musi zostaæ stworzony przed innymi widgetami
 root.geometry("1010x500+250+150")
-root.title("Pracownia Informatyczna")  # tytu³ naszej tabeli root
-root_label = tk.Label(root)
-root_label.grid()
+root.title("D¿ulia & Cezar Company")  # tytu³ naszej tabeli root
+#root_label = tk.Label(root)
+#root_label.grid()
 
 # Menu
 menu = Menu(root)
@@ -262,6 +496,12 @@ oblicz = Menu(menu)
 menu.add_cascade(label="Wspó³czynniki", menu=oblicz)
 oblicz.add_command(label="Wspó³czynnik inbredu", command=imbred)
 oblicz.add_command(label="Wspó³czynnik pokrewieñsta", command=pokrewienstwo)
+oblicz.add_command(label="Œredni wspó³czynnik pokrewieñstwa", command=avgpokrewienstwa)
+
+# Drzewo
+drzewo = Menu(menu)
+menu.add_cascade(label= "Drzewo", menu=drzewo)
+drzewo.add_command(label="Wyœwietl drzewo genealogiczne", command=showTree)
 
 # =================================ZAKLADKI==========================================
 class RootApp(tk.Tk):
@@ -865,8 +1105,8 @@ class Osobniki(Frame):
 # =====================KONIEC_ZAKLADEK================================================================================
 
 if __name__ == "__main__":
-    root = RootApp()
-    root.mainloop()
+    Root = RootApp()
+    Root.mainloop()
 
 # root.mainloop()  # zamkniêcie pêtli
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
