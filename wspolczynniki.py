@@ -56,8 +56,8 @@ class Oblicz(object):
         query = "SELECT id_os FROM osobniki WHERE nazwa=?"
         db_rows = self.run_query(query, (self.nazwa,))
         for row in db_rows:
-            self.id = row[0]
-        return self.id
+            id = row[0]
+        return id
 
     def all_osobniki(self):
         query = 'SELECT * FROM osobniki ORDER BY id_hod DESC'
@@ -84,12 +84,14 @@ class Oblicz(object):
         self.nazwa = nazwa
         self.list_of_parents = []
         self.nazwa1 = self.nazwa_id(self.nazwa)
-        query = 'SELECT id_os2 FROM relacje WHERE id_os1=?'
-        print(self.nazwa1)
-        db_rows = self.run_query(query, (self.nazwa1,))
-        for self.row in db_rows:
-            self.parent = self.id_nazwa(self.row)
-            self.list_of_parents.append(self.parent)
+        try:
+            query = 'SELECT id_os2 FROM relacje WHERE id_os1=?'
+            db_rows = self.run_query(query, (self.nazwa1,))
+            for self.row in db_rows:
+                self.parent = self.id_nazwa(self.row)
+                self.list_of_parents.append(self.parent)
+        except ValueError:
+            pass
         return self.list_of_parents
 
     def find_grand(self, nazwa):
@@ -416,9 +418,7 @@ class Oblicz(object):
         self.le = 0
         self.lf = 0
         self.A = self.find_parent(self.nzw1[0])
-        print(self.A)
         self.B = self.find_parent(self.nzw2[0])
-        print(self.B)
         self.C = self.find_grand(self.nzw1[0])
         self.D = self.find_grand(self.nzw2[0])
         self.E = self.find_pra(self.nzw1[0])
@@ -1323,7 +1323,6 @@ class Oblicz(object):
                 if len(self.x) > 0:
                     self.ic = self.x.pop()
                     self.F = self.inbred(self.ic)
-                    print(self.nzw1, self.nzw2)
                     self.k = self.sciezka_konkretna(self.nzw1, self.nzw2, self.ic)
                     for self.i in range(self.k.count(0)):
                         self.k.remove(0)
@@ -1371,6 +1370,18 @@ class Oblicz(object):
         self.f = math.sqrt((1 + self.Fx) * (1 + self.Fy))
         self.F = (self.r / 2) * self.f
         return self.F
+
+    def sredni_wspolczynnik_pokrewienstwa(self, nazwa):
+        self.nazwa = nazwa
+        self.all = self.tree(self.nazwa)
+        self.lista = []
+        for i in self.all:
+            RC = self.pokrewienstwo(self.nazwa, i)
+            self.lista.append(RC)
+        self.suma = sum(self.lista)
+        self.length = len(self.all)
+        MK = self.suma/self.length
+        return MK
 
     '''def blad(self):
         return 'Error menu'
@@ -1420,6 +1431,7 @@ class Oblicz(object):
               "11 - wspó³czynnik inbredu")'''
 
 
-#jula = Oblicz()
-#jula.__main__()
-#jula.all_osobniki()
+jula = Oblicz()
+# jula.__main__()
+# jula.all_osobniki()
+jula.sredni_wspolczynnik_pokrewienstwa('FERRO')
