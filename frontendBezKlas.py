@@ -2,6 +2,7 @@
 import tkinter as tk
 # import baza
 import sqlite3
+import math
 from tkinter import *
 from tkinter import ttk
 from tkinter import Listbox
@@ -28,7 +29,6 @@ def baseopen():  # To chyba dzia³a
 
 def baseclose(db):  # to nie dzia³a jeszcze
     db.close()
-    print("widzisz to to dzia³a")
 
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -99,6 +99,7 @@ def imbred():
         pokre = Oblicz()
         wsp = pokre.inbred(nzw1)
         text = f'Wspó³czynnik inbredu wynosi {wsp} \n'
+        wynik_wsimb.delete('1.0', END)
         wynik_wsimb.insert(END, text, 'p')
 
     def zapisywanieDoPlikuInbred(plik, tresc):
@@ -137,15 +138,15 @@ def pokrewienstwo():
 
     F1 = Frame(wspok, borderwidth=2)
     F1.grid(column=0, row=0, columnspan=2)
-    #F2 = Frame(wspok, borderwidth=2)
-    #F2.grid(column=0, row=1, columnspan=2)
+    F2 = Frame(wspok, borderwidth=2)
+    F2.grid(column=0, row=1, columnspan=2)
     F3 = Frame(wspok, borderwidth=2)
-    F3.grid(column=0, row=1, columnspan=2)
+    F3.grid(column=2, row=0, columnspan=2)
 
     L1 = Label(F1, text="Wybierz osobnika 1")
     L1.grid(column=0, row=0, columnspan=3)
-    #L2 = Label(F2, text="Wybierz osobnika 2")
-    #L2.grid(column=0, row=1, columnspan=3)
+    L2 = Label(F2, text="Wybierz osobnika 2")
+    L2.grid(column=0, row=1, columnspan=3)
     L3 = Label(F3, text="Okienko Wynikowe")
     L3.grid(column=0, row=2)
 
@@ -157,8 +158,16 @@ def pokrewienstwo():
     treeO_wspok1.heading('#3', text='Imiê Hodowcy', anchor=W)
     treeO_wspok1.heading('#4', text='Nazwisko Hodowcy', anchor=W)
 
+    treeO_wspok2 = ttk.Treeview(F2, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
+    treeO_wspok2.grid(row=7, column=0, columnspan=3)
+    treeO_wspok2.heading('#0', text='Nazwa', anchor=W)
+    treeO_wspok2.heading('#1', text='P³eæ', anchor=W)
+    treeO_wspok2.heading('#2', text='Gatunek', anchor=W)
+    treeO_wspok2.heading('#3', text='Imiê Hodowcy', anchor=W)
+    treeO_wspok2.heading('#4', text='Nazwisko Hodowcy', anchor=W)
+
     # okienko wyœwietlaj¹ce wynik
-    wynik_wspok2 = Text(F3, width=100, height=12)
+    wynik_wspok2 = Text(F3, width=60, height=12)
     wynik_wspok2.grid()
 
     # Definicje do przycisków
@@ -182,7 +191,7 @@ def pokrewienstwo():
         for row in db_rows:
             treeO_wspok1.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
-    def viewing_record2():
+    '''def viewing_record2():
         records = treeO_wspok2.get_children()
         for element in records:
             treeO_wspok2.delete(element)
@@ -193,7 +202,7 @@ def pokrewienstwo():
                 ORDER BY id_os DESC"""
         db_rows = run_query(query)
         for row in db_rows:
-            treeO_wspok2.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
+            treeO_wspok2.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))'''
 
     def id_nazwa(id):
         """Funkcja zamieniaj¹ca id w nazwe osobnika"""
@@ -249,6 +258,1147 @@ def pokrewienstwo():
             lista.append(pra)
         return lista
 
+    def porownanie(nzw1, nzw2):
+        print ("In porownanie")
+        nzw1 = nzw1
+        nzw2 = nzw2
+        a = find_parent(nzw1)
+        A = find_parent(nzw2)
+        aa = []
+        aa.extend(a)
+        aa.extend(A)
+        b = find_grand(nzw1)
+        B = find_grand(nzw2)
+        bb = []
+        bb.extend(b)
+        bb.extend(B)
+        c = find_pra(nzw1)
+        C = find_pra(nzw2)
+        cc = []
+        cc.extend(c)
+        cc.extend(C)
+        wspolny = []
+        if (a == A) and len(a) == 2:
+            wspolny.extend(a)
+            return wspolny
+        else:
+            i = list(set(a) & set(A))
+            wspolny.extend(i)
+
+        if (len(a) > 0 or len(A) > 0):
+            for i in aa:
+                i = aa.pop(0)
+                i = str(i[0])
+                if ( i == nzw1) or (i == nzw2):
+                    wspolny.append(i)
+
+        if not wspolny:
+            if b == B and len(b) == 4:
+                wspolny.extend(b)
+                return wspolny
+            elif (len(b) > 0 or len(B) > 0):
+                for i in bb:
+                    i = bb.pop(0)
+                    i = str(i[0])
+                    if (i == nzw1) or (i == nzw2):
+                        wspolny.append(i)
+                i = list(set(b) & set(B))
+                for z in b:
+                    if b.count(z) > 1:
+                        wspolny.append(z)
+                for z in B:
+                    if B.count(z) > 1:
+                        wspolny.append(z)
+                wspolny.extend(i)
+
+        if not wspolny:
+
+            if c == C and len(c) == 8:
+                wspolny.extend(c)
+                return wspolny
+            elif (len(c) > 0 or len(C) > 0):
+                for i in cc:
+                    i = cc.pop(0)
+                    i = str(i[0])
+                    if (i == nzw1) or (i == nzw2):
+                        wspolny.append(i)
+            else:
+                i = list(set(c) & set(C))
+                for z in c:
+                    if c.count(z) > 1:
+                        wspolny.append(i)
+                for z in C:
+                    if C.count(z) > 1:
+                        wspolny.append(i)
+                wspolny.extend(i)
+
+        if not wspolny:
+            wsp = wspolny_przodek(nzw1, nzw2)
+            wspolny.extend(wsp)
+            return wspolny
+        return wspolny
+
+    def porownanie2(nzw1, nzw2):
+        print ( "in porownanie2")
+        nzw1 = nzw1
+        nzw2 = nzw2
+        a = find_parent(nzw1)
+        A = find_parent(nzw2)
+        b = find_grand(nzw1)
+        B = find_grand(nzw2)
+        c = find_pra(nzw1)
+        C = find_pra(nzw2)
+        wspolny = porownanie(nzw1, nzw2)
+        w = 0
+        if not wspolny:
+            nzw1 = str(nzw1)
+            nzw1 = (nzw1,)
+            nzw2 = str(nzw2)
+            nzw2 = (nzw2,)
+            for i in a:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 1
+            for i in A:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 1
+            for i in b:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 2
+            for i in B:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 2
+            for i in c:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 3
+            for i in C:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 3
+        return w
+
+    def sciezka_konkretna( nzw1, nzw2, cos):  # zamiany!
+        #nzw1 = nzw1
+        #nzw2 = nzw2
+        print("in scezka konkretna", nzw1, nzw2)
+        cos = cos
+        if type(cos) == str:
+            cos = (cos,)
+        full = []
+        wsp_a = 0
+        wsp_b = 0
+        wsp_b_1 = 0
+        wsp_c = 0
+        wsp_c_1 = 0
+        wsp_c_2 = 0
+        wsp_c_3 = 0
+        wsp_c_4 = 0
+        wsp_c_5 = 0
+        wsp_c_6 = 0
+        wsp_c_7 = 0
+        wsp_c_8 = 0
+        wsp_c_9 = 0
+        wsp_c_10 = 0
+        wsp_c_11 = 0
+        wsp_c_12 = 0
+        wsp_c_13 = 0
+        wsp_c_14 = 0
+        wsp_c_15 = 0
+        wsp_d_1 = 0
+        wsp_d_2 = 0
+        wsp_d_3 = 0
+        wsp_d_4 = 0
+        wsp_d_5 = 0
+        wsp_d_6 = 0
+        wsp_d_7 = 0
+        wsp_d_8 = 0
+        wsp_d_9 = 0
+        wsp_d_10 = 0
+        wsp_d_11 = 0
+        wsp_d_12 = 0
+        wsp_d_13 = 0
+        wsp_d_14 = 0
+        wsp_d_15 = 0
+        wsp_d_16 = 0
+        la = 0
+        lb = 0
+        lc = 0
+        ld = 0
+        le = 0
+        lf = 0
+        print("before find parent", nzw1, nzw2)
+        A = find_parent(nzw1) # usun¹³em [0]
+        B = find_parent(nzw2) # usun¹³em [0]
+        print("find parent", nzw1, nzw2)
+        C = find_grand(nzw1) # usun¹³em [0]
+        D = find_grand(nzw2) # usun¹³em [0]
+        print("find grand", nzw1, nzw2)
+        E = find_pra(nzw1) # usun¹³em [0]
+        Fe = find_pra(nzw2) # usun¹³em [0]
+
+        print("find_pra", nzw1, nzw2)
+        if A or B:
+            if (A == B):
+                if len(A) == 2:
+                    for a in range(len(A)):
+                        #a = A.pop(0)
+                        aa = str(a)
+                        if (a == cos):
+                            wsp_a += 2
+                elif len(A) == 1:
+                    for a in range(len(A)):
+                        #a = A.pop(0)
+                        a = str(a) #a[0]
+                        if (a == cos):
+                            wsp_a += 1
+                full.append(wsp_a)
+                for i in range(full.count(0)):
+                    full.remove(0)
+                if full:
+                    return full
+            else:
+                for a in range(len(A)):
+                    for b in range(len(B)):
+                        #a = A.pop(0)
+                        aa = str(a)
+                        #b = B.pop(0)
+                        bb = str(b)
+                        if (a == cos) and (b == cos):
+                            wsp_a += 2
+                        elif (a == cos) or (b == cos):
+                            wsp_a += 1
+                full.append(wsp_a)
+            for i in range(full.count(0)):
+                full.remove(0)
+            if full:
+                return full
+        if not full:
+            if C or D:
+                if (C == D):
+                    for c in range(len(C)):
+                        #c = C.pop(0)
+                        c = str(c)
+                        if (c == cos):
+                            wsp_b += 4
+                        full.append(wsp_b)
+            if E or Fe:
+                if (E == Fe):
+                    for e in range(len(E)):
+                        #e = E.pop(0)
+                        e = str(e)
+                        if (e == cos):
+                            wsp_c += 6
+                        full.append(wsp_c)
+
+        z = max(len(A), len(B), len(C), len(D), len(E), len(Fe))
+        lista = [A, B, C, D, E, Fe]
+        for l in lista:
+            for l in lista:
+                if len(l) < z:
+                    l.extend([0])
+
+        lista_index = []
+        for l in lista:
+            for i in l:
+                if (i == cos):
+                    index = lista.index(l)
+                    lista_index.append(index)
+        lista_index = list(set(lista_index))
+        lista_wszystkiego = []
+        lista_rodzicow = []
+        lista_dziadkow = []
+        lista_pra = []
+        if len(lista_index) > 0:
+            for a in range(len(lista_index)):
+                i = lista_index.pop()
+                if (i == 0) or (i == 1):
+                    lista_rodzicow.append(i)
+                elif (i == 2) or (i == 3):
+                    lista_dziadkow.append(i)
+                elif (i == 4) or (i == 5):
+                    lista_pra.append(i)
+            lista_wszystkiego.append(lista_rodzicow)
+            lista_wszystkiego.append(lista_dziadkow)
+            lista_wszystkiego.append(lista_pra)
+            for a in range(len(lista_wszystkiego)):
+                for b in lista_wszystkiego:
+                    if not b:
+                        lista_wszystkiego.remove(b)
+
+            if len(lista_wszystkiego) == 1:
+                for a in range(len(lista_wszystkiego)):
+                    l = lista_wszystkiego.pop()
+                    if (l == [0]) or (l == [1]) or (l == [0, 1]) or (l == [1, 0]):
+                        for a in range(len(A)):
+                            for b in range(len(B)):
+                                a = A.pop(0)
+                                b = B.pop(0)
+                                if (a == cos) and (b == cos):
+                                    wsp_a += 2
+                                elif (a == cos) or (b == cos):
+                                    wsp_a += 1
+                                else:
+                                    wsp_a += 0
+                                    break
+                                full.append(wsp_a)
+
+                    elif (l == [2]) or (l == [3]) or (l == [2, 3]) or (l == [3, 2]):
+                        for c in range(len(C)):
+                            c = C.pop(0)
+                            if (c == cos):
+                                lc += 1
+                        for d in range(len(D)):
+                            d = D.pop(0)
+                            if (d == cos):
+                                ld += 1
+                        if lc > 1 and ld > 1:
+                            wsp_b += 4
+                            wsp_b_1 += 4
+                            full.extend([wsp_b, wsp_b_1])
+                        elif lc > 1 or ld > 1:
+                            wsp_b += 4
+                            full.append(wsp_b)
+                        elif lc == 1 and ld == 1:
+                            wsp_b += 4
+                            full.append(wsp_b)
+                        elif lc == 1 or ld == 1:
+                            wsp_b += 2
+                            full.append(wsp_b)
+                        else:
+                            print('nie ma wsrod dziadkow')
+
+                    elif (l == 4) or (l == 5) or (l == [4, 5]) or (l == [5, 4]):
+                        for e in range(len(E)):
+                            e = E.pop()
+                            if (e == cos):
+                                le += 1
+                        for f in range(len(Fe)):
+                            f = Fe.pop(0)
+                            if (f == cos):
+                                lf += 1
+                        if le == 4 and lf == 4:
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            wsp_c_7 += 6
+                            wsp_c_8 += 6
+                            wsp_c_9 += 6
+                            wsp_c_10 += 6
+                            wsp_c_11 += 6
+                            wsp_c_12 += 6
+                            wsp_c_13 += 6
+                            wsp_c_14 += 6
+                            wsp_c_15 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7, wsp_c_8, wsp_c_9,
+                                              wsp_c_10, wsp_c_11, wsp_c_12, wsp_c_13, wsp_c_14,
+                                              wsp_c_15])
+                        elif (le == 4 and lf == 3) or (le == 3 and lf == 4):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 5
+                            wsp_c_6 += 5
+                            wsp_c_7 += 5
+                            wsp_c_8 += 5
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7, wsp_c_8])
+                        elif (le == 4 and lf == 2) or (le == 2 and lf == 4):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            wsp_c_7 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7])
+                        elif (le == 4 and lf == 1) or (le == 1 and lf == 4):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4])
+                        elif (le == 4 and lf == 0) or (le == 0 and lf == 4):  # inbred
+                            wsp_c += 4
+                            wsp_c_1 += 4
+                            wsp_c_2 += 4
+                            wsp_c_3 += 4
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3])
+                        elif le == 3 and lf == 3:
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            wsp_c_7 += 6
+                            wsp_c_8 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7, wsp_c_8])
+                        elif (le == 3 and lf == 2) or (le == 2 and lf == 3):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6])
+                        elif (le == 3 and lf == 1) or (le == 1 and lf == 3):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 0
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3])
+                        elif (le == 3 and lf == 0) or (le == 0 and lf == 3):  # inbred
+                            wsp_c += 4
+                            wsp_c_1 += 4
+                            wsp_c_2 += 2
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2])
+                        elif le == 2 and lf == 2:
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3])
+                        elif (le == 2 and lf == 1) or (le == 1 and lf == 2):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 0
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2])
+                        elif (le == 2 and lf == 0) or (le == 0 and lf == 2):  # inbred
+                            wsp_c += 4
+                            wsp_c_1 += 0
+                            full.extend([wsp_c, wsp_c_1])
+                        elif le == 1 and lf == 1:
+                            wsp_c += 6
+                            full.append(wsp_c)
+                        elif (le == 1 or lf == 0) or (le == 0 and lf == 1):
+                            wsp_c += 0
+                            full.append(wsp_c)
+                        else:
+                            print('nie ma wsrod pradziadkow')
+            else:
+
+                # rodzic i dziadek
+                if (((lista_rodzicow == [0]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [0]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [0]) and (lista_dziadkow == [2, 3]))
+                        or ((lista_rodzicow == [0]) and (lista_dziadkow == [3, 2]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [2, 3]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [3, 2]))
+                        or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [1, 0]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [1, 0]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [2, 3]))
+                        or ((lista_rodzicow == [1, 0] and (lista_dziadkow == [2, 3]))
+                            or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [3, 2]))
+                            or ((lista_rodzicow == [1, 0]) and (lista_dziadkow == [3, 2])))):
+
+                    for a in range(len(A)):
+                        a = A.pop()
+                        if (a == cos):
+                            la += 1
+                    for b in range(len(B)):
+                        b = B.pop(0)
+                        if (b == cos):
+                            lb += 1
+                    for c in range(len(C)):
+                        c = C.pop()
+                        if (c == cos):
+                            lc += 1
+                    for d in range(len(D)):
+                        d = D.pop(0)
+                        if (d == cos):
+                            ld += 1
+
+                    if (la == 1 and lb == 1 and lc == 1 and ld == 1):  ##
+                        wsp_d_1 += 4
+                        wsp_d_2 += 3
+                        wsp_d_3 += 3
+                        wsp_d_4 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 0) or (
+                            la == 1 and lb == 1 and lc == 0 and ld == 1):  ##
+                        wsp_d_1 += 3
+                        wsp_d_2 += 2
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 2) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 1):  ##
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        wsp_d_3 += 3
+                        wsp_d_4 += 3
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 1 and ld == 1):  ##
+                        wsp_d_1 += 4
+                        wsp_d_2 += 3
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 0 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 1 and ld == 0):  ##
+                        wsp_d_1 += 3
+                        full.append(wsp_d_1)
+                # rodzic i pradziadek
+                elif (((lista_rodzicow == [0]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [0]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [0]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [0]) and (lista_pra == [5, 4]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [5, 4]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [5, 4]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [5, 4]))):
+                    for a in range(len(A)):
+                        a = A.pop()
+                        if (a == cos):
+                            la += 1
+                    for b in range(len(B)):
+                        b = B.pop(0)
+                        if (b == cos):
+                            lb += 1
+                    for e in range(len(E)):
+                        e = E.pop()
+                        if (e == cos):
+                            le += 1
+                    for f in range(len(Fe)):
+                        f = Fe.pop(0)
+                        if (f == cos):
+                            lf += 1
+
+                    if la == 1 and lb == 1 and lc == 2 and ld == 2:  ##
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 4
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 4
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        wsp_d_9 += 2
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9])
+                    elif (la == 1 and lb == 0 and lc == 2 and ld == 4) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 4):  ##
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+
+                        wsp_d_9 += 4
+                        wsp_d_10 += 4
+                        wsp_d_11 += 4
+                        wsp_d_12 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 2) or (
+                            la == 1 and lb == 1 and lc == 2 and ld == 1):  ##
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 4
+                        wsp_d_4 += 4
+                        wsp_d_5 += 4
+                        wsp_d_6 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 4) or (
+                            la == 0 and lb == 1 and lc == 4 and ld == 1):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif (la == 1 and lb == 1 and lc == 2 and ld == 0) or (
+                            la == 1 and lb == 1 and lc == 0 and ld == 2):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        wsp_d_3 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 1):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 4
+                        wsp_d_3 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 0) or (
+                            la == 1 and lb == 1 and lc == 0 and ld == 1):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 2
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 2 and ld == 3) or (
+                            la == 0 and lb == 1 and lc == 3 and ld == 2):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        wsp_d_9 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8, wsp_d_9])
+                    elif (la == 1 and lb == 0 and lc == 2 and ld == 2) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 2):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif ((la == 1 and lb == 0 and lc == 2 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 1) or (
+                                  la == 1 and lb == 0 and lc == 1 and ld == 2) or (
+                                  la == 0 and lb == 1 and lc == 1 and ld == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif (la == 0 and lb == 1 and lc == 2 and ld == 0) or (
+                            la == 1 and lb == 0 and lc == 0 and ld == 2):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 3) or (
+                            la == 0 and lb == 1 and lc == 3 and ld == 1):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 4
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif (la == 1 and lb == 0 and lc == 0 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 1 and ld == 0):
+                        wsp_d_1 += 4
+                        full.append(wsp_d_1)
+
+                elif ((((lista_dziadkow == [2]) and (lista_pra == [4])) or (
+                        (lista_dziadkow == [3]) and (lista_pra == [4])) or (
+                               (lista_dziadkow == [2]) and (lista_pra == [5])) or (
+                               (lista_dziadkow == [3]) and (lista_pra == [5])) or (
+                               (lista_dziadkow == [2]) and (lista_pra == [4, 5])) or (
+                               (lista_dziadkow == [2]) and (lista_pra == [5, 4])) or (
+                               (lista_dziadkow == [3] and (lista_pra == [4, 5])) or (
+                               (lista_dziadkow == [3] and (lista_pra == [5, 4])) or (
+                               (lista_dziadkow == [2, 3]) and (lista_pra == [4])) or (
+                                       (lista_dziadkow == [3, 2]) and (lista_pra == [4])) or (
+                                       (lista_dziadkow == [2, 3]) and (lista_pra == [5])) or (
+                                       (lista_dziadkow == [3, 2]) and (lista_pra == [5])) or (
+                                       (lista_dziadkow == [2, 3]) and (lista_pra == [4, 5])) or (
+                                       (lista_dziadkow == [3, 2] and (lista_pra == [4, 5])) or (
+                                       (lista_dziadkow == [2, 3]) and (lista_pra == [3, 2])) or (
+                                               (lista_dziadkow == [1, 0]) and (lista_pra == [5, 4]))))))):
+                    for c in range(len(C)):
+                        c = C.pop()
+                        if (c == cos):
+                            lc += 1
+                    for d in range(len(D)):
+                        d = D.pop(0)
+                        if (d == cos):
+                            ld += 1
+                    for e in range(len(E)):
+                        e = E.pop()
+                        if (e == cos):
+                            le += 1
+                    for f in range(len(Fe)):
+                        f = Fe.pop(0)
+                        if (f == cos):
+                            lf += 1
+                    if ((lc == 2) and (ld == 2) and (le == 2) and (lf == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 6
+                        wsp_d_4 += 5
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 4
+                        wsp_d_7 += 5
+                        wsp_d_8 += 4
+
+                        wsp_d_9 += 6
+                        wsp_d_10 += 5
+                        wsp_d_11 += 6
+                        wsp_d_12 += 5
+
+                        wsp_d_13 += 5
+                        wsp_d_14 += 4
+                        wsp_d_15 += 5
+                        wsp_d_16 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 2) and (ld == 2) and (le == 2) and (lf == 1)) or (
+                            (lc == 2) and (ld == 2) and (le == 1) and (lf == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 5
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 5
+                        wsp_d_9 += 5
+
+                        wsp_d_10 += 5
+                        wsp_d_11 += 4
+                        wsp_d_12 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif ((lc == 2) and (ld == 2) and (le == 2) and (lf == 0)) or (
+                            (lc == 2) and (ld == 2) and (le == 0) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 4
+                        wsp_d_4 += 4
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8])
+                    elif (((lc == 2) and (ld == 1) and (le == 2) and (lf == 3)) or (
+                            (lc == 2) and (ld == 1) and (le == 3) and (lf == 2))
+                          or ((lc == 1) and (ld == 2) and (le == 2) and (lf == 3)) or (
+                                  (lc == 1) and (ld == 2) and (le == 3) and (lf == 2))):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 4
+                        wsp_d_7 += 5
+                        wsp_d_8 += 5
+
+                        wsp_d_9 += 6
+                        wsp_d_10 += 5
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+
+                        wsp_d_13 += 5
+                        wsp_d_14 += 4
+                        wsp_d_15 += 5
+                        wsp_d_16 += 5
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 2) and (ld == 1) and (le == 2) and (lf == 2)) or (
+                            (lc == 1) and (ld == 2) and (le == 2) and (lf == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 6
+
+                        wsp_d_4 += 5
+                        wsp_d_5 += 4
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 5
+                        wsp_d_9 += 6
+
+                        wsp_d_10 += 5
+                        wsp_d_11 += 4
+                        wsp_d_12 += 5
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif (((lc == 2) and (ld == 1) and (le == 2) and (lf == 1)) or (
+                            (lc == 1) and (ld == 2) and (le == 1) and (lf == 2))
+                          or ((lc == 2) and (ld == 1) and (le == 1) and (lf == 2)) or (
+                                  (lc == 1) and (ld == 2) and (le == 2) and (lf == 1))):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 5
+                        wsp_d_4 += 4
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 5
+                        wsp_d_8 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif (((lc == 2) and (ld == 1) and (le == 2) and (lf == 0)) or (
+                            (lc == 1) and (ld == 2) and (le == 0) and (lf == 2))
+                          or ((lc == 2) and (ld == 1) and (le == 0) and (lf == 2)) or (
+                                  (lc == 1) and (ld == 2) and (le == 2) and (lf == 0))):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 4
+
+                        wsp_d_3 += 5
+                        wsp_d_4 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 1) and (le == 1) and (lf == 0)) or (
+                            (lc == 1) and (ld == 2) and (le == 0) and (lf == 1)):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 5
+                        wsp_d_3 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif ((lc == 1) and (ld == 2) and (le == 1) and (lf == 0)) or (
+                            (lc == 2) and (ld == 1) and (le == 0) and (lf == 1)):  ####
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        wsp_d_3 += 5
+                        wsp_d_4 += 5
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 1) and (le == 0) and (lf == 1)) or (
+                            (lc == 2) and (ld == 1) and (le == 1) and (lf == 0)):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 5
+                        wsp_d_3 += 4
+                        wsp_d_4 += 5
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 4)) or (
+                            (lc == 0) and (ld == 2) and (le == 4) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+                        wsp_d_4 += 5
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+
+                        wsp_d_9 += 5
+                        wsp_d_10 += 5
+                        wsp_d_11 += 5
+                        wsp_d_12 += 5
+
+                        wsp_d_13 += 6
+                        wsp_d_14 += 6
+                        wsp_d_15 += 6
+                        wsp_d_16 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 3)) or (
+                            (lc == 0) and (ld == 2) and (le == 3) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 5
+                        wsp_d_8 += 5
+                        wsp_d_9 += 5
+
+                        wsp_d_10 += 6
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 2)) or (
+                            (lc == 0) and (ld == 2) and (le == 2) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 1)) or (
+                            (lc == 0) and (ld == 2) and (le == 1) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 6
+                        wsp_d_3 += 5
+                        wsp_d_4 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 0) and (le == 1) and (lf == 2)) or (
+                            (lc == 0) and (ld == 2) and (le == 2) and (lf == 1)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 5
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 4)) or (
+                            (lc == 0) and (ld == 1) and (le == 4) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+                        wsp_d_4 += 5
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+
+                        wsp_d_9 += 6
+                        wsp_d_10 += 6
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+
+                        wsp_d_13 += 6
+                        wsp_d_14 += 6
+                        wsp_d_15 += 6
+                        wsp_d_16 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 3)) or (
+                            (lc == 0) and (ld == 1) and (le == 3) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        wsp_d_9 += 6
+
+                        wsp_d_10 += 6
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif ((lc == 1) and (ld == 0) and (le == 2) and (lf == 3)) or (
+                            (lc == 0) and (ld == 1) and (le == 3) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        wsp_d_9 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8, wsp_d_9])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 2)) or (
+                            (lc == 0) and (ld == 1) and (le == 2) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 1)) or (
+                            (lc == 0) and (ld == 1) and (le == 1) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 1) and (ld == 0) and (le == 1) and (lf == 3)) or (
+                            (lc == 0) and (ld == 1) and (le == 3) and (lf == 1)):  #
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_4, wsp_d_5])
+
+        FULL = sum(full)
+        full = full[0:len(full)]
+        return full
+
+    def inbred( nzw):
+        print ("Start inbred", nzw)
+        nzw = nzw
+        x = find_parent(nzw)
+        print("x in  inbred", nzw)
+        if len(x) == 2:
+            rodzic1 = x[0]
+            print("rodzic 1 inbred", nzw)
+            rodzic2 = x[1]
+            print("rodzic 2 inbred", nzw)
+        else:
+            F = 0
+            return F
+        y = porownanie(rodzic1, rodzic2)
+        if y:
+            for i in range(len(y)):
+                w = []
+                ii = y.pop()
+                ic = str(ii[0])
+                xx = find_parent(ic)
+                if len(xx) == 2:
+                    a1 = xx[0]
+                    rodzic11 = str(a1[0])
+                    b1 = xx[1]
+                    rodzic12 = str(b1[0])
+                    por = porownanie(rodzic11, rodzic12)
+                    if por:
+                        for a in range(len(por)):
+                            ai = por.pop()
+                            sy = sciezka_konkretna(rodzic11, rodzic12, ai)
+                            for i in range(sy.count(0)):
+                                sy.remove(0)
+                            Za = []
+                            for j in sy:
+                                w = 0.5 ** (j + 1)
+                                Za.append(w)
+                            Fa = sum(Za)
+                    else:
+                        Fa = 0
+                else:
+                    Fa = 0
+            k = sciezka_konkretna(rodzic1, rodzic2, ii)
+            for i in range(k.count(0)):
+                k.remove(0)
+            for i in range(len(k)):
+                sz = k.pop()
+                szy = (0.5 ** (sz + 1)) * (1 + Fa)
+                w.append(szy)
+        else:
+            F = 0
+            return F
+        F = sum(w)
+        return F
+
+    def tree2( nazwa):
+        nazwa = nazwa
+        a = find_parent(nazwa)
+        b = find_grand(nazwa)
+        c = find_pra(nazwa)
+        ListTree = []
+        for i in a:
+            ListTree.append(i)
+        for j in b:
+            ListTree.append(j)
+        for y in c:
+            ListTree.append(y)
+        return ListTree
+
+    def wspolny_przodek(nazwa1, nazwa2):
+        #nazwa1 = nazwa1
+        #nazwa2 = nazwa2
+        x = tree2(nazwa1)
+        y = tree2(nazwa2)
+        wsp = set(x) & set(y)
+        return wsp
+
+    def pokrewienstwo():
+        nzw1 = treeO_wspok1.item(treeO_wspok1.selection())['text']
+        nzw2 = treeO_wspok2.item(treeO_wspok2.selection())['text']
+        x = porownanie(nzw1, nzw2)
+        y = porownanie2(nzw1, nzw2)
+        #print ("in pokrewienstwo",nzw1, nzw2)
+        w = []
+        FFF = []
+        if x:
+            for i in range(len(x)):
+                w = []
+                if len(x) > 0:
+                    ic = x.pop()
+                    #print("2 in pokrewienstwo", nzw1, nzw2)
+                    F = inbred(ic)
+                    #print("3 in pokrewienstwo", nzw1, nzw2)
+                    k = sciezka_konkretna(nzw1, nzw2, ic)
+                    #print("4 in pokrewienstwo", nzw1, nzw2)
+                    for i in range(k.count(0)):
+                        k.remove(0)
+                    if len(k) > 0:
+                        for i in range(len(k)):
+                            sz = k.pop()
+                            szy = 0.5 ** sz
+                            w.append(szy)
+                    else:
+                        szy = 0
+                        w.append(szy)
+                    pi = sum(w)
+                    FF = ((pi) * (1 + F))
+                    FFF.append(FF)
+                else:
+                    X = 0
+                    return 0
+        if y:
+            szy = 0.5 ** y
+            w.append(szy)
+            pi = sum(w)
+            FFF.append(pi)
+
+        FFFF = sum(FFF)
+        Fx = inbred(nzw1)
+        Fy = inbred(nzw2)
+        f = math.sqrt((1 + Fx) * (1 + Fy))
+        X = (FFFF / f)
+        wo ="Wspó³czynnik pokrewieñstwa dla tych osobników wynosi: %i" % X
+        wynik_wspok2.delete('1.0', END)
+        wynik_wspok2.insert(END, wo, ('p'))
+        wynik_wspok2.insert(END, '\n', ('p'))
+        #return X
+
 
     def tree():
         nazwa = treeO_wspok1.item(treeO_wspok1.selection())['text']
@@ -262,9 +1412,16 @@ def pokrewienstwo():
             ListTree.append(j)
         for y in c:
             ListTree.append(y)
-            wynik_wspok2.insert(END, ListTree, ('p'))
+            print ("First",ListTree)
 
-    '''def zapisywanieDoPlikuPokre(plik, tresc):
+        for naz in ListTree:
+            print ("Second",naz)
+            treeO_wspok2.insert('', 0, text=naz)
+
+
+
+
+    def zapisywanieDoPlikuPokre(plik, tresc):
         plik1 = open(plik, 'w')
         plik1.write(tresc)
         plik1.close()
@@ -285,13 +1442,14 @@ def pokrewienstwo():
           "Gatunek: {}\n" \
           "Hodowca: {}\n" \
           "\n" \
-          "Wspó³czynnik pokrewieñstwa pomiêdzy tymi osobnikami wynosi: {}\n" \''''
+          "Wspó³czynnik pokrewieñstwa pomiêdzy tymi osobnikami wynosi: {}\n"
 
     # Przyciski
     B1 = Button(F1, text='Wyœwietl spokrewnione osobniki',command=tree).grid(column=0, row=8, columnspan=3)
-    #B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
-    #            command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4, columnspan=3)
-    B3 = Button(wspok, text='Zakoñcz', command=wspok.destroy).grid(column=1, row=10)
+    B2 = Button(F2, text='Oblicz wspó³czynnik pokrewieñstwa', command=pokrewienstwo).grid(column=0, row=8, columnspan=3)
+    B3 = Button(F3, text='Zapisz wynik do pliku tekstowego',
+                command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4, columnspan=3)
+    B4 = Button(wspok, text='Zakoñcz', command=wspok.destroy).grid(column=1, row=10)
 
     viewing_record1()
 
@@ -306,7 +1464,7 @@ def avgpokrewienstwa():
     db_name = "baza.db"
 
     avgpok = Tk()
-    avgpok.geometry("1500x600+0+0")
+    avgpok.geometry("1050x600+0+0")
     avgpok.title("Œredni wspó³czynnik pokrewieñstwa")
     avgpok_label = Label(avgpok)
     avgpok_label.grid()
@@ -358,27 +1516,1241 @@ def avgpokrewienstwa():
         for row in db_rows:
             treeO_avgpok.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
 
-    def sredni_wspolczynnik_pokrewienstwa(nazwa):
-        nazwa = treeO_wspok1.item(treeO_wspok1.selection())['text']
-        all = tree(nazwa)
+    def id_nazwa(id):
+        """Funkcja zamieniaj¹ca id w nazwe osobnika"""
+        print("Start in id nazwa", id)
+        id = id
+        query = "SELECT nazwa FROM osobniki WHERE id_os=?"
+        db_rows = run_query(query, id)
+        for row in db_rows:
+            nazwa = row[0]
+        return nazwa
+
+    def nazwa_id(nazwa):
+        """Funkcja podaje id osobnika"""
+        nazwa = nazwa
+        print ("Start in nazwa_id", nazwa)
+        query = "SELECT id_os FROM osobniki WHERE nazwa=?"
+        db_rows = run_query(query, (nazwa,))
+        print("next one in nazwa id", nazwa)
+        for row in db_rows:
+            id = row[0]
+            print ("for in nazwa id", nazwa)
+        return id
+
+    def find_parent(nazwa):
+        #nazwa = nazwa
+        list_of_parents = []
+        print("Start in find parent nazwa",nazwa)
+        nazwa1 = nazwa_id(nazwa)
+        try:
+            print("try in find parent nazwa 1: ", nazwa1)
+            query = 'SELECT id_os2 FROM relacje WHERE id_os1=?'
+            db_rows = run_query(query, (nazwa1,))
+            for row in db_rows:
+                parent = id_nazwa(row)
+                list_of_parents.append(parent)
+        except ValueError:
+            pass
+        return list_of_parents
+
+    def find_grand(nazwa):
+        nazwa = nazwa
+        lista = []
+        nazwa1 = nazwa_id(nazwa)
+        query = 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?)'
+        db_rows = run_query(query, (nazwa1,))
+        for row in db_rows:
+            grand = id_nazwa(row)
+            lista.append(grand)
+        return lista
+
+    def find_pra(nazwa:str):
+        nazwa = nazwa
+        lista = []
+        nazwa1 = nazwa_id(nazwa)
+        query = 'SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1 in (SELECT id_os2 FROM relacje WHERE id_os1=?))'
+        db_rows = run_query(query, [nazwa1])
+        for row in db_rows:
+            pra = id_nazwa(row)
+            lista.append(pra)
+        return lista
+
+    def tree():
+        nazwa = treeO_avgpok.item(treeO_avgpok.selection())['text']
+        a = find_parent(nazwa)
+        b = find_grand(nazwa)
+        c = find_pra(nazwa)
+        ListTree = []
+        for i in a:
+            ListTree.append(i)
+        for j in b:
+            ListTree.append(j)
+        for y in c:
+            ListTree.append(y)
+        return ListTree
+
+    def wspolny_przodek(nazwa1, nazwa2):
+        nazwa1 = nazwa1
+        nazwa2 = nazwa2
+        x = tree()
+        y = tree()
+        wsp = set(x) & set(y)
+        return wsp
+
+    def porownanie(nzw1, nzw2):
+        print ("In porownanie")
+        nzw1 = nzw1
+        nzw2 = nzw2
+        a = find_parent(nzw1)
+        A = find_parent(nzw2)
+        aa = []
+        aa.extend(a)
+        aa.extend(A)
+        b = find_grand(nzw1)
+        B = find_grand(nzw2)
+        bb = []
+        bb.extend(b)
+        bb.extend(B)
+        c = find_pra(nzw1)
+        C = find_pra(nzw2)
+        cc = []
+        cc.extend(c)
+        cc.extend(C)
+        wspolny = []
+        if (a == A) and len(a) == 2:
+            wspolny.extend(a)
+            return wspolny
+        else:
+            i = list(set(a) & set(A))
+            wspolny.extend(i)
+
+        if (len(a) > 0 or len(A) > 0):
+            for i in aa:
+                i = aa.pop(0)
+                i = str(i[0])
+                if ( i == nzw1) or (i == nzw2):
+                    wspolny.append(i)
+
+        if not wspolny:
+            if b == B and len(b) == 4:
+                wspolny.extend(b)
+                return wspolny
+            elif (len(b) > 0 or len(B) > 0):
+                for i in bb:
+                    i = bb.pop(0)
+                    i = str(i[0])
+                    if (i == nzw1) or (i == nzw2):
+                        wspolny.append(i)
+                i = list(set(b) & set(B))
+                for z in b:
+                    if b.count(z) > 1:
+                        wspolny.append(z)
+                for z in B:
+                    if B.count(z) > 1:
+                        wspolny.append(z)
+                wspolny.extend(i)
+
+        if not wspolny:
+
+            if c == C and len(c) == 8:
+                wspolny.extend(c)
+                return wspolny
+            elif (len(c) > 0 or len(C) > 0):
+                for i in cc:
+                    i = cc.pop(0)
+                    i = str(i[0])
+                    if (i == nzw1) or (i == nzw2):
+                        wspolny.append(i)
+            else:
+                i = list(set(c) & set(C))
+                for z in c:
+                    if c.count(z) > 1:
+                        wspolny.append(i)
+                for z in C:
+                    if C.count(z) > 1:
+                        wspolny.append(i)
+                wspolny.extend(i)
+
+        if not wspolny:
+            wsp = wspolny_przodek(nzw1, nzw2)
+            wspolny.extend(wsp)
+            return wspolny
+        return wspolny
+
+    def porownanie2(nzw1, nzw2):
+        print ( "in porownanie2")
+        nzw1 = nzw1
+        nzw2 = nzw2
+        a = find_parent(nzw1)
+        A = find_parent(nzw2)
+        b = find_grand(nzw1)
+        B = find_grand(nzw2)
+        c = find_pra(nzw1)
+        C = find_pra(nzw2)
+        wspolny = porownanie(nzw1, nzw2)
+        w = 0
+        if not wspolny:
+            nzw1 = str(nzw1)
+            nzw1 = (nzw1,)
+            nzw2 = str(nzw2)
+            nzw2 = (nzw2,)
+            for i in a:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 1
+            for i in A:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 1
+            for i in b:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 2
+            for i in B:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 2
+            for i in c:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 3
+            for i in C:
+                if (nzw1 == i) or (nzw2 == i):
+                    w += 3
+        return w
+
+    def sciezka_konkretna( nzw1, nzw2, cos):  # zamiany!
+        #nzw1 = nzw1
+        #nzw2 = nzw2
+        print("in scezka konkretna", nzw1, nzw2)
+        cos = cos
+        if type(cos) == str:
+            cos = (cos,)
+        full = []
+        wsp_a = 0
+        wsp_b = 0
+        wsp_b_1 = 0
+        wsp_c = 0
+        wsp_c_1 = 0
+        wsp_c_2 = 0
+        wsp_c_3 = 0
+        wsp_c_4 = 0
+        wsp_c_5 = 0
+        wsp_c_6 = 0
+        wsp_c_7 = 0
+        wsp_c_8 = 0
+        wsp_c_9 = 0
+        wsp_c_10 = 0
+        wsp_c_11 = 0
+        wsp_c_12 = 0
+        wsp_c_13 = 0
+        wsp_c_14 = 0
+        wsp_c_15 = 0
+        wsp_d_1 = 0
+        wsp_d_2 = 0
+        wsp_d_3 = 0
+        wsp_d_4 = 0
+        wsp_d_5 = 0
+        wsp_d_6 = 0
+        wsp_d_7 = 0
+        wsp_d_8 = 0
+        wsp_d_9 = 0
+        wsp_d_10 = 0
+        wsp_d_11 = 0
+        wsp_d_12 = 0
+        wsp_d_13 = 0
+        wsp_d_14 = 0
+        wsp_d_15 = 0
+        wsp_d_16 = 0
+        la = 0
+        lb = 0
+        lc = 0
+        ld = 0
+        le = 0
+        lf = 0
+        print("before find parent", nzw1, nzw2)
+        A = find_parent(nzw1) # usun¹³em [0]
+        B = find_parent(nzw2) # usun¹³em [0]
+        print("find parent", nzw1, nzw2)
+        C = find_grand(nzw1) # usun¹³em [0]
+        D = find_grand(nzw2) # usun¹³em [0]
+        print("find grand", nzw1, nzw2)
+        E = find_pra(nzw1) # usun¹³em [0]
+        Fe = find_pra(nzw2) # usun¹³em [0]
+
+        print("find_pra", nzw1, nzw2)
+        if A or B:
+            if (A == B):
+                if len(A) == 2:
+                    for a in range(len(A)):
+                        #a = A.pop(0)
+                        aa = str(a)
+                        if (a == cos):
+                            wsp_a += 2
+                elif len(A) == 1:
+                    for a in range(len(A)):
+                        #a = A.pop(0)
+                        a = str(a) #a[0]
+                        if (a == cos):
+                            wsp_a += 1
+                full.append(wsp_a)
+                for i in range(full.count(0)):
+                    full.remove(0)
+                if full:
+                    return full
+            else:
+                for a in range(len(A)):
+                    for b in range(len(B)):
+                        #a = A.pop(0)
+                        aa = str(a)
+                        #b = B.pop(0)
+                        bb = str(b)
+                        if (a == cos) and (b == cos):
+                            wsp_a += 2
+                        elif (a == cos) or (b == cos):
+                            wsp_a += 1
+                full.append(wsp_a)
+            for i in range(full.count(0)):
+                full.remove(0)
+            if full:
+                return full
+        if not full:
+            if C or D:
+                if (C == D):
+                    for c in range(len(C)):
+                        #c = C.pop(0)
+                        c = str(c)
+                        if (c == cos):
+                            wsp_b += 4
+                        full.append(wsp_b)
+            if E or Fe:
+                if (E == Fe):
+                    for e in range(len(E)):
+                        #e = E.pop(0)
+                        e = str(e)
+                        if (e == cos):
+                            wsp_c += 6
+                        full.append(wsp_c)
+
+        z = max(len(A), len(B), len(C), len(D), len(E), len(Fe))
+        lista = [A, B, C, D, E, Fe]
+        for l in lista:
+            for l in lista:
+                if len(l) < z:
+                    l.extend([0])
+
+        lista_index = []
+        for l in lista:
+            for i in l:
+                if (i == cos):
+                    index = lista.index(l)
+                    lista_index.append(index)
+        lista_index = list(set(lista_index))
+        lista_wszystkiego = []
+        lista_rodzicow = []
+        lista_dziadkow = []
+        lista_pra = []
+        if len(lista_index) > 0:
+            for a in range(len(lista_index)):
+                i = lista_index.pop()
+                if (i == 0) or (i == 1):
+                    lista_rodzicow.append(i)
+                elif (i == 2) or (i == 3):
+                    lista_dziadkow.append(i)
+                elif (i == 4) or (i == 5):
+                    lista_pra.append(i)
+            lista_wszystkiego.append(lista_rodzicow)
+            lista_wszystkiego.append(lista_dziadkow)
+            lista_wszystkiego.append(lista_pra)
+            for a in range(len(lista_wszystkiego)):
+                for b in lista_wszystkiego:
+                    if not b:
+                        lista_wszystkiego.remove(b)
+
+            if len(lista_wszystkiego) == 1:
+                for a in range(len(lista_wszystkiego)):
+                    l = lista_wszystkiego.pop()
+                    if (l == [0]) or (l == [1]) or (l == [0, 1]) or (l == [1, 0]):
+                        for a in range(len(A)):
+                            for b in range(len(B)):
+                                a = A.pop(0)
+                                b = B.pop(0)
+                                if (a == cos) and (b == cos):
+                                    wsp_a += 2
+                                elif (a == cos) or (b == cos):
+                                    wsp_a += 1
+                                else:
+                                    wsp_a += 0
+                                    break
+                                full.append(wsp_a)
+
+                    elif (l == [2]) or (l == [3]) or (l == [2, 3]) or (l == [3, 2]):
+                        for c in range(len(C)):
+                            c = C.pop(0)
+                            if (c == cos):
+                                lc += 1
+                        for d in range(len(D)):
+                            d = D.pop(0)
+                            if (d == cos):
+                                ld += 1
+                        if lc > 1 and ld > 1:
+                            wsp_b += 4
+                            wsp_b_1 += 4
+                            full.extend([wsp_b, wsp_b_1])
+                        elif lc > 1 or ld > 1:
+                            wsp_b += 4
+                            full.append(wsp_b)
+                        elif lc == 1 and ld == 1:
+                            wsp_b += 4
+                            full.append(wsp_b)
+                        elif lc == 1 or ld == 1:
+                            wsp_b += 2
+                            full.append(wsp_b)
+                        else:
+                            print('nie ma wsrod dziadkow')
+
+                    elif (l == 4) or (l == 5) or (l == [4, 5]) or (l == [5, 4]):
+                        for e in range(len(E)):
+                            e = E.pop()
+                            if (e == cos):
+                                le += 1
+                        for f in range(len(Fe)):
+                            f = Fe.pop(0)
+                            if (f == cos):
+                                lf += 1
+                        if le == 4 and lf == 4:
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            wsp_c_7 += 6
+                            wsp_c_8 += 6
+                            wsp_c_9 += 6
+                            wsp_c_10 += 6
+                            wsp_c_11 += 6
+                            wsp_c_12 += 6
+                            wsp_c_13 += 6
+                            wsp_c_14 += 6
+                            wsp_c_15 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7, wsp_c_8, wsp_c_9,
+                                              wsp_c_10, wsp_c_11, wsp_c_12, wsp_c_13, wsp_c_14,
+                                              wsp_c_15])
+                        elif (le == 4 and lf == 3) or (le == 3 and lf == 4):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 5
+                            wsp_c_6 += 5
+                            wsp_c_7 += 5
+                            wsp_c_8 += 5
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7, wsp_c_8])
+                        elif (le == 4 and lf == 2) or (le == 2 and lf == 4):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            wsp_c_7 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7])
+                        elif (le == 4 and lf == 1) or (le == 1 and lf == 4):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4])
+                        elif (le == 4 and lf == 0) or (le == 0 and lf == 4):  # inbred
+                            wsp_c += 4
+                            wsp_c_1 += 4
+                            wsp_c_2 += 4
+                            wsp_c_3 += 4
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3])
+                        elif le == 3 and lf == 3:
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            wsp_c_7 += 6
+                            wsp_c_8 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6, wsp_c_7, wsp_c_8])
+                        elif (le == 3 and lf == 2) or (le == 2 and lf == 3):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            wsp_c_4 += 6
+                            wsp_c_5 += 6
+                            wsp_c_6 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3, wsp_c_4,
+                                              wsp_c_5, wsp_c_6])
+                        elif (le == 3 and lf == 1) or (le == 1 and lf == 3):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 0
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3])
+                        elif (le == 3 and lf == 0) or (le == 0 and lf == 3):  # inbred
+                            wsp_c += 4
+                            wsp_c_1 += 4
+                            wsp_c_2 += 2
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2])
+                        elif le == 2 and lf == 2:
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 6
+                            wsp_c_3 += 6
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2, wsp_c_3])
+                        elif (le == 2 and lf == 1) or (le == 1 and lf == 2):
+                            wsp_c += 6
+                            wsp_c_1 += 6
+                            wsp_c_2 += 0
+                            full.extend([wsp_c, wsp_c_1, wsp_c_2])
+                        elif (le == 2 and lf == 0) or (le == 0 and lf == 2):  # inbred
+                            wsp_c += 4
+                            wsp_c_1 += 0
+                            full.extend([wsp_c, wsp_c_1])
+                        elif le == 1 and lf == 1:
+                            wsp_c += 6
+                            full.append(wsp_c)
+                        elif (le == 1 or lf == 0) or (le == 0 and lf == 1):
+                            wsp_c += 0
+                            full.append(wsp_c)
+                        else:
+                            print('nie ma wsrod pradziadkow')
+            else:
+
+                # rodzic i dziadek
+                if (((lista_rodzicow == [0]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [0]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [0]) and (lista_dziadkow == [2, 3]))
+                        or ((lista_rodzicow == [0]) and (lista_dziadkow == [3, 2]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [2, 3]))
+                        or ((lista_rodzicow == [1]) and (lista_dziadkow == [3, 2]))
+                        or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [1, 0]) and (lista_dziadkow == [2]))
+                        or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [1, 0]) and (lista_dziadkow == [3]))
+                        or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [2, 3]))
+                        or ((lista_rodzicow == [1, 0] and (lista_dziadkow == [2, 3]))
+                            or ((lista_rodzicow == [0, 1]) and (lista_dziadkow == [3, 2]))
+                            or ((lista_rodzicow == [1, 0]) and (lista_dziadkow == [3, 2])))):
+
+                    for a in range(len(A)):
+                        a = A.pop()
+                        if (a == cos):
+                            la += 1
+                    for b in range(len(B)):
+                        b = B.pop(0)
+                        if (b == cos):
+                            lb += 1
+                    for c in range(len(C)):
+                        c = C.pop()
+                        if (c == cos):
+                            lc += 1
+                    for d in range(len(D)):
+                        d = D.pop(0)
+                        if (d == cos):
+                            ld += 1
+
+                    if (la == 1 and lb == 1 and lc == 1 and ld == 1):  ##
+                        wsp_d_1 += 4
+                        wsp_d_2 += 3
+                        wsp_d_3 += 3
+                        wsp_d_4 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 0) or (
+                            la == 1 and lb == 1 and lc == 0 and ld == 1):  ##
+                        wsp_d_1 += 3
+                        wsp_d_2 += 2
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 2) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 1):  ##
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        wsp_d_3 += 3
+                        wsp_d_4 += 3
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 1 and ld == 1):  ##
+                        wsp_d_1 += 4
+                        wsp_d_2 += 3
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 0 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 1 and ld == 0):  ##
+                        wsp_d_1 += 3
+                        full.append(wsp_d_1)
+                # rodzic i pradziadek
+                elif (((lista_rodzicow == [0]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [0]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [0]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [0]) and (lista_pra == [5, 4]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [1]) and (lista_pra == [5, 4]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [4]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [5]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [4, 5]))
+                      or ((lista_rodzicow == [0, 1]) and (lista_pra == [5, 4]))
+                      or ((lista_rodzicow == [1, 0]) and (lista_pra == [5, 4]))):
+                    for a in range(len(A)):
+                        a = A.pop()
+                        if (a == cos):
+                            la += 1
+                    for b in range(len(B)):
+                        b = B.pop(0)
+                        if (b == cos):
+                            lb += 1
+                    for e in range(len(E)):
+                        e = E.pop()
+                        if (e == cos):
+                            le += 1
+                    for f in range(len(Fe)):
+                        f = Fe.pop(0)
+                        if (f == cos):
+                            lf += 1
+
+                    if la == 1 and lb == 1 and lc == 2 and ld == 2:  ##
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 4
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 4
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        wsp_d_9 += 2
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9])
+                    elif (la == 1 and lb == 0 and lc == 2 and ld == 4) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 4):  ##
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+
+                        wsp_d_9 += 4
+                        wsp_d_10 += 4
+                        wsp_d_11 += 4
+                        wsp_d_12 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 2) or (
+                            la == 1 and lb == 1 and lc == 2 and ld == 1):  ##
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 4
+                        wsp_d_4 += 4
+                        wsp_d_5 += 4
+                        wsp_d_6 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 4) or (
+                            la == 0 and lb == 1 and lc == 4 and ld == 1):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif (la == 1 and lb == 1 and lc == 2 and ld == 0) or (
+                            la == 1 and lb == 1 and lc == 0 and ld == 2):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        wsp_d_3 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 1):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 4
+                        wsp_d_3 += 2
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif (la == 1 and lb == 1 and lc == 1 and ld == 0) or (
+                            la == 1 and lb == 1 and lc == 0 and ld == 1):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 2
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 2 and ld == 3) or (
+                            la == 0 and lb == 1 and lc == 3 and ld == 2):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        wsp_d_9 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8, wsp_d_9])
+                    elif (la == 1 and lb == 0 and lc == 2 and ld == 2) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 2):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif ((la == 1 and lb == 0 and lc == 2 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 2 and ld == 1) or (
+                                  la == 1 and lb == 0 and lc == 1 and ld == 2) or (
+                                  la == 0 and lb == 1 and lc == 1 and ld == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif (la == 0 and lb == 1 and lc == 2 and ld == 0) or (
+                            la == 1 and lb == 0 and lc == 0 and ld == 2):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        full.extend([wsp_d_1, wsp_d_2])
+                    elif (la == 1 and lb == 0 and lc == 1 and ld == 3) or (
+                            la == 0 and lb == 1 and lc == 3 and ld == 1):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 4
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif (la == 1 and lb == 0 and lc == 0 and ld == 1) or (
+                            la == 0 and lb == 1 and lc == 1 and ld == 0):
+                        wsp_d_1 += 4
+                        full.append(wsp_d_1)
+
+                elif ((((lista_dziadkow == [2]) and (lista_pra == [4])) or (
+                        (lista_dziadkow == [3]) and (lista_pra == [4])) or (
+                               (lista_dziadkow == [2]) and (lista_pra == [5])) or (
+                               (lista_dziadkow == [3]) and (lista_pra == [5])) or (
+                               (lista_dziadkow == [2]) and (lista_pra == [4, 5])) or (
+                               (lista_dziadkow == [2]) and (lista_pra == [5, 4])) or (
+                               (lista_dziadkow == [3] and (lista_pra == [4, 5])) or (
+                               (lista_dziadkow == [3] and (lista_pra == [5, 4])) or (
+                               (lista_dziadkow == [2, 3]) and (lista_pra == [4])) or (
+                                       (lista_dziadkow == [3, 2]) and (lista_pra == [4])) or (
+                                       (lista_dziadkow == [2, 3]) and (lista_pra == [5])) or (
+                                       (lista_dziadkow == [3, 2]) and (lista_pra == [5])) or (
+                                       (lista_dziadkow == [2, 3]) and (lista_pra == [4, 5])) or (
+                                       (lista_dziadkow == [3, 2] and (lista_pra == [4, 5])) or (
+                                       (lista_dziadkow == [2, 3]) and (lista_pra == [3, 2])) or (
+                                               (lista_dziadkow == [1, 0]) and (lista_pra == [5, 4]))))))):
+                    for c in range(len(C)):
+                        c = C.pop()
+                        if (c == cos):
+                            lc += 1
+                    for d in range(len(D)):
+                        d = D.pop(0)
+                        if (d == cos):
+                            ld += 1
+                    for e in range(len(E)):
+                        e = E.pop()
+                        if (e == cos):
+                            le += 1
+                    for f in range(len(Fe)):
+                        f = Fe.pop(0)
+                        if (f == cos):
+                            lf += 1
+                    if ((lc == 2) and (ld == 2) and (le == 2) and (lf == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 6
+                        wsp_d_4 += 5
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 4
+                        wsp_d_7 += 5
+                        wsp_d_8 += 4
+
+                        wsp_d_9 += 6
+                        wsp_d_10 += 5
+                        wsp_d_11 += 6
+                        wsp_d_12 += 5
+
+                        wsp_d_13 += 5
+                        wsp_d_14 += 4
+                        wsp_d_15 += 5
+                        wsp_d_16 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 2) and (ld == 2) and (le == 2) and (lf == 1)) or (
+                            (lc == 2) and (ld == 2) and (le == 1) and (lf == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 5
+                        wsp_d_5 += 4
+                        wsp_d_6 += 4
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 5
+                        wsp_d_9 += 5
+
+                        wsp_d_10 += 5
+                        wsp_d_11 += 4
+                        wsp_d_12 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif ((lc == 2) and (ld == 2) and (le == 2) and (lf == 0)) or (
+                            (lc == 2) and (ld == 2) and (le == 0) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 4
+                        wsp_d_4 += 4
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 4
+                        wsp_d_8 += 4
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8])
+                    elif (((lc == 2) and (ld == 1) and (le == 2) and (lf == 3)) or (
+                            (lc == 2) and (ld == 1) and (le == 3) and (lf == 2))
+                          or ((lc == 1) and (ld == 2) and (le == 2) and (lf == 3)) or (
+                                  (lc == 1) and (ld == 2) and (le == 3) and (lf == 2))):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 4
+                        wsp_d_7 += 5
+                        wsp_d_8 += 5
+
+                        wsp_d_9 += 6
+                        wsp_d_10 += 5
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+
+                        wsp_d_13 += 5
+                        wsp_d_14 += 4
+                        wsp_d_15 += 5
+                        wsp_d_16 += 5
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 2) and (ld == 1) and (le == 2) and (lf == 2)) or (
+                            (lc == 1) and (ld == 2) and (le == 2) and (lf == 2)):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+                        wsp_d_3 += 6
+
+                        wsp_d_4 += 5
+                        wsp_d_5 += 4
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 5
+                        wsp_d_9 += 6
+
+                        wsp_d_10 += 5
+                        wsp_d_11 += 4
+                        wsp_d_12 += 5
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif (((lc == 2) and (ld == 1) and (le == 2) and (lf == 1)) or (
+                            (lc == 1) and (ld == 2) and (le == 1) and (lf == 2))
+                          or ((lc == 2) and (ld == 1) and (le == 1) and (lf == 2)) or (
+                                  (lc == 1) and (ld == 2) and (le == 2) and (lf == 1))):
+                        wsp_d_1 += 6
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 5
+                        wsp_d_4 += 4
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 5
+                        wsp_d_8 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif (((lc == 2) and (ld == 1) and (le == 2) and (lf == 0)) or (
+                            (lc == 1) and (ld == 2) and (le == 0) and (lf == 2))
+                          or ((lc == 2) and (ld == 1) and (le == 0) and (lf == 2)) or (
+                                  (lc == 1) and (ld == 2) and (le == 2) and (lf == 0))):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 4
+
+                        wsp_d_3 += 5
+                        wsp_d_4 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 1) and (le == 1) and (lf == 0)) or (
+                            (lc == 1) and (ld == 2) and (le == 0) and (lf == 1)):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 5
+                        wsp_d_3 += 4
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3])
+                    elif ((lc == 1) and (ld == 2) and (le == 1) and (lf == 0)) or (
+                            (lc == 2) and (ld == 1) and (le == 0) and (lf == 1)):  ####
+                        wsp_d_1 += 4
+                        wsp_d_2 += 4
+                        wsp_d_3 += 5
+                        wsp_d_4 += 5
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 1) and (le == 0) and (lf == 1)) or (
+                            (lc == 2) and (ld == 1) and (le == 1) and (lf == 0)):
+                        wsp_d_1 += 4
+                        wsp_d_2 += 5
+                        wsp_d_3 += 4
+                        wsp_d_4 += 5
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 4)) or (
+                            (lc == 0) and (ld == 2) and (le == 4) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+                        wsp_d_4 += 5
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+
+                        wsp_d_9 += 5
+                        wsp_d_10 += 5
+                        wsp_d_11 += 5
+                        wsp_d_12 += 5
+
+                        wsp_d_13 += 6
+                        wsp_d_14 += 6
+                        wsp_d_15 += 6
+                        wsp_d_16 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 3)) or (
+                            (lc == 0) and (ld == 2) and (le == 3) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 5
+                        wsp_d_8 += 5
+                        wsp_d_9 += 5
+
+                        wsp_d_10 += 6
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 2)) or (
+                            (lc == 0) and (ld == 2) and (le == 2) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 5
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif ((lc == 2) and (ld == 0) and (le == 2) and (lf == 1)) or (
+                            (lc == 0) and (ld == 2) and (le == 1) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 6
+                        wsp_d_3 += 5
+                        wsp_d_4 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 2) and (ld == 0) and (le == 1) and (lf == 2)) or (
+                            (lc == 0) and (ld == 2) and (le == 2) and (lf == 1)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 5
+                        wsp_d_6 += 5
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 4)) or (
+                            (lc == 0) and (ld == 1) and (le == 4) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+                        wsp_d_4 += 5
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+
+                        wsp_d_9 += 6
+                        wsp_d_10 += 6
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+
+                        wsp_d_13 += 6
+                        wsp_d_14 += 6
+                        wsp_d_15 += 6
+                        wsp_d_16 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12,
+                             wsp_d_13, wsp_d_14, wsp_d_15, wsp_d_16])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 3)) or (
+                            (lc == 0) and (ld == 1) and (le == 3) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        wsp_d_9 += 6
+
+                        wsp_d_10 += 6
+                        wsp_d_11 += 6
+                        wsp_d_12 += 6
+                        full.extend(
+                            [wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5, wsp_d_6,
+                             wsp_d_7, wsp_d_8, wsp_d_9, wsp_d_10, wsp_d_11, wsp_d_12])
+                    elif ((lc == 1) and (ld == 0) and (le == 2) and (lf == 3)) or (
+                            (lc == 0) and (ld == 1) and (le == 3) and (lf == 2)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        wsp_d_9 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8, wsp_d_9])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 2)) or (
+                            (lc == 0) and (ld == 1) and (le == 2) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+
+                        wsp_d_7 += 6
+                        wsp_d_8 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4, wsp_d_5,
+                                          wsp_d_6, wsp_d_7, wsp_d_8])
+                    elif ((lc == 1) and (ld == 0) and (le == 3) and (lf == 1)) or (
+                            (lc == 0) and (ld == 1) and (le == 1) and (lf == 3)):
+                        wsp_d_1 += 5
+                        wsp_d_2 += 6
+                        wsp_d_3 += 6
+                        wsp_d_4 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_3, wsp_d_4])
+                    elif ((lc == 1) and (ld == 0) and (le == 1) and (lf == 3)) or (
+                            (lc == 0) and (ld == 1) and (le == 3) and (lf == 1)):  #
+                        wsp_d_1 += 5
+                        wsp_d_2 += 5
+                        wsp_d_3 += 5
+
+                        wsp_d_4 += 6
+                        wsp_d_5 += 6
+                        wsp_d_6 += 6
+                        full.extend([wsp_d_1, wsp_d_2, wsp_d_4, wsp_d_5])
+
+        FULL = sum(full)
+        full = full[0:len(full)]
+        return full
+
+    def inbred( nzw):
+        print ("Start inbred", nzw)
+        nzw = nzw
+        x = find_parent(nzw)
+        print("x in  inbred", nzw)
+        if len(x) == 2:
+            rodzic1 = x[0]
+            print("rodzic 1 inbred", nzw)
+            rodzic2 = x[1]
+            print("rodzic 2 inbred", nzw)
+        else:
+            F = 0
+            return F
+        y = porownanie(rodzic1, rodzic2)
+        if y:
+            for i in range(len(y)):
+                w = []
+                ii = y.pop()
+                ic = str(ii[0])
+                xx = find_parent(ic)
+                if len(xx) == 2:
+                    a1 = xx[0]
+                    rodzic11 = str(a1[0])
+                    b1 = xx[1]
+                    rodzic12 = str(b1[0])
+                    por = porownanie(rodzic11, rodzic12)
+                    if por:
+                        for a in range(len(por)):
+                            ai = por.pop()
+                            sy = sciezka_konkretna(rodzic11, rodzic12, ai)
+                            for i in range(sy.count(0)):
+                                sy.remove(0)
+                            Za = []
+                            for j in sy:
+                                w = 0.5 ** (j + 1)
+                                Za.append(w)
+                            Fa = sum(Za)
+                    else:
+                        Fa = 0
+                else:
+                    Fa = 0
+            k = sciezka_konkretna(rodzic1, rodzic2, ii)
+            for i in range(k.count(0)):
+                k.remove(0)
+            for i in range(len(k)):
+                sz = k.pop()
+                szy = (0.5 ** (sz + 1)) * (1 + Fa)
+                w.append(szy)
+        else:
+            F = 0
+            return F
+        F = sum(w)
+        return F
+
+    def pokrewienstwo(nzw1, nzw2):
+        x = porownanie(nzw1, nzw2)
+        y = porownanie2(nzw1, nzw2)
+        print ("in pokrewienstwo",nzw1, nzw2)
+        w = []
+        FFF = []
+        if x:
+            for i in range(len(x)):
+                w = []
+                if len(x) > 0:
+                    ic = x.pop()
+                    print("2 in pokrewienstwo", nzw1, nzw2)
+                    F = inbred(ic)
+                    print("3 in pokrewienstwo", nzw1, nzw2)
+                    k = sciezka_konkretna(nzw1, nzw2, ic) # > print 5
+                    print("4 in pokrewienstwo", nzw1, nzw2)
+                    for i in range(k.count(0)):
+                        k.remove(0)
+                    if len(k) > 0:
+                        for i in range(len(k)):
+                            sz = k.pop()
+                            szy = 0.5 ** sz
+                            w.append(szy)
+                    else:
+                        szy = 0
+                        w.append(szy)
+                    pi = sum(w)
+                    FF = ((pi) * (1 + F))
+                    FFF.append(FF)
+                else:
+                    X = 0
+                    return 0
+        if y:
+            szy = 0.5 ** y
+            w.append(szy)
+            pi = sum(w)
+            FFF.append(pi)
+
+        FFFF = sum(FFF)
+        Fx = inbred(nzw1)
+        Fy = inbred(nzw2)
+        f = math.sqrt((1 + Fx) * (1 + Fy))
+        X = (FFFF / f)
+        return X
+
+    def sredni_wspolczynnik_pokrewienstwa():
+        nazwa = treeO_avgpok.item(treeO_avgpok.selection())['text']
+        all = tree()
         lista = []
         for i in all:
             RC = pokrewienstwo(nazwa, i)
             lista.append(RC)
-        suma = sum(self.lista)
+        suma = sum(lista)
         length = len(all)
         MK = suma/length
-        wynik_avgpok.insert(END, MK, ('p'))
+        mk = "Œredni wspó³czynnik pokrewieñstwa dla wybranego osobnika wynosi %i" % MK
+        wynik_avgpok.delete('1.0', END)
+        wynik_avgpok.insert(END, mk, ('p'))
+        wynik_avgpok.insert(END, '\n', ('p'))
+
+    def zapisywanieDoPlikuAvgPokre(plik, tresc):
+            plik1 = open(plik, 'w')
+            plik1.write(tresc)
+            plik1.close()
+
+    pok = "Œredni wspó³czynnik pokrewieñstwa\n" \
+          "\n" \
+          "Osobnik:" \
+          "\n" \
+          "Nazwa: {}\n" \
+          "P³eæ: {}\n" \
+          "Gatunek: {}\n" \
+          "Hodowca: {}\n" \
+          "\n" \
+          "Œredni wspó³czynnik pokrewieñstwa dla tego osobnika wynosi: {}\n"
 
     # Przyciski
     B1 = Button(F1, text='Oblicz œredni wspólczynnik pokrewieñstwa',
                 command=sredni_wspolczynnik_pokrewienstwa).grid(column=0, row=8, columnspan=3)
-    #B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
-    #            command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4,
-    #                                                                                          columnspan=3)
-    B3 = Button(avgpok, text='Zakoñcz', command=avgpok.destroy).grid(column=1, row=10)
+    B2 = Button(F3, text='Zapisz wynik do pliku tekstowego',
+                command=zapisywanieDoPlikuAvgPokre("Avg_Wspolczynnik_pokrewienstwa.txt", pok)).grid(column=0, row=4,
+                                                                                              columnspan=3)
+    B3 = Button(avgpok, text='Zakoñcz', command=avgpok.destroy).grid(column=0, row=10, columnspan=3)
 
-    #viewing_record1()
+    viewing_record1()
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -421,7 +2793,8 @@ def showTree():
 
     # Definicje przycisków
     def show():
-        P1 = Node("P1")
+        LittleP1="Dambo"
+        P1 = Node(LittleP1)
         P2 = Node("P2", parent=P1)
         P3 = Node("P3", parent=P1)
         P4 = Node("P4", parent=P2)
@@ -476,7 +2849,7 @@ def showTree():
 # okno root
 root = Tk()  # root widget - musi zostaæ stworzony przed innymi widgetami
 root.geometry("1010x500+250+150")
-root.title("D¿ulia & Cezar Company")  # tytu³ naszej tabeli root
+root.title("Julia & Cezar Company")  # tytu³ naszej tabeli root
 #root_label = tk.Label(root)
 #root_label.grid()
 
