@@ -48,7 +48,7 @@ class Oblicz(object):
         db_rows = self.run_query(query, self.id)
         for row in db_rows:
             self.nazwa = row[0]
-        return self.nazwa
+            return self.nazwa
 
     def nazwa_id(self, nazwa):
         """Funkcja podaje id osobnika"""
@@ -57,7 +57,7 @@ class Oblicz(object):
         db_rows = self.run_query(query, (self.nazwa,))
         for row in db_rows:
             id = row[0]
-        return id
+            return id
 
     def all_osobniki(self):
         query = 'SELECT * FROM osobniki ORDER BY id_hod DESC'
@@ -87,8 +87,8 @@ class Oblicz(object):
         try:
             query = 'SELECT id_os2 FROM relacje WHERE id_os1=?'
             db_rows = self.run_query(query, (self.nazwa1,))
-            for self.row in db_rows:
-                self.parent = self.id_nazwa(self.row)
+            for row in db_rows:
+                self.parent = self.id_nazwa(row)
                 self.list_of_parents.append(self.parent)
         except ValueError:
             pass
@@ -186,7 +186,7 @@ class Oblicz(object):
         if (len(self.a) > 0 or len(self.A) > 0):
             for self.i in self.aa:
                 self.i = self.aa.pop(0)
-                self.i = str(self.i[0])
+                #self.i = str(self.i[0])
                 if (self.i == self.nzw1) or (self.i == self.nzw2):
                     self.wspolny.append(self.i)
 
@@ -197,7 +197,7 @@ class Oblicz(object):
             elif (len(self.b) > 0 or len(self.B) > 0):
                 for self.i in self.bb:
                     self.i = self.bb.pop(0)
-                    self.i = str(self.i[0])
+                    #self.i = str(self.i[0])
                     if (self.i == self.nzw1) or (self.i == self.nzw2):
                         self.wspolny.append(self.i)
                 self.i = list(set(self.b) & set(self.B))
@@ -217,7 +217,7 @@ class Oblicz(object):
             elif (len(self.c) > 0 or len(self.C) > 0):
                 for self.i in self.cc:
                     self.i = self.cc.pop(0)
-                    self.i = str(self.i[0])
+                    #self.i = str(self.i[0])
                     if (self.i == self.nzw1) or (self.i == self.nzw2):
                         self.wspolny.append(self.i)
             else:
@@ -239,36 +239,35 @@ class Oblicz(object):
     def porownanie2(self, nzw1, nzw2):
         self.nzw1 = nzw1
         self.nzw2 = nzw2
-        self.a = self.find_parent(self.nzw1)
-        self.A = self.find_parent(self.nzw2)
-        self.b = self.find_grand(self.nzw1)
-        self.B = self.find_grand(self.nzw2)
-        self.c = self.find_pra(self.nzw1)
-        self.C = self.find_pra(self.nzw2)
+        a = self.find_parent(self.nzw1)
+        A = self.find_parent(self.nzw2)
+        b = self.find_grand(self.nzw1)
+        B = self.find_grand(self.nzw2)
+        c = self.find_pra(self.nzw1)
+        C = self.find_pra(self.nzw2)
         self.wspolny = self.porownanie(self.nzw1, self.nzw2)
+        for i in self.wspolny:
+            if i == nzw1 or i == nzw2:
+                self.wspolny.remove(i)
         self.w = 0
         if not self.wspolny:
-            self.nzw1 = str(self.nzw1)
-            self.nzw1 = (self.nzw1,)
-            self.nzw2 = str(self.nzw2)
-            self.nzw2 = (self.nzw2,)
-            for self.i in self.a:
-                if (self.nzw1 == self.i) or (self.nzw2 == self.i):
+            for k in a:
+                if (self.nzw1 == k) or (self.nzw2 == k):
                     self.w += 1
-            for self.i in self.A:
-                if (self.nzw1 == self.i) or (self.nzw2 == self.i):
+            for j in A:
+                if (self.nzw1 == j) or (self.nzw2 == j):
                     self.w += 1
-            for self.i in self.b:
-                if (self.nzw1 == self.i) or (self.nzw2 == self.i):
+            for i in b:
+                if (self.nzw1 == i) or (self.nzw2 == i):
                     self.w += 2
-            for self.i in self.B:
-                if (self.nzw1 == self.i) or (self.nzw2 == self.i):
+            for i in B:
+                if (self.nzw1 == i) or (self.nzw2 == i):
                     self.w += 2
-            for self.i in self.c:
-                if (self.nzw1 == self.i) or (self.nzw2 == self.i):
+            for i in c:
+                if (self.nzw1 == i) or (self.nzw2 == i):
                     self.w += 3
-            for self.i in self.C:
-                if (self.nzw1 == self.i) or (self.nzw2 == self.i):
+            for i in C:
+                if (self.nzw1 == i) or (self.nzw2 == i):
                     self.w += 3
         return self.w
 
@@ -373,8 +372,8 @@ class Oblicz(object):
         self.nzw1 = nzw1
         self.nzw2 = nzw2
         self.cos = cos
-        if type(self.cos) == str:
-            self.cos = (self.cos,)
+        '''if type(self.cos) == str:
+            self.cos = (self.cos,)'''
         self.full = []
         self.wsp_a = 0
         self.wsp_b = 0
@@ -417,23 +416,23 @@ class Oblicz(object):
         self.ld = 0
         self.le = 0
         self.lf = 0
-        self.A = self.find_parent(self.nzw1[0])
-        self.B = self.find_parent(self.nzw2[0])
-        self.C = self.find_grand(self.nzw1[0])
-        self.D = self.find_grand(self.nzw2[0])
-        self.E = self.find_pra(self.nzw1[0])
-        self.Fe = self.find_pra(self.nzw2[0])
+        self.A = self.find_parent(self.nzw1)
+        self.B = self.find_parent(self.nzw2)
+        self.C = self.find_grand(self.nzw1)
+        self.D = self.find_grand(self.nzw2)
+        self.E = self.find_pra(self.nzw1)
+        self.Fe = self.find_pra(self.nzw2)
         if self.A or self.B:
             if (self.A == self.B):
                 if len(self.A) == 2:
                     for self.a in range(len(self.A)):
-                        #self.a = self.A.pop(0)
+                        self.a = self.A.pop(0)
                         self.aa = str(self.a)
                         if (self.a == self.cos):
                             self.wsp_a += 2
                 elif len(self.A) == 1:
                     for self.a in range(len(self.A)):
-                        #self.a = self.A.pop(0)
+                        self.a = self.A.pop(0)
                         self.a = str(self.a) #a[0]
                         if (self.a == self.cos):
                             self.wsp_a += 1
@@ -445,15 +444,13 @@ class Oblicz(object):
             else:
                 for self.a in range(len(self.A)):
                     for self.b in range(len(self.B)):
-                        #self.a = self.A.pop(0)
-                        self.aa = str(self.a)
-                        #self.b = self.B.pop(0)
-                        self.bb = str(self.b)
+                        self.a = self.A.pop(0)
+                        self.b = self.B.pop(0)
                         if (self.a == self.cos) and (self.b == self.cos):
                             self.wsp_a += 2
                         elif (self.a == self.cos) or (self.b == self.cos):
                             self.wsp_a += 1
-                self.full.append(self.wsp_a)
+                            self.full.append(self.wsp_a)
             for self.i in range(self.full.count(0)):
                 self.full.remove(0)
             if self.full:
@@ -462,7 +459,7 @@ class Oblicz(object):
             if self.C or self.D:
                 if (self.C == self.D):
                     for self.c in range(len(self.C)):
-                        #self.c = self.C.pop(0)
+                        self.c = self.C.pop(0)
                         self.c = str(self.c)
                         if (self.c == self.cos):
                             self.wsp_b += 4
@@ -470,7 +467,7 @@ class Oblicz(object):
             if self.E or self.Fe:
                 if (self.E == self.Fe):
                     for self.e in range(len(self.E)):
-                        #self.e = self.E.pop(0)
+                        self.e = self.E.pop(0)
                         self.e = str(self.e)
                         if (self.e == self.cos):
                             self.wsp_c += 6
@@ -479,9 +476,9 @@ class Oblicz(object):
         self.z = max(len(self.A), len(self.B), len(self.C), len(self.D), len(self.E), len(self.Fe))
         lista = [self.A, self.B, self.C, self.D, self.E, self.Fe]
         for self.l in self.lista:
-            for self.l in self.lista:
-                if len(self.l) < self.z:
-                    self.l.extend([0])
+            #for self.l in self.lista:
+            if len(self.lista) < self.z:
+                self.l.extend([0])
 
         self.lista_index = []
         for self.l in self.lista:
@@ -1257,7 +1254,10 @@ class Oblicz(object):
                         self.full.extend([self.wsp_d_1, self.wsp_d_2, self.wsp_d_4, self.wsp_d_5])
 
         self.FULL = sum(self.full)
+        print('self.FULL', self.FULL)
         self.full = self.full[0:len(self.full)]
+        print('self.full', self.full)
+
         return self.full
 
     def inbred(self, nzw):
@@ -1274,13 +1274,13 @@ class Oblicz(object):
             for self.i in range(len(self.y)):
                 self.w = []
                 self.ii = self.y.pop()
-                self.ic = str(self.ii[0])
+                self.ic = str(self.ii)
                 self.xx = self.find_parent(self.ic)
                 if len(self.xx) == 2:
-                    self.a1 = self.xx[0]
-                    self.rodzic11 = str(self.a1[0])
-                    self.b1 = self.xx[1]
-                    self.rodzic12 = str(self.b1[0])
+                    self.rodzic11 = self.xx[0]
+                    # self.rodzic11 = str(self.a1)
+                    self.rodzic12 = self.xx[1]
+                    # self.rodzic12 = str(self.b1)
                     self.por = self.porownanie(self.rodzic11, self.rodzic12)
                     if self.por:
                         for self.a in range(len(self.por)):
@@ -1313,15 +1313,22 @@ class Oblicz(object):
     def pokrewienstwo(self, nzw1, nzw2):
         self.nzw1 = nzw1
         self.nzw2 = nzw2
-        self.x = self.porownanie(self.nzw1, self.nzw2)
+        self.porownanie_x = self.porownanie(self.nzw1, self.nzw2)
+        self.porownanie_x = list(set(self.porownanie_x))
         self.y = self.porownanie2(self.nzw1, self.nzw2)
         self.w = []
         self.FFF = []
-        if self.x:
-            for self.i in range(len(self.x)):
+        if self.y > 0:
+            self.szy = 0.5 ** self.y
+            self.w.append(self.szy)
+            self.pi = sum(self.w)
+            self.FFF.append(self.pi)
+
+        elif self.porownanie_x:
+            for self.i in range(len(self.porownanie_x)):
                 self.w = []
-                if len(self.x) > 0:
-                    self.ic = self.x.pop()
+                if len(self.porownanie_x) > 0:
+                    self.ic = self.porownanie_x.pop()
                     self.F = self.inbred(self.ic)
                     self.k = self.sciezka_konkretna(self.nzw1, self.nzw2, self.ic)
                     for self.i in range(self.k.count(0)):
@@ -1329,22 +1336,17 @@ class Oblicz(object):
                     if len(self.k) > 0:
                         for self.i in range(len(self.k)):
                             self.sz = self.k.pop()
+                            print('sz: ', self.sz)
                             self.szy = 0.5 ** self.sz
                             self.w.append(self.szy)
                     else:
-                        self.szy = 0
+                        self.szy = 0.5 #0.5
                         self.w.append(self.szy)
                     self.pi = sum(self.w)
                     self.FF = ((self.pi) * (1 + self.F))
                     self.FFF.append(self.FF)
                 else:
                     self.X = 0
-                    return 0
-        if self.y:
-            self.szy = 0.5 ** self.y
-            self.w.append(self.szy)
-            self.pi = sum(self.w)
-            self.FFF.append(self.pi)
 
         self.FFFF = sum(self.FFF)
         self.Fx = self.inbred(self.nzw1[0])
@@ -1434,4 +1436,13 @@ class Oblicz(object):
 jula = Oblicz()
 # jula.__main__()
 # jula.all_osobniki()
-jula.sredni_wspolczynnik_pokrewienstwa('FERRO')
+# jula.sredni_wspolczynnik_pokrewienstwa('FERRO')
+# print(jula.find_parent('Fido'))
+# print(jula.tree('Fido'))
+# print(jula.tree('Gorky'))
+# print(jula.find_parent('Gorky'))
+# print(jula.inbred('Gorky'))
+# print(jula.pokrewienstwo('Gorky', 'ANJA'))
+# print(jula.pokrewienstwo('Gorky', 'KARON'))
+# print(jula.pokrewienstwo('KLIF', 'LUFA'))
+# print(jula.pokrewienstwo('KLIF', 'KIRA'))

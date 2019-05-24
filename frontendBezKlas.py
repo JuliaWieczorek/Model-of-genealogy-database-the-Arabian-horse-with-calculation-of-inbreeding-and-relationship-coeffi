@@ -40,7 +40,7 @@ def imbred():
     db_name = "baza.db"
 
     wsimb = Tk()
-    wsimb.geometry("1025x600+0+0")
+    wsimb.geometry("1000x600+0+0")
     wsimb.title("Wspó³czynnik inbredu")
     wsimb_label = Label(wsimb)
     wsimb_label.grid()
@@ -131,7 +131,7 @@ def pokrewienstwo():
     db_name = "baza.db"
 
     wspok = Tk()
-    wspok.geometry("1500x600+0+0")
+    wspok.geometry("1000x600+0+0")
     wspok.title("Wspó³czynnik pokrewieñstwa")
     wspok_label = Label(wspok)
     wspok_label.grid()
@@ -141,7 +141,7 @@ def pokrewienstwo():
     F2 = Frame(wspok, borderwidth=2)
     F2.grid(column=0, row=1, columnspan=2)
     F3 = Frame(wspok, borderwidth=2)
-    F3.grid(column=2, row=0, columnspan=2)
+    F3.grid(column=0, row=2, columnspan=2)
 
     L1 = Label(F1, text="Wybierz osobnika 1")
     L1.grid(column=0, row=0, columnspan=3)
@@ -204,6 +204,7 @@ def pokrewienstwo():
         for row in db_rows:
             treeO_wspok2.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))'''
 
+    '''
     def id_nazwa(id):
         """Funkcja zamieniaj¹ca id w nazwe osobnika"""
         id = id
@@ -223,7 +224,6 @@ def pokrewienstwo():
         return id
 
     def find_parent(nazwa):
-        nazwa = nazwa
         list_of_parents = []
         nazwa1 = nazwa_id(nazwa)
         try:
@@ -376,10 +376,10 @@ def pokrewienstwo():
         return w
 
     def sciezka_konkretna( nzw1, nzw2, cos):  # zamiany!
-        #nzw1 = nzw1
-        #nzw2 = nzw2
+        # nzw1 = nzw1
+        # nzw2 = nzw2
         print("in scezka konkretna", nzw1, nzw2)
-        cos = cos
+        # cos = cos
         if type(cos) == str:
             cos = (cos,)
         full = []
@@ -439,13 +439,13 @@ def pokrewienstwo():
             if (A == B):
                 if len(A) == 2:
                     for a in range(len(A)):
-                        #a = A.pop(0)
+                        a = A.pop(0)
                         aa = str(a)
                         if (a == cos):
                             wsp_a += 2
                 elif len(A) == 1:
                     for a in range(len(A)):
-                        #a = A.pop(0)
+                        a = A.pop(0)
                         a = str(a) #a[0]
                         if (a == cos):
                             wsp_a += 1
@@ -457,9 +457,9 @@ def pokrewienstwo():
             else:
                 for a in range(len(A)):
                     for b in range(len(B)):
-                        #a = A.pop(0)
+                        a = A.pop(0)
                         aa = str(a)
-                        #b = B.pop(0)
+                        b = B.pop(0)
                         bb = str(b)
                         if (a == cos) and (b == cos):
                             wsp_a += 2
@@ -474,7 +474,7 @@ def pokrewienstwo():
             if C or D:
                 if (C == D):
                     for c in range(len(C)):
-                        #c = C.pop(0)
+                        c = C.pop(0)
                         c = str(c)
                         if (c == cos):
                             wsp_b += 4
@@ -482,7 +482,7 @@ def pokrewienstwo():
             if E or Fe:
                 if (E == Fe):
                     for e in range(len(E)):
-                        #e = E.pop(0)
+                        e = E.pop(0)
                         e = str(e)
                         if (e == cos):
                             wsp_c += 6
@@ -1398,13 +1398,13 @@ def pokrewienstwo():
         wynik_wspok2.insert(END, wo, ('p'))
         wynik_wspok2.insert(END, '\n', ('p'))
         #return X
-
-
+    '''
     def tree():
         nazwa = treeO_wspok1.item(treeO_wspok1.selection())['text']
-        a = find_parent(nazwa)
-        b = find_grand(nazwa)
-        c = find_pra(nazwa)
+        pokre = Oblicz()
+        a = pokre.find_parent(nazwa)
+        b = pokre.find_grand(nazwa)
+        c = pokre.find_pra(nazwa)
         ListTree = []
         for i in a:
             ListTree.append(i)
@@ -1412,14 +1412,21 @@ def pokrewienstwo():
             ListTree.append(j)
         for y in c:
             ListTree.append(y)
-            print ("First",ListTree)
 
         for naz in ListTree:
-            print ("Second",naz)
             treeO_wspok2.insert('', 0, text=naz)
 
-
-
+    def wynikPokre():
+        try:
+            nazwa = treeO_wspok1.item(treeO_wspok1.selection())['text']
+            nazwa2 = treeO_wspok2.item(treeO_wspok2.selection())['text']
+        except IndexError as e:
+            return
+        pokre = Oblicz()
+        wsp = pokre.pokrewienstwo(nazwa, nazwa2)
+        text = f'Wspó³czynnik pokrewienstwa wynosi {wsp} \n'
+        wynik_wspok2.delete('1.0', END)
+        wynik_wspok2.insert(END, text, 'p')
 
     def zapisywanieDoPlikuPokre(plik, tresc):
         plik1 = open(plik, 'w')
@@ -1445,8 +1452,8 @@ def pokrewienstwo():
           "Wspó³czynnik pokrewieñstwa pomiêdzy tymi osobnikami wynosi: {}\n"
 
     # Przyciski
-    B1 = Button(F1, text='Wyœwietl spokrewnione osobniki',command=tree).grid(column=0, row=8, columnspan=3)
-    B2 = Button(F2, text='Oblicz wspó³czynnik pokrewieñstwa', command=pokrewienstwo).grid(column=0, row=8, columnspan=3)
+    B1 = Button(F1, text='Wyœwietl spokrewnione osobniki', command=tree).grid(column=0, row=8, columnspan=3)
+    B2 = Button(F2, text='Oblicz wspó³czynnik pokrewieñstwa', command=wynikPokre).grid(column=0, row=8, columnspan=3)
     B3 = Button(F3, text='Zapisz wynik do pliku tekstowego',
                 command=zapisywanieDoPlikuPokre("Wspolczynnik_Pokrewienstawa.txt", pok)).grid(column=0, row=4, columnspan=3)
     B4 = Button(wspok, text='Zakoñcz', command=wspok.destroy).grid(column=1, row=10)
@@ -1464,7 +1471,7 @@ def avgpokrewienstwa():
     db_name = "baza.db"
 
     avgpok = Tk()
-    avgpok.geometry("1050x600+0+0")
+    avgpok.geometry("1000x600+0+0")
     avgpok.title("Œredni wspó³czynnik pokrewieñstwa")
     avgpok_label = Label(avgpok)
     avgpok_label.grid()
@@ -2761,7 +2768,7 @@ def showTree():
     db_name = "baza.db"
 
     treeview = Tk()
-    treeview.geometry("1500x600+0+0")
+    treeview.geometry("1000x600+0+0")
     treeview.title("Drzewo genealogiczne")
     treeview_label = Label(treeview)
     treeview_label.grid()
@@ -2848,7 +2855,7 @@ def showTree():
 #######################################################################################################################
 # okno root
 root = Tk()  # root widget - musi zostaæ stworzony przed innymi widgetami
-root.geometry("1010x500+250+150")
+root.geometry("1000x600+0+0")
 root.title("Julia & Cezar Company")  # tytu³ naszej tabeli root
 #root_label = tk.Label(root)
 #root_label.grid()
