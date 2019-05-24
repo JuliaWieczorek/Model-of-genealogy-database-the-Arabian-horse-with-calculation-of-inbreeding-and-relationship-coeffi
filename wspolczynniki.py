@@ -6,34 +6,6 @@ import math
 class Oblicz(object):
     db_name = "baza.db"
 
-    '''def __main__(self):
-        self.menu()
-        self.funkcje = {'1': self.all_osobniki, '2': self.find_child1, '3': self.find_parent1, '4': self.find_grand1,
-                        '5': self.find_pra1, '6': self.wspolny_przodek1, '7': self.sciezka1, '8': self.tree1,
-                        '9': self.inbred1, '10': self.pokrewienstwo1, '11': self.inbred_pokr1}
-        self.nazwyFunkcji = {'1': 'all_osobniki', '2': 'znajdujaca potomkow osobnika',
-                             '3': 'znajdujaca rodzicow osobnika',
-                             '4': 'znajdujaca dziadkow osobika',
-                             '5': 'odnajdujaca dziadkow', '6': 'szukajaca wspolnych przodkow',
-                             '7': 'funkcje wyznaczajaca sciezke',
-                             '8': 'wyznaczajaca drzewo pokolen',
-                             '9': 'obliczajaca wspolczynnik inbredu', '10': 'obliczajaca wspolczynnik pokrewienstwa',
-                             '11': 'obliczajaca wspó³czynnik inbredu'}
-        self.op = input("Co wybierzesz?-> ")
-        while self.op != '12':
-            if self.op == '2' or self.op == '3' or self.op == '4' or self.op == '5' or self.op == '8' or \
-                    self.op == '9' or self.op == '11':
-                self.nzw1 = input('Wybierz osobnika: ')
-            elif self.op == '7' or self.op == '10' or self.op == '6':
-                self.nzw1 = input('Wybierz pierwszego osobnika: ')
-                self.nzw2 = input('Wybierz drugiego osobnika: ')
-            self.wybranaFkcja = self.funkcje.get(self.op, self.blad)
-            self.nazwaWybranejFkcji = self.nazwyFunkcji.get(self.op, self.blad)
-            print("::::wybrales funkcje {nazwa}::::\n {wynik}".format(nazwa=self.nazwaWybranejFkcji,
-                                                                      wynik=self.wybranaFkcja()))
-            self.menu()
-            self.op = input("Co wybierzesz?-> ")'''
-
     def run_query(self, query, parameters=()):
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()
