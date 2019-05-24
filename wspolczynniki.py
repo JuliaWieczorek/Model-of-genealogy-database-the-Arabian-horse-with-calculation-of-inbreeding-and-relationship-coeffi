@@ -1308,7 +1308,6 @@ class Oblicz(object):
                     if len(self.k) > 0:
                         for self.i in range(len(self.k)):
                             self.sz = self.k.pop()
-                            print('sz: ', self.sz)
                             self.szy = 0.5 ** self.sz
                             self.w.append(self.szy)
                     else:
