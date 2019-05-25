@@ -82,7 +82,6 @@ def imbred():
         query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
              JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
              JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
-
              ORDER BY id_os DESC"""
         db_rows = run_query(query)
         for row in db_rows:
@@ -104,13 +103,29 @@ def imbred():
         imie = treeO_wsimb.item(treeO_wsimb.selection())['text']
         plik = "Inbred_Osobnika_%(imie)s.txt" % {'imie': imie}
         plik1 = open(plik, 'w')
+        obiekt = Oblicz()
+        id = obiekt.nazwa_id(imie)
+        queryplec = "SELECT plec FROM osobniki WHERE id_os = ?"
+        db_rows_plec = run_query(queryplec, (id,))
+        for plec in db_rows_plec:
+            TestPlec = plec[0]
+        querygatunek = """SELECT gatunek FROM osobniki 
+                        JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+                        WHERE id_os = ?"""
+        db_rows_gatunek = run_query(querygatunek, (id,))
+        for gat in db_rows_gatunek:
+            TestGat = gat[0]
+        queryhodowca = """SELECT imie, nazwisko FROM osobniki 
+                        JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+                        WHERE id_os = ?"""
+        db_rows_hodowca = run_query(queryhodowca, (id,))
+        for hod in db_rows_hodowca:
+            TestHodI = hod[0]
+            TestHodN = hod[1]
         TestNazwa = imie
-        TestPlec = 'Samiec'
-        TestGat = 'Pies'
-        TestHod = 'Bogdan Zbychu'
         TestInbred = 0.57
-        h = "Wspo³czynnik Inbredu \n\nNazwa osobnika: %(NazwaI)s\nP³eæ osobnika: %(P³eæI)s\nGatunek osobnika: %(GatI)s\nHodowca osobnika: %(HodI)s\nWspó³czynnik Inbredu wynosi: %(WspI)f" \
-            % {'NazwaI': TestNazwa, 'P³eæI': TestPlec, 'GatI': TestGat, 'HodI': TestHod, 'WspI': TestInbred}
+        h = "Wspo³czynnik Inbredu \n\nNazwa osobnika: %(NazwaI)s\nP³eæ osobnika: %(P³eæI)s\nGatunek osobnika: %(GatI)s\nImiê hodowca: %(HodI)s\nNazwisko hodowcy: %(HodN)s\nWspó³czynnik Inbredu wynosi: %(WspI)f" \
+            % {'NazwaI': TestNazwa, 'P³eæI': TestPlec, 'GatI': TestGat, 'HodI': TestHodI, 'HodN': TestHodN , 'WspI': TestInbred}
         plik1.write(h)
         plik1.close()
 
@@ -191,7 +206,6 @@ def pokrewienstwo():
         db_rows = run_query(query)
         for row in db_rows:
             treeO_wspok1.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
-
 
     def tree():
         nazwa = treeO_wspok1.item(treeO_wspok1.selection())['text']
@@ -722,8 +736,6 @@ def showTree():
             # a=print("{1} {2}".format(pre[0]), node.name[0])
             treeO_avgpok.insert(END, a)
 
-
-
     # Przyciski
     B1 = Button(F2, text='Wyœwietl drzewo dla wybranego osobnika', command=show).grid(column=0, row=0,
                                                                                               columnspan=3, rowspan=2)
@@ -1182,7 +1194,6 @@ class Osobniki(Frame):
         query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
          JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
          JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
-
          ORDER BY id_os DESC"""
         db_rows = self.run_query(query)
         for row in db_rows:
