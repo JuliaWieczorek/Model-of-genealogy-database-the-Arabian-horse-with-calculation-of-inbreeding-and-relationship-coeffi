@@ -716,11 +716,12 @@ def showTree():
             P31 = Node(nazwaP31, parent=P15)
         except:
             'b³ad'
-
+        treeO_avgpok.insert(END, '----------------------------------\n', ('p'))
         for pre, fill, node in RenderTree(P1):
-            print("%s%s" % (pre, node.name))
+            a = ("%s%s\n" % (pre, node.name))
             # a=print("{1} {2}".format(pre[0]), node.name[0])
-            # treeO_avgpok.insert(END, a)
+            treeO_avgpok.insert(END, a)
+
 
 
     # Przyciski
