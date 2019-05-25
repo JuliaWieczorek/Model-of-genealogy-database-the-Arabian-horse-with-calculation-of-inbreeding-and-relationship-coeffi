@@ -12,10 +12,8 @@ from tkinter import scrolledtext
 from wspolczynniki import Oblicz
 from anytree import Node, RenderTree
 
-
 # DEFINICJE
 ######################################################################################################################
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Otwieranie bazy danych i zamykanie
@@ -38,7 +36,7 @@ def imbred():
     db_name = "baza.db"
 
     wsimb = Tk()
-    wsimb.geometry("1000x600+0+0")
+    wsimb.geometry("1010x600+0+0")
     wsimb.title("Wspó³czynnik inbredu")
     wsimb_label = Label(wsimb)
     wsimb_label.grid()
@@ -95,7 +93,7 @@ def imbred():
         nzw1 = treeO_wsimb.item(treeO_wsimb.selection())['text']
         pokre = Oblicz()
         wsp = pokre.inbred(nzw1)
-        text = 'Osobnik: %(n)s\nJego wspó³czynnik inbredu wynosi: %(wsp)f \n' % {'n': nzw1, 'wsp': wsp}
+        text = 'Osobnik: %(n)s\nJego wspó³czynnik inbredu wynosi: %(wsp)1.3f \n' % {'n': nzw1, 'wsp': wsp}
         wynik_wsimb.delete('1.0', END)
         wynik_wsimb.insert(END, text, 'p')
 
@@ -124,7 +122,7 @@ def imbred():
             TestHodN = hod[1]
         TestNazwa = imie
         TestInbred = 0.57
-        h = "Wspo³czynnik Inbredu \n\nNazwa osobnika: %(NazwaI)s\nP³eæ osobnika: %(P³eæI)s\nGatunek osobnika: %(GatI)s\nImiê hodowca: %(HodI)s\nNazwisko hodowcy: %(HodN)s\nWspó³czynnik Inbredu wynosi: %(WspI)f" \
+        h = "Wspo³czynnik Inbredu \n\nOsobnik:\nNazwa: %(NazwaI)s\nP³eæ: %(P³eæI)s\nGatunek: %(GatI)s\n\nHodowca:\nImiê: %(HodI)s\nNazwisko: %(HodN)s\n\nWspó³czynnik Inbredu wynosi: %(WspI)1.3f" \
             % {'NazwaI': TestNazwa, 'P³eæI': TestPlec, 'GatI': TestGat, 'HodI': TestHodI, 'HodN': TestHodN , 'WspI': TestInbred}
         plik1.write(h)
         plik1.close()
@@ -146,7 +144,7 @@ def pokrewienstwo():
     db_name = "baza.db"
 
     wspok = Tk()
-    wspok.geometry("1000x600+0+0")
+    wspok.geometry("1500x600+0+0")
     wspok.title("Wspó³czynnik pokrewieñstwa")
     wspok_label = Label(wspok)
     wspok_label.grid()
@@ -156,7 +154,7 @@ def pokrewienstwo():
     F2 = Frame(wspok, borderwidth=2)
     F2.grid(column=0, row=1, columnspan=2)
     F3 = Frame(wspok, borderwidth=2)
-    F3.grid(column=0, row=2, columnspan=2)
+    F3.grid(column=2, row=0, columnspan=2)
 
     L1 = Label(F1, text="Wybierz osobnika 1")
     L1.grid(column=0, row=0, columnspan=3)
@@ -233,22 +231,63 @@ def pokrewienstwo():
             return
         pokre = Oblicz()
         wsp = pokre.pokrewienstwo(nazwa, nazwa2)
-        text = "Osobnik pierwszy: %(n1)s\nOsobnik drugi: %(n2)s\nWspó³czynnik pokrewieñstwa tych osobników wynosi: %(p)f" % {'n1': nazwa, 'n2': nazwa2, 'p': wsp}
+        text = "Osobnik pierwszy: %(n1)s\nOsobnik drugi: %(n2)s\nWspó³czynnik pokrewieñstwa tych osobników wynosi: %(p)1.3f" % {'n1': nazwa, 'n2': nazwa2, 'p': wsp}
         wynik_wspok2.delete('1.0', END)
         wynik_wspok2.insert(END, text, 'p')
         wynik_wspok2.insert(END, '\n', ('p'))
+        return wsp
 
     def zapisywanieDoPlikuPokre():
         imie1 = treeO_wspok1.item(treeO_wspok1.selection())['text']
         imie2 = treeO_wspok2.item(treeO_wspok2.selection())['text']
         plik = "Pokrewienstwo_Osobnika_%(imie1)s_oraz_%(imie2)s.txt" % {'imie1': imie1, 'imie2': imie2}
         plik1 = open(plik, 'w')
-        pok2 = "Wspólczynnik pokrewieñstwa\n\nOsobnik pierwszy: \nNazwa: %(nazwa1)s \nP³eæ:\nGatunek:\nHodowca:\n\nOsobnik drugi:\n\nNazwa: %(nazwa2)s\nP³eæ:\nGatunek:\nHodowca:\n\nWspó³czynnik pokrewieñstwa pomiêdzy tymi osobnikami wynosi: {}\n" \
-               % {'nazwa1': imie1, 'nazwa2': imie2}
+
+        obiekt = Oblicz()
+        id1 = obiekt.nazwa_id(imie1)
+        id2 = obiekt.nazwa_id(imie2)
+
+        queryplec = "SELECT plec FROM osobniki WHERE id_os = ?"
+        db_rows_plec1 = run_query(queryplec, (id1,))
+        for j in db_rows_plec1:
+            plec1 = j[0]
+
+        db_rows_plec2 = run_query(queryplec, (id2,))
+        for i in db_rows_plec2:
+            plec2 = i[0]
+
+        querygatunek = """SELECT gatunek FROM osobniki 
+                                 JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+                                 WHERE id_os = ?"""
+        db_rows_gatunek1 = run_query(querygatunek, (id1,))
+        for gat in db_rows_gatunek1:
+            gat1 = gat[0]
+
+        db_rows_gatunek2 = run_query(querygatunek, (id2,))
+        for gatu in db_rows_gatunek2:
+            gat2 = gatu[0]
+
+        queryhodowca = """SELECT imie, nazwisko FROM osobniki 
+                                 JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+                                 WHERE id_os = ?"""
+        db_rows_hodowca1 = run_query(queryhodowca, (id1,))
+        for hod1 in db_rows_hodowca1:
+            hodI1 = hod1[0]
+            hodN1 = hod1[1]
+
+        db_rows_hodowca2 = run_query(queryhodowca, (id2,))
+        for hod2 in db_rows_hodowca2:
+            hodI2 = hod2[0]
+            hodN2 = hod2[1]
+
+        wynikipokre = wynikPokre()
+
+        pok2 = "Wspólczynnik pokrewieñstwa\n\nOsobnik pierwszy: \nNazwa: {nazwa1} \nP³eæ: {plec1} \nGatunek: {gat1}\nImiê hodowcy: {hodI1}\nNazwisko hodowcy: {hodN1}\n\nOsobnik drugi:\nNazwa: {nazwa2}\nP³eæ: {plec2}\nGatunek: {gat2}\nImiê hodowcy: {hodI2}\nNazwisko hodowcy: {hodN2}\n\nWspó³czynnik pokrewieñstwa pomiêdzy tymi osobnikami wynosi: {wynik}\n" \
+            .format(**{'nazwa1': imie1, 'plec1': plec1, 'gat1': gat1, 'hodI1': hodI1, 'hodN1': hodN1, 'nazwa2': imie2,
+                       'plec2': plec2, 'gat2': gat2, 'hodI2': hodI2, 'hodN2': hodN2, 'wynik': wynikipokre})
 
         plik1.write(pok2)
         plik1.close()
-
 
     # Przyciski
     B1 = Button(F1, text='Wyœwietl spokrewnione osobniki', command=tree).grid(column=0, row=8, columnspan=3)
@@ -258,7 +297,6 @@ def pokrewienstwo():
     B4 = Button(wspok, text='Zakoñcz', command=wspok.destroy).grid(column=1, row=10)
 
     viewing_record1()
-
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -268,7 +306,7 @@ def avgpokrewienstwa():
     db_name = "baza.db"
 
     avgpok = Tk()
-    avgpok.geometry("1000x600+0+0")
+    avgpok.geometry("1010x600+0+0")
     avgpok.title("Œredni wspó³czynnik pokrewieñstwa")
     avgpok_label = Label(avgpok)
     avgpok_label.grid()
@@ -349,17 +387,39 @@ def avgpokrewienstwa():
             MK = suma/length
         except ZeroDivisionError:
             MK = 0
-        mk = "Osobnik: %(n)s\nŒredni wspó³czynnik pokrewieñstwa dla tego osobnika wynosi: %(p)f" % {'n': nazwa ,'p':MK}
+        mk = "Osobnik: %(n)s\nŒredni wspó³czynnik pokrewieñstwa dla tego osobnika wynosi: %(p)1.3f" % {'n': nazwa ,'p':MK}
         wynik_avgpok.delete('1.0', END)
         wynik_avgpok.insert(END, mk, ('p'))
         wynik_avgpok.insert(END, '\n', ('p'))
+        return MK
 
     def zapisywanieDoPlikuAvgPokre():
         imie = treeO_avgpok.item(treeO_avgpok.selection())['text']
         plik = "AVG_pokrewienstwa_osobnika_%(imie)s.txt" % {'imie': imie}
+        obiekt = Oblicz()
+        id = obiekt.nazwa_id(imie)
+        queryplec = "SELECT plec FROM osobniki WHERE id_os = ?"
+        db_rows_plec = run_query(queryplec, (id,))
+        for plec in db_rows_plec:
+            TestPlec = plec[0]
+        querygatunek = """SELECT gatunek FROM osobniki 
+                                JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+                                WHERE id_os = ?"""
+        db_rows_gatunek = run_query(querygatunek, (id,))
+        for gat in db_rows_gatunek:
+            TestGat = gat[0]
+        queryhodowca = """SELECT imie, nazwisko FROM osobniki 
+                                JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+                                WHERE id_os = ?"""
+        db_rows_hodowca = run_query(queryhodowca, (id,))
+        for hod in db_rows_hodowca:
+            TestHodI = hod[0]
+            TestHodN = hod[1]
+        TestNazwa = imie
+        wynik = sredni_wspolczynnik_pokrewienstwa()
         plik1 = open(plik, 'w')
-        pok = "Œredni wspó³czynnik pokrewieñstwa \n\nOsobnik: \nNazwa: %(nazwa)s \nP³eæ: {} \nGatunek:{} \nHodowca:{} \nŒredni wspó³czynnik pokrewieñstwa wynosi: tyle" \
-              % {'nazwa': imie}
+        pok = "Œredni wspó³czynnik pokrewieñstwa \n\nOsobnik: \nNazwa: %(NazwaI)s \nP³eæ: %(P³eæI)s \nGatunek: %(GatI)s \n\nHodowca:\nImiê: %(HodI)s \nNazwisko: %(HodN)s\n\nŒredni wspó³czynnik pokrewieñstwa wynosi: %(WspI)1.3f" \
+              % {'NazwaI': TestNazwa, 'P³eæI': TestPlec, 'GatI': TestGat, 'HodI': TestHodI, 'HodN': TestHodN , 'WspI': wynik}
         plik1.write(pok)
         plik1.close()
 
@@ -382,7 +442,7 @@ def showTree():
     db_name = "baza.db"
 
     treeview = Tk()
-    treeview.geometry("1000x600+0+0")
+    treeview.geometry("1500x600+0+0")
     treeview.title("Drzewo genealogiczne")
     treeview_label = Label(treeview)
     treeview_label.grid()
@@ -748,19 +808,17 @@ def showTree():
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
 #######################################################################################################################
 # okno root
 root = Tk()  # root widget - musi zostaæ stworzony przed innymi widgetami
 root.geometry("1000x600+0+0")
-root.title("Julia & Cezar Company")  # tytu³ naszej tabeli root
-#root_label = tk.Label(root)
-#root_label.grid()
+root.title("Heredity")  # tytu³ naszej tabeli root
 
 # Menu
 menu = Menu(root)
 root.config(menu=menu)
 filemenu = tk.Menu(menu)
+
 # Plik
 menu.add_cascade(label="Plik", menu=filemenu)
 filemenu.add_command(label="Otwórz baze", command=baseopen)
@@ -794,7 +852,6 @@ class RootApp(tk.Tk):
         self._frame = new_frame
         self._frame.grid()
 
-
 class NoteBook(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
@@ -812,7 +869,6 @@ class NoteBook(Frame):
         self.tab1.destroy()
         self.tab1 = new_frame
 
-
 # Zak³adka 1
 class Tab1(Frame):
     db_name = "baza.db"
@@ -828,7 +884,6 @@ class Tab1(Frame):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.grid()
-
 
 # Wygl¹d Zak³adki 1
 class Hodowcy(Frame):
@@ -971,7 +1026,6 @@ class Hodowcy(Frame):
         self.message['text'] = 'Rekord {} zmieniony.'.format(name)
         self.viewing_record()
 
-
 # Zak³adka 2
 class Tab2(Frame):
     def __init__(self, master):
@@ -985,7 +1039,6 @@ class Tab2(Frame):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.grid()
-
 
 # Wygl¹d zak³adki 2
 class Gatunki(Frame):
@@ -1117,7 +1170,6 @@ class Gatunki(Frame):
         self.message['text'] = 'Nazwa gatunku {} zosta³a zmieniona.'.format(name)
         self.viewing_record()
 
-
 # Zak³adka 3
 class Tab3(Frame):
     def __init__(self, master):
@@ -1131,7 +1183,6 @@ class Tab3(Frame):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.grid()
-
 
 # Wygl¹d zak³adki 3
 class Osobniki(Frame):
@@ -1377,12 +1428,9 @@ class Osobniki(Frame):
         self.message['text'] = 'Rekord {} zosta³ zmieniony.'.format(old_name)
         self.viewing_record()
 
-
 # =====================KONIEC_ZAKLADEK================================================================================
-
 if __name__ == "__main__":
     Root = RootApp()
     Root.mainloop()
 
-# root.mainloop()  # zamkniêcie pêtli
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
