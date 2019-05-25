@@ -421,67 +421,301 @@ def showTree():
 
     def show():
         nazwaP1 = treeO_treeshow.item(treeO_treeshow.selection())['text']
-        nazwaP2 = 'Mamuœka'
-        nazwaP3 = 'Tatuœek'
-        '''nazwaP4 =
-        nazwaP5 =
-        nazwaP6 =
-        nazwaP7 =
-        nazwaP8 =
-        nazwaP9 =
-        nazwaP10 =
-        nazwaP11 =
-        nazwaP12 =
-        nazwaP13 =
-        nazwaP14 =
-        nazwaP15 =
-        nazwaP16 =
-        nazwaP17 =
-        nazwaP18 =
-        nazwaP19 =
-        nazwaP20 =
-        nazwaP21 =
-        nazwaP22 =
-        nazwaP23 =
-        nazwaP24 =
-        nazwaP25 =
-        nazwaP26 =
-        nazwaP27 =
-        nazwaP28 =
-        nazwaP29 =
-        nazwaP30=
-        nazwaP31 ='''
-        P1 = Node(nazwaP1)
-        P2 = Node(nazwaP2, parent=P1)
-        P3 = Node(nazwaP3, parent=P1)
-        P4 = Node("P4", parent=P2)
-        P5 = Node("P5", parent=P2)
-        P6 = Node("P6", parent=P3)
-        P7 = Node("P7", parent=P3)
-        P8 = Node("P8", parent=P4)
-        P9 = Node("P9", parent=P4)
-        P10 = Node("P10", parent=P5)
-        P11 = Node("P11", parent=P5)
-        P12 = Node("P12", parent=P6)
-        P13 = Node("P13", parent=P6)
-        P14 = Node("P14", parent=P7)
-        P15 = Node("P15", parent=P7)
-        P16 = Node("P16", parent=P8)
-        P17 = Node("P17", parent=P8)
-        P18 = Node("P18", parent=P9)
-        P19 = Node("P19", parent=P9)
-        P20 = Node("P20", parent=P10)
-        P21 = Node("P21", parent=P10)
-        P22 = Node("P22", parent=P11)
-        P23 = Node("P23", parent=P11)
-        P24 = Node("P24", parent=P12)
-        P25 = Node("P25", parent=P12)
-        P26 = Node("P26", parent=P13)
-        P27 = Node("P27", parent=P13)
-        P28 = Node("P28", parent=P14)
-        P29 = Node("P29", parent=P14)
-        P30 = Node("P30", parent=P15)
-        P31 = Node("P31", parent=P15)
+        obiekt = Oblicz()
+        if nazwaP1:
+            name1 = obiekt.find_parent(nazwaP1)  # rodzice
+            if len(name1) > 1:
+                nazwaP2 = name1[0]  # matka
+                nazwaP3 = name1[1]  # ojciec
+                name2 = obiekt.find_parent(nazwaP2)  # dziadkowie
+                name3 = obiekt.find_parent(nazwaP3)  # dziadkowie
+                if len(name2) > 1:
+                    nazwaP4 = name2[0]  # babcia
+                    nazwaP5 = name2[1]  # dziadek
+                    name4 = obiekt.find_parent(nazwaP4)  # pradziadkowie
+                    name5 = obiekt.find_parent(nazwaP5)  # pradziadkowie
+                    if len(name4) > 1:
+                        nazwaP8 = name4[0]  # prababka
+                        nazwaP9 = name4[1]  # pradziad
+                        name8 = obiekt.find_parent(nazwaP8)  # prapra
+                        name9 = obiekt.find_parent(nazwaP9)  # prapra
+                        if len(name8) > 1:
+                            nazwaP16 = name8[0]
+                            nazwaP17 = name8[1]
+                        elif len(name8) == 1:
+                            nazwaP16 = name8[0]
+                        else:
+                            pass
+                        if len(name9) > 1:
+                            nazwaP18 = name9[0]
+                            nazwaP19 = name9[1]
+                        elif len(name9) == 1:
+                            nazwaP18 = name9[0]
+                        else:
+                            pass
+                    elif len(name4) == 1:
+                        nazwaP8 = name4[0]  # prababka
+                        name8 = obiekt.find_parent(nazwaP8)  # prapra
+                        if len(name8) > 1:
+                            nazwaP16 = name8[0]
+                            nazwaP17 = name8[1]
+                        elif len(name8) == 1:
+                            nazwaP16 = name8[0]
+                        else:
+                            pass
+                    else:
+                        pass
+                    if len(name5) > 1:
+                        nazwaP10 = name5[0]  # prababka
+                        nazwaP11 = name5[1]  # pradziad
+                        name10 = obiekt.find_parent(nazwaP10)  # prapra
+                        name11 = obiekt.find_parent(nazwaP11)  # prapra
+                        if len(name10) > 1:
+                            nazwaP20 = name10[0]
+                            nazwaP21 = name10[1]
+                        elif len(name10) == 1:
+                            nazwaP20 = name10[0]
+                        else:
+                            pass
+                        if len(name11) > 1:
+                            nazwaP22 = name11[0]
+                            nazwaP23 = name11[1]
+                        elif len(name11) == 1:
+                            nazwaP22 = name11[0]
+                        else:
+                            pass
+                    elif len(name5) == 1:
+                        nazwaP10 = name5[0]  # prababka
+                        name10 = obiekt.find_parent(nazwaP10)  # prapra
+                        if len(name10) > 1:
+                            nazwaP20 = name10[0]
+                            nazwaP21 = name10[1]
+                        elif len(name10) == 1:
+                            nazwaP20 = name10[0]
+                        else:
+                            pass
+                    else:
+                        pass
+                elif len(name2) == 1:
+                    nazwaP5 = name2[0]  # babcia
+                    name4 = obiekt.find_parent(nazwaP4)  # pradziadkowie
+                else:
+                    pass
+                if len(name3) > 1:
+                    nazwaP6 = name3[0]  # babcia
+                    nazwaP7 = name3[1]  # dziadek
+                    name6 = obiekt.find_parent(nazwaP6)  # pradziadkowie
+                    name7 = obiekt.find_parent(nazwaP7)  # pradziadkowie
+                    if len(name6) > 1:
+                        nazwaP12 = name6[0]  # prababka
+                        nazwaP13 = name6[1]  # pradziad
+                        name12 = obiekt.find_parent(nazwaP12)  # prapra
+                        name13 = obiekt.find_parent(nazwaP13)  # prapra
+                        if len(name12) > 1:
+                            nazwaP24 = name12[0]
+                            nazwaP25 = name12[1]
+                        elif len(name12) == 1:
+                            nazwaP24 = name12[0]
+                        else:
+                            pass
+                        if len(name13) > 1:
+                            nazwaP26 = name13[0]
+                            nazwaP27 = name13[1]
+                        elif len(name13) == 1:
+                            nazwaP26 = name13[0]
+                        else:
+                            pass
+                    elif len(name6) == 1:
+                        nazwaP12 = name6[0]  # prababka
+                        nazwaP12 = name6[0]  # prababka
+                        name12 = obiekt.find_parent(nazwaP12)  # prapra
+                        if len(name12) > 1:
+                            nazwaP24 = name12[0]
+                            nazwaP25 = name12[1]
+                        elif len(name12) == 1:
+                            nazwaP24 = name12[0]
+                        else:
+                            pass
+                    else:
+                        pass
+                    if len(name7) > 1:
+                        nazwaP14 = name7[0]  # prababka
+                        nazwaP15 = name7[1]  # pradziad
+                        name14 = obiekt.find_parent(nazwaP14)  # prapra
+                        name15 = obiekt.find_parent(nazwaP15)  # prapra
+                        if len(name14) > 1:
+                            nazwaP28 = name14[0]
+                            nazwaP29 = name14[1]
+                        elif len(name14) == 1:
+                            nazwaP28 = name14[0]
+                        else:
+                            pass
+                        if len(name15) > 1:
+                            nazwaP30 = name15[0]
+                            nazwaP31 = name15[1]
+                        elif len(name15) == 1:
+                            nazwaP30 = name15[0]
+                        else:
+                            pass
+                    elif len(name7) == 1:
+                        nazwaP14 = name7[0]  # prababka
+                        name14 = obiekt.find_parent(nazwaP14)  # prapra
+                        if len(name14) > 1:
+                            nazwaP28 = name14[0]
+                            nazwaP29 = name14[1]
+                        elif len(name14) == 1:
+                            nazwaP28 = name14[0]
+                        else:
+                            pass
+                    else:
+                        pass
+                elif len(name3) == 1:
+                    nazwaP6 = name3[0]  # babcia
+                    name6 = obiekt.find_parent(nazwaP6)  # pradziadkowie
+                else:
+                    pass
+            elif len(name1) == 1:
+                nazwaP2 = name1[0]  # matka
+                name2 = obiekt.find_parent(nazwaP2)  # dziadkowie
+                if len(name2) > 1:
+                    nazwaP4 = name2[0]  # babcia
+                    nazwaP5 = name2[1]  # dziadek
+                    name4 = obiekt.find_parent(nazwaP4)  # pradziadkowie
+                    name5 = obiekt.find_parent(nazwaP5)  # pradziadkowie
+                    if len(name4) > 1:
+                        nazwaP8 = name4[0]  # prababka
+                        nazwaP9 = name4[1]  # pradziad
+                        name8 = obiekt.find_parent(nazwaP8)  # prapra
+                        name9 = obiekt.find_parent(nazwaP9)  # prapra
+                        if len(name8) > 1:
+                            nazwaP16 = name8[0]
+                            nazwaP17 = name8[1]
+                        elif len(name8) == 1:
+                            nazwaP16 = name8[0]
+                        else:
+                            pass
+                        if len(name9) > 1:
+                            nazwaP18 = name9[0]
+                            nazwaP19 = name9[1]
+                        elif len(name9) == 1:
+                            nazwaP18 = name9[0]
+                        else:
+                            pass
+                    elif len(name4) == 1:
+                        nazwaP8 = name4[0]  # prababka
+                        name8 = obiekt.find_parent(nazwaP8)  # prapra
+                        if len(name8) > 1:
+                            nazwaP16 = name8[0]
+                            nazwaP17 = name8[1]
+                        elif len(name8) == 1:
+                            nazwaP16 = name8[0]
+                        else:
+                            pass
+                    else:
+                        pass
+                    if len(name5) > 1:
+                        nazwaP10 = name5[0]  # prababka
+                        nazwaP11 = name5[1]  # pradziad
+                        name10 = obiekt.find_parent(nazwaP10)  # prapra
+                        name11 = obiekt.find_parent(nazwaP11)  # prapra
+                        if len(name10) > 1:
+                            nazwaP20 = name10[0]
+                            nazwaP21 = name10[1]
+                        elif len(name10) == 1:
+                            nazwaP20 = name10[0]
+                        else:
+                            pass
+                        if len(name11) > 1:
+                            nazwaP22 = name11[0]
+                            nazwaP23 = name11[1]
+                        elif len(name11) == 1:
+                            nazwaP22 = name11[0]
+                        else:
+                            pass
+                    elif len(name5) == 1:
+                        nazwaP10 = name5[0]  # prababka
+                        name10 = obiekt.find_parent(nazwaP10)  # prapra
+                        if len(name10) > 1:
+                            nazwaP20 = name10[0]
+                            nazwaP21 = name10[1]
+                        elif len(name10) == 1:
+                            nazwaP20 = name10[0]
+                        else:
+                            pass
+                    else:
+                        pass
+                elif len(name2) == 1:
+                    nazwaP4 = name2[0]  # babcia
+                    name4 = obiekt.find_parent(nazwaP4)  # pradziadkowie
+                    if len(name4) > 1:
+                        nazwaP8 = name4[0]  # prababka
+                        nazwaP9 = name4[1]  # pradziad
+                        name8 = obiekt.find_parent(nazwaP8)  # prapra
+                        name9 = obiekt.find_parent(nazwaP9)  # prapra
+                        if len(name8) > 1:
+                            nazwaP16 = name8[0]
+                            nazwaP17 = name8[1]
+                        elif len(name8) == 1:
+                            nazwaP16 = name8[0]
+                        else:
+                            pass
+                        if len(name9) > 1:
+                            nazwaP18 = name9[0]
+                            nazwaP19 = name9[1]
+                        elif len(name9) == 1:
+                            nazwaP18 = name9[0]
+                        else:
+                            pass
+                    elif len(name4) == 1:
+                        nazwaP8 = name4[0]  # prababka
+                        name8 = obiekt.find_parent(nazwaP8)  # prapra
+                        if len(name8) > 1:
+                            nazwaP16 = name8[0]
+                            nazwaP17 = name8[1]
+                        elif len(name8) == 1:
+                            nazwaP16 = name8[0]
+                        else:
+                            pass
+                    else:
+                        pass
+                else:
+                    pass
+            else:
+                pass
+        try:
+            P1 = Node(nazwaP1)
+            P2 = Node(nazwaP2, parent=P1)
+            P3 = Node(nazwaP3, parent=P1)
+            P4 = Node(nazwaP4, parent=P2)
+            P5 = Node(nazwaP5, parent=P2)
+            P6 = Node(nazwaP6, parent=P3)
+            P7 = Node(nazwaP7, parent=P3)
+            P8 = Node(nazwaP8, parent=P4)
+            P9 = Node(nazwaP9, parent=P4)
+            P10 = Node(nazwaP10, parent=P5)
+            P11 = Node(nazwaP11, parent=P5)
+            P12 = Node(nazwaP12, parent=P6)
+            P13 = Node(nazwaP13, parent=P6)
+            P14 = Node(nazwaP14, parent=P7)
+            P15 = Node(nazwaP15, parent=P7)
+            P16 = Node(nazwaP16, parent=P8)
+            P17 = Node(nazwaP17, parent=P8)
+            P18 = Node(nazwaP18, parent=P9)
+            P19 = Node(nazwaP19, parent=P9)
+            P20 = Node(nazwaP20, parent=P10)
+            P21 = Node(nazwaP21, parent=P10)
+            P22 = Node(nazwaP22, parent=P11)
+            P23 = Node(nazwaP23, parent=P11)
+            P24 = Node(nazwaP24, parent=P12)
+            P25 = Node(nazwaP25, parent=P12)
+            P26 = Node(nazwaP26, parent=P13)
+            P27 = Node(nazwaP27, parent=P13)
+            P28 = Node(nazwaP28, parent=P14)
+            P29 = Node(nazwaP29, parent=P14)
+            P30 = Node(nazwaP30, parent=P15)
+            P31 = Node(nazwaP31, parent=P15)
+        except:
+            'b³ad'
 
         for pre, fill, node in RenderTree(P1):
             print("%s%s" % (pre, node.name))
