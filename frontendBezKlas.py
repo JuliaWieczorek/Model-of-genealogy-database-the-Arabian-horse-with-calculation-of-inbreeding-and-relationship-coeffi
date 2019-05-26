@@ -1,21 +1,16 @@
 # -*- coding: cp1250 -*-
+from baza import StrukturaBazyDanych
 import tkinter as tk
-# import baza
 import sqlite3
-import math
 from tkinter import *
 from tkinter import ttk
-from tkinter import Listbox
 from tkinter import filedialog
-from tkinter import messagebox
-from tkinter import scrolledtext
 from wspolczynniki import Oblicz
 from anytree import Node, RenderTree
 
 
 # DEFINICJE
 ######################################################################################################################
-
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Otwieranie bazy danych i zamykanie
@@ -98,6 +93,7 @@ def imbred():
         text = 'Osobnik: %(n)s\nJego współczynnik inbredu wynosi: %(wsp)f \n' % {'n': nzw1, 'wsp': wsp}
         wynik_wsimb.delete('1.0', END)
         wynik_wsimb.insert(END, text, 'p')
+        return wsp
 
     def zapisywanieDoPlikuInbred():
         imie = treeO_wsimb.item(treeO_wsimb.selection())['text']
@@ -123,7 +119,7 @@ def imbred():
             TestHodI = hod[0]
             TestHodN = hod[1]
         TestNazwa = imie
-        TestInbred = 0.57
+        TestInbred = wynikInbred()
         h = "Wspołczynnik Inbredu \n\nNazwa osobnika: %(NazwaI)s\nPłeć osobnika: %(PłećI)s\nGatunek osobnika: %(GatI)s\nImię hodowca: %(HodI)s\nNazwisko hodowcy: %(HodN)s\nWspółczynnik Inbredu wynosi: %(WspI)f" \
             % {'NazwaI': TestNazwa, 'PłećI': TestPlec, 'GatI': TestGat, 'HodI': TestHodI, 'HodN': TestHodN , 'WspI': TestInbred}
         plik1.write(h)
@@ -237,14 +233,56 @@ def pokrewienstwo():
         wynik_wspok2.delete('1.0', END)
         wynik_wspok2.insert(END, text, 'p')
         wynik_wspok2.insert(END, '\n', ('p'))
+        return wsp
 
     def zapisywanieDoPlikuPokre():
         imie1 = treeO_wspok1.item(treeO_wspok1.selection())['text']
         imie2 = treeO_wspok2.item(treeO_wspok2.selection())['text']
         plik = "Pokrewienstwo_Osobnika_%(imie1)s_oraz_%(imie2)s.txt" % {'imie1': imie1, 'imie2': imie2}
         plik1 = open(plik, 'w')
-        pok2 = "Wspólczynnik pokrewieństwa\n\nOsobnik pierwszy: \nNazwa: %(nazwa1)s \nPłeć:\nGatunek:\nHodowca:\n\nOsobnik drugi:\n\nNazwa: %(nazwa2)s\nPłeć:\nGatunek:\nHodowca:\n\nWspółczynnik pokrewieństwa pomiędzy tymi osobnikami wynosi: {}\n" \
-               % {'nazwa1': imie1, 'nazwa2': imie2}
+
+        obiekt = Oblicz()
+        id1 = obiekt.nazwa_id(imie1)
+        id2 = obiekt.nazwa_id(imie2)
+
+        queryplec = "SELECT plec FROM osobniki WHERE id_os = ?"
+        db_rows_plec1 = run_query(queryplec, (id1,))
+        for j in db_rows_plec1:
+            plec1 = j[0]
+
+        db_rows_plec2 = run_query(queryplec, (id2,))
+        for i in db_rows_plec2:
+            plec2 = i[0]
+
+        querygatunek = """SELECT gatunek FROM osobniki 
+                                JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
+                                WHERE id_os = ?"""
+        db_rows_gatunek1 = run_query(querygatunek, (id1,))
+        for gat in db_rows_gatunek1:
+            gat1 = gat[0]
+
+        db_rows_gatunek2 = run_query(querygatunek, (id2,))
+        for gatu in db_rows_gatunek2:
+            gat2 = gatu[0]
+
+        queryhodowca = """SELECT imie, nazwisko FROM osobniki 
+                                JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
+                                WHERE id_os = ?"""
+        db_rows_hodowca1 = run_query(queryhodowca, (id1,))
+        for hod1 in db_rows_hodowca1:
+            hodI1 = hod1[0]
+            hodN1 = hod1[1]
+
+        db_rows_hodowca2 = run_query(queryhodowca, (id2,))
+        for hod2 in db_rows_hodowca2:
+            hodI2 = hod2[0]
+            hodN2 = hod2[1]
+
+        wynikipokre = wynikPokre()
+
+
+        pok2 = "Wspólczynnik pokrewieństwa\n\nOsobnik pierwszy: \nNazwa: %(nazwa1)s \nPłeć: %(plec1)s \nGatunek: %(gat1)s\n Imię hodowcy: %(hodI1)s\n Nazwisko hodowcy: %(hodN1)s\n\nOsobnik drugi:\n\nNazwa: %(nazwa2)s\nPłeć: %(plec2)s\nGatunek: %(gat2)s\nImię hodowcy: %(hodI2)s\n Nazwisko hodowcy: %(hodN2)s\n\nWspółczynnik pokrewieństwa pomiędzy tymi osobnikami wynosi: %{wynik}f\n" \
+               % {'nazwa1': imie1, 'plec1': plec1, 'gat1': gat1, 'hodI1': hodI1, 'hodN1': hodN1, 'nazwa2': imie2, 'plec2': plec2, 'gat2': gat2, 'hodI2': hodI2, 'hodN2': hodN2, 'wynik': wynikipokre}
 
         plik1.write(pok2)
         plik1.close()
@@ -750,35 +788,6 @@ def showTree():
 
 
 #######################################################################################################################
-# okno root
-root = Tk()  # root widget - musi zostać stworzony przed innymi widgetami
-root.geometry("1000x600+0+0")
-root.title("Julia & Cezar Company")  # tytuł naszej tabeli root
-#root_label = tk.Label(root)
-#root_label.grid()
-
-# Menu
-menu = Menu(root)
-root.config(menu=menu)
-filemenu = tk.Menu(menu)
-# Plik
-menu.add_cascade(label="Plik", menu=filemenu)
-filemenu.add_command(label="Otwórz baze", command=baseopen)
-filemenu.add_command(label="Zamknij baze", command=baseclose)
-filemenu.add_separator()
-filemenu.add_command(label="Zamknij program", command=root.destroy)
-
-# Obliczenia
-oblicz = Menu(menu)
-menu.add_cascade(label="Współczynniki", menu=oblicz)
-oblicz.add_command(label="Współczynnik inbredu", command=imbred)
-oblicz.add_command(label="Współczynnik pokrewieństa", command=pokrewienstwo)
-oblicz.add_command(label="Średni współczynnik pokrewieństwa", command=avgpokrewienstwa)
-
-# Drzewo
-drzewo = Menu(menu)
-menu.add_cascade(label= "Drzewo", menu=drzewo)
-drzewo.add_command(label="Wyświetl drzewo genealogiczne", command=showTree)
 
 # =================================ZAKLADKI==========================================
 class RootApp(tk.Tk):
@@ -797,6 +806,7 @@ class RootApp(tk.Tk):
 
 class NoteBook(Frame):
     def __init__(self, master):
+        baza = StrukturaBazyDanych()
         Frame.__init__(self, master)
         self.notebook = ttk.Notebook()
         self.tab1 = Tab1(self.notebook)
@@ -807,11 +817,34 @@ class NoteBook(Frame):
         self.notebook.add(self.tab3, text="Osobniki")
         self.notebook.grid()
 
+        # Menu
+        menu = Menu(master)
+        master.config(menu=menu)
+        filemenu = tk.Menu(menu)
+        # Plik
+        menu.add_cascade(label="Plik", menu=filemenu)
+        filemenu.add_command(label="Otwórz baze", command=baseopen)
+        filemenu.add_command(label="Zamknij baze", command=baseclose)
+        filemenu.add_separator()
+        filemenu.add_command(label="Zamknij program", command=master.destroy)
+
+        # Obliczenia
+        oblicz = Menu(menu)
+        menu.add_cascade(label="Współczynniki", menu=oblicz)
+        oblicz.add_command(label="Współczynnik inbredu", command=imbred)
+        oblicz.add_command(label="Współczynnik pokrewieństa", command=pokrewienstwo)
+        oblicz.add_command(label="Średni współczynnik pokrewieństwa", command=avgpokrewienstwa)
+
+        # Drzewo
+        drzewo = Menu(menu)
+        menu.add_cascade(label="Drzewo", menu=drzewo)
+        drzewo.add_command(label="Wyświetl drzewo genealogiczne", command=showTree)
+
+
     def switch_tab1(self, frame_class):
         new_frame = frame_class(self.notebook)
         self.tab1.destroy()
         self.tab1 = new_frame
-
 
 # Zakładka 1
 class Tab1(Frame):
@@ -1383,6 +1416,4 @@ class Osobniki(Frame):
 if __name__ == "__main__":
     Root = RootApp()
     Root.mainloop()
-
-# root.mainloop()  # zamknięcie pętli
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

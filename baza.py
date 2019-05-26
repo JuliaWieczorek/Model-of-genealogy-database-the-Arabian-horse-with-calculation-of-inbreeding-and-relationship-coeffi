@@ -1,70 +1,82 @@
 # -*- coding: cp1250 -*-
 
 import sqlite3
-
-conn = sqlite3.connect('baza.db')
-conn.execute("PRAGMA foreign_keys = 1")
-cur = conn.cursor()
-
-
-# rows = conn.execute('pragma foreign_keys')
-# for row in rows:
-#    print(row)
+import os.path
 
 class StrukturaBazyDanych():
 
     def __init__(self):
-        __all__ = [self.create_table(), self.data_entry_genre(),
-                   self.data_entry_breeder(), self.data_entry_individual(),
-                   self.data_entry_relation(), self.data_entry_os_hod()]
+        global db_name
+        db_name = 'baza.db'
+        __all__ = [self.read_table()]
+
+    def read_table(self):
+        if os.path.isfile('baza.db') == False:
+            conn = sqlite3.connect('baza.db')
+            conn.execute("PRAGMA foreign_keys = 1")
+            __all__ = [self.create_table(), self.data_entry_genre(),
+                       self.data_entry_breeder(), self.data_entry_individual(),
+                       self.data_entry_relation(), self.data_entry_os_hod()]
+            __all__
+        else:
+            baza = 'baza.db'
 
     def drop(self):
-        cur.execute("""DROP TABLE  GATUNKI""")
-        cur.execute("""DROP TABLE  OSOBNIKI""")
-        cur.execute("""DROP TABLE  RELACJE""")
-        cur.execute("""DROP TABLE  OSOBNIKI_HODOWCY""")
-        cur.execute("""DROP TABLE  HODOWCY""")
-        conn.commit()
+        with sqlite3.connect(db_name) as conn:
+            cur = conn.cursor()
+            cur.execute("""DROP TABLE  GATUNKI""")
+            cur.execute("""DROP TABLE  OSOBNIKI""")
+            cur.execute("""DROP TABLE  RELACJE""")
+            cur.execute("""DROP TABLE  OSOBNIKI_HODOWCY""")
+            cur.execute("""DROP TABLE  HODOWCY""")
+            conn.commit()
 
     def create_table(self):
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS GATUNKI (
-        id_gat int NOT NULL,
-        gatunek varchar(255),
-        PRIMARY KEY (id_gat));""")
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS OSOBNIKI (
-        id_os int(10) NOT NULL,
-        nazwa varchar(255),
-        plec varchar(255) NOT NULL,
-        id_gat int NOT NULL,
-        id_hod int,
-        PRIMARY KEY (id_os),
-        FOREIGN KEY (id_hod) REFERENCES HODOWCY(id_hod));""")
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS RELACJE (
-        id_os1 int,
-        id_os2 int,
-        PRIMARY KEY (id_os1, id_os2)); """)
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS HODOWCY (
-        id_hod int NOT NULL,
-        imie varchar(255),
-        nazwisko varchar(255),
-        PRIMARY KEY (id_hod))""")
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS OSOBNIKI_HODOWCY (
-        id_os int NOT NULL,
-        id_hod int NOT NULL,
-        FOREIGN KEY (id_os) REFERENCES OSOBNIKI(id_os),
-        FOREIGN KEY (id_hod) REFERENCES HODOWCY(id_hod))""")
+        with sqlite3.connect(db_name) as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                    CREATE TABLE IF NOT EXISTS GATUNKI (
+                    id_gat int NOT NULL,
+                    gatunek varchar(255),
+                    PRIMARY KEY (id_gat));""")
+            cur.execute("""
+                    CREATE TABLE IF NOT EXISTS OSOBNIKI (
+                    id_os int(10) NOT NULL,
+                    nazwa varchar(255),
+                    plec varchar(255) NOT NULL,
+                    id_gat int NOT NULL,
+                    id_hod int,
+                    PRIMARY KEY (id_os),
+                    FOREIGN KEY (id_hod) REFERENCES HODOWCY(id_hod));""")
+            cur.execute("""
+                    CREATE TABLE IF NOT EXISTS RELACJE (
+                    id_os1 int,
+                    id_os2 int,
+                    PRIMARY KEY (id_os1, id_os2)); """)
+            cur.execute("""
+                    CREATE TABLE IF NOT EXISTS HODOWCY (
+                    id_hod int NOT NULL,
+                    imie varchar(255),
+                    nazwisko varchar(255),
+                    PRIMARY KEY (id_hod))""")
+            cur.execute("""
+                    CREATE TABLE IF NOT EXISTS OSOBNIKI_HODOWCY (
+                    id_os int NOT NULL,
+                    id_hod int NOT NULL,
+                    FOREIGN KEY (id_os) REFERENCES OSOBNIKI(id_os),
+                    FOREIGN KEY (id_hod) REFERENCES HODOWCY(id_hod))""")
+            conn.commit()
+
 
     def data_entry_genre(self):
         """ Wpisuje dane do encji GATUNKI """
-        cur.execute("INSERT INTO GATUNKI VALUES(1,'konie')")
-        cur.execute("INSERT INTO GATUNKI VALUES(2,'psy')")
-        cur.execute("INSERT INTO GATUNKI VALUES(3,'koty')")
-        conn.commit()
+        with sqlite3.connect(db_name) as conn:
+            cur = conn.cursor()
+            cur.execute("INSERT INTO GATUNKI VALUES(1,'konie')")
+            cur.execute("INSERT INTO GATUNKI VALUES(2,'psy')")
+            cur.execute("INSERT INTO GATUNKI VALUES(3,'koty')")
+            conn.commit()
+
 #133 - babcia to tez matka (ZULA)
     def data_entry_relation(self):
         """Wpisuje dane do relacji (rodzic, dziecko)"""
@@ -106,15 +118,19 @@ class StrukturaBazyDanych():
                         (138, 86), (139, 86), (140, 87), (141, 87), (142, 152), (93, 152), (121, 153), (144, 153),
                         (145, 138), (147, 154), (148, 154), (152, 157), (153, 157), (138, 114), (154, 114), (96, 158),
                         (97, 158), (157, 159), (114, 159), (158, 160), (159, 160)]
-        cur.executemany("INSERT INTO RELACJE(id_os1, id_os2) VALUES (?, ?)", self.relacje1)
-        conn.commit()
+        with sqlite3.connect(db_name) as conn:
+            cur = conn.cursor()
+            cur.executemany("INSERT INTO RELACJE(id_os1, id_os2) VALUES (?, ?)", self.relacje1)
+            conn.commit()
 
     def data_entry_breeder(self):
         """Wpisuje informacje o hodowcy"""
-        cur.execute("INSERT INTO HODOWCY VALUES(1, 'Jan', 'Kowalski')")
-        cur.execute("INSERT INTO HODOWCY VALUES(2, 'Robert', 'Nowak')")
-        cur.execute("INSERT INTO HODOWCY VALUES(3, 'Maria', 'Anna')")
-        conn.commit()
+        with sqlite3.connect(db_name) as conn:
+            cur = conn.cursor()
+            cur.execute("INSERT INTO HODOWCY VALUES(1, 'Jan', 'Kowalski')")
+            cur.execute("INSERT INTO HODOWCY VALUES(2, 'Robert', 'Nowak')")
+            cur.execute("INSERT INTO HODOWCY VALUES(3, 'Maria', 'Anna')")
+            conn.commit()
 
     def data_entry_os_hod(self):
         self.os_hod = [(1, 1), (2, 2), (3, 3), (4, 3), (5, 1), (6, 3), (7, 3), (8, 1), (9, 3), (10, 2), (11, 1),
@@ -154,8 +170,10 @@ class StrukturaBazyDanych():
                        (150, 1),
                        (151, 1), (152, 2),
                        (153, 2), (154, 1), (155, 1), (156, 1), (157, 2), (158, 2), (159, 2), (160, 3)]
-        cur.executemany("""INSERT INTO OSOBNIKI_HODOWCY(id_os, id_hod) VALUES (?, ?)""", self.os_hod)
-        conn.commit()
+        with sqlite3.connect(db_name) as conn:
+            cur = conn.cursor()
+            cur.executemany("""INSERT INTO OSOBNIKI_HODOWCY(id_os, id_hod) VALUES (?, ?)""", self.os_hod)
+            conn.commit()
 
     def data_entry_individual(self):
         """Wpisuje informacje o osobnikach"""
@@ -231,10 +249,8 @@ class StrukturaBazyDanych():
                          (154, 'CERA', 'samica', 3, 1), (155, 'SKY', 'samiec', 3, 1),
                          (156, 'BEZA', 'samica', 3, 1), (157, 'SZNAPS', 'samiec', 3, 2), (158, 'INTER', 'samiec', 3, 2),
                          (159, 'DAMA', 'samica', 3, 2), (160, 'DAMA', 'samiec', 3, 3)]
-        cur.executemany("""INSERT INTO OSOBNIKI(id_os, nazwa, plec, id_gat, id_hod) VALUES (?, ?, ?, ?, ?)""",
+        with sqlite3.connect(db_name) as conn:
+            cur = conn.cursor()
+            cur.executemany("""INSERT INTO OSOBNIKI(id_os, nazwa, plec, id_gat, id_hod) VALUES (?, ?, ?, ?, ?)""",
                         self.osobniki)
-        conn.commit()
-
-baza = StrukturaBazyDanych()
-cur.close()
-conn.close()
+            conn.commit()
