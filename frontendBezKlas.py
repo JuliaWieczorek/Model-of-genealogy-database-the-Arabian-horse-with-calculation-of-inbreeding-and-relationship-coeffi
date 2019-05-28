@@ -77,7 +77,7 @@ def inbred():
         query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
              JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
              JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
-             ORDER BY id_os DESC"""
+             ORDER BY nazwa DESC"""
         db_rows = run_query(query)
         for row in db_rows:
             treeO_wsimb.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
@@ -197,8 +197,7 @@ def pokrewienstwo():
         query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
              JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
              JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
-
-             ORDER BY id_os DESC"""
+             ORDER BY nazwa DESC"""
         db_rows = run_query(query)
         for row in db_rows:
             treeO_wspok1.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
@@ -352,8 +351,7 @@ def avgpokrewienstwa():
         query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
              JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
              JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
-
-             ORDER BY id_os DESC"""
+             ORDER BY nazwa DESC"""
         db_rows = run_query(query)
         for row in db_rows:
             treeO_avgpok.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
@@ -465,8 +463,7 @@ def showTree():
         query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
              JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
              JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
-
-             ORDER BY id_os DESC"""
+             ORDER BY nazwa DESC"""
         db_rows = run_query(query)
         for row in db_rows:
             treeO_treeshow.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
@@ -888,8 +885,8 @@ class Hodowcy(Frame):
         self.treeH = ttk.Treeview(master, height=10, columns=2)
         self.treeH.grid(row=4, column=0, columnspan=2)
         self.treeH.grid(row=4, column=0, columnspan=2)
-        self.treeH.heading('#0', text='ID', anchor=W)
-        self.treeH.heading(2, text='Imiê', anchor=W)
+        self.treeH.heading('#0', text='Imiê', anchor=W)
+        self.treeH.heading(2, text='Nazwisko', anchor=W)
 
         ttk.Button(master, text='Usuñ Hodowce', command=self.deleting).grid(row=5, column=0)
         ttk.Button(master, text='Edytuj Hodowce', command=self.editing).grid(row=5, column=1)
@@ -907,7 +904,7 @@ class Hodowcy(Frame):
         records = self.treeH.get_children()
         for element in records:
             self.treeH.delete(element)
-        query = 'SELECT * FROM hodowcy ORDER BY id_hod DESC'
+        query = 'SELECT * FROM hodowcy ORDER BY imie DESC'
         db_rows = self.run_query(query)
         for row in db_rows:
             self.treeH.insert('', 0, text=row[1], values=row[2])
@@ -1058,7 +1055,7 @@ class Gatunki(Frame):
         records = self.treeG.get_children()
         for element in records:
             self.treeG.delete(element)
-        query = 'SELECT gatunek FROM gatunki ORDER BY id_gat DESC'
+        query = 'SELECT gatunek FROM gatunki ORDER BY gatunek DESC'
         db_rows = self.run_query(query)
         for row in db_rows:
             self.treeG.insert('', 0, text=row[0])
@@ -1227,7 +1224,7 @@ class Osobniki(Frame):
         query = """SELECT nazwa, plec, gatunek, imie, nazwisko FROM osobniki
          JOIN gatunki AS g ON osobniki.id_gat = g.id_gat
          JOIN hodowcy AS h ON osobniki.id_hod = h.id_hod
-         ORDER BY id_os DESC"""
+         ORDER BY nazwa DESC"""
         db_rows = self.run_query(query)
         for row in db_rows:
             self.treeO.insert('', 0, text=row[0], values=(row[1], row[2], row[3], row[4]))
@@ -1258,7 +1255,7 @@ class Osobniki(Frame):
             if id1 in lista:
                 imie = self.fbreeder.get()
                 nazwisko = self.lbreeder.get()
-                query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id gatunku
+                query2 = 'SELECT id_hod FROM hodowcy WHERE  imie = ? AND nazwisko = ?'  # znalezienie id hodowcy
                 parameters = (imie, nazwisko)
                 lista1 = []
                 id2 = 0
@@ -1268,10 +1265,21 @@ class Osobniki(Frame):
                     lista1.append(id2)
 
                 if id2 in lista1:
+                    nzw1 = self.treeO.item(self.treeO.selection())['text']
+                    nzw2 = self.treeO.item(self.treeO.selection())['text']
+                    obiekt = Oblicz()
+                    id1 = obiekt.nazwa_id(nzw1)
+                    id2 = obiekt.nazwa_id(nzw2)
                     l = self.lenrecord()
                     query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
                     parameters = (l + 1, self.name.get(), self.gender.get(), id1, id2)
                     self.run_query(query, parameters)
+                    query1 = 'INSERT INTO relacje VALUES (?, ?)'
+                    query2 = 'INSERT INTO relacje VALUES (?, ?)'
+                    parameters1 = (l+1, id1)
+                    parameters2 = (l+1, id2)
+                    self.run_query(query1, parameters1)
+                    self.run_query(query2, parameters2)
                     self.message['text'] = 'Rekord {} zosta³ dodany.'.format(self.name.get())
                     self.name.delete(0, END)
                     self.gender.delete(0, END)
