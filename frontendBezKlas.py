@@ -547,7 +547,7 @@ def showTree():
                         pass
                 elif len(name2) == 1:
                     nazwaP5 = name2[0]  # babcia
-                    name4 = obiekt.find_parent(nazwaP4)  # pradziadkowie
+                    name4 = obiekt.find_parent(nazwaP5)  # pradziadkowie ##bylo nazwaP4
                 else:
                     pass
                 if len(name3) > 1:
@@ -1193,12 +1193,25 @@ class Osobniki(Frame):
         self.lbreeder = Entry(frame)
         self.lbreeder.grid(row=5, column=2)
 
-        ttk.Button(frame, text='Dodaj nowego osobnika', command=self.adding).grid(row=6, column=1, columnspan=2)
+        ttk.Button(frame, text='Dodaj relacje', command=self.click).grid(row=6, column=1, columnspan=2)
+        self.relacje = Label(text='', fg='red')
+        self.relacje.grid(row=6, column=0)
+
+        Label(frame, text="Rodzic 1: ").grid(row=7, column=1)
+        self.e1 = Entry(frame)
+        self.e1.grid(row=7, column=2)
+
+        Label(frame, text="Rodzic 2: ").grid(row=8, column=1)
+        self.e2 = Entry(frame)
+        self.e2.grid(row=8, column=2)
+
+
+        ttk.Button(frame, text='Dodaj nowego osobnika', command=self.adding).grid(row=9, column=1, columnspan=2)
         self.message = Label(text='', fg='red')
-        self.message.grid(row=6, column=0)
+        self.message.grid(row=9, column=0)
 
         self.treeO = ttk.Treeview(master, height=10, columns=('Name', 'Gender', 'Species', 'Breeder'))
-        self.treeO.grid(row=7, column=0, columnspan=3)
+        self.treeO.grid(row=10, column=0, columnspan=3)
         self.treeO.heading('#0', text='Nazwa', anchor=W)
         self.treeO.heading('#1', text='P³eæ', anchor=W)
         self.treeO.heading('#2', text='Gatunek', anchor=W)
@@ -1241,6 +1254,16 @@ class Osobniki(Frame):
         return len(self.name.get()) != 0 and len(self.gender.get()) != 0 and len(self.species.get()) != 0 and len(
             self.fbreeder.get()) != 0 and len(self.lbreeder.get()) != 0
 
+    def click(self):
+        nzw1 = self.treeO.item(self.treeO.selection())['text']
+        if not self.e1.get():
+            self.e1.insert(END, nzw1)
+        else:
+            self.e2.insert(END, nzw1)
+        obiekt = Oblicz()
+        id1 = obiekt.nazwa_id(nzw1)
+        return id1
+
     def adding(self):
         if self.validation():
             lista = []
@@ -1265,21 +1288,21 @@ class Osobniki(Frame):
                     lista1.append(id2)
 
                 if id2 in lista1:
-                    nzw1 = self.treeO.item(self.treeO.selection())['text']
-                    nzw2 = self.treeO.item(self.treeO.selection())['text']
-                    obiekt = Oblicz()
-                    id1 = obiekt.nazwa_id(nzw1)
-                    id2 = obiekt.nazwa_id(nzw2)
                     l = self.lenrecord()
+                    dl = l+1
                     query = 'INSERT INTO osobniki VALUES (?, ?, ?, ?, ?)'
-                    parameters = (l + 1, self.name.get(), self.gender.get(), id1, id2)
+                    parameters = (dl, self.name.get(), self.gender.get(), id1, id2)
                     self.run_query(query, parameters)
+                    klik = self.e1.get()
+                    klik1 = self.e2.get()
+                    obiekt = Oblicz()
                     query1 = 'INSERT INTO relacje VALUES (?, ?)'
-                    query2 = 'INSERT INTO relacje VALUES (?, ?)'
-                    parameters1 = (l+1, id1)
-                    parameters2 = (l+1, id2)
+                    parameters1 = (dl, obiekt.nazwa_id(klik))
                     self.run_query(query1, parameters1)
-                    self.run_query(query2, parameters2)
+                    if self.e2.get():
+                        query2 = 'INSERT INTO relacje VALUES (?, ?)'
+                        parameters2 = (dl, obiekt.nazwa_id(klik1))
+                        self.run_query(query2, parameters2)
                     self.message['text'] = 'Rekord {} zosta³ dodany.'.format(self.name.get())
                     self.name.delete(0, END)
                     self.gender.delete(0, END)
