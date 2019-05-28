@@ -27,9 +27,9 @@ def baseclose(db):  # to nie dzia³a jeszcze
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Wspó³czynnik imbredu
+# Wspó³czynnik inbredu
 # Widget
-def imbred():
+def inbred():
     db_name = "baza.db"
 
     wsimb = Tk()
@@ -126,7 +126,7 @@ def imbred():
         plik1.close()
 
     # Przyciski
-    B1_wsimb = Button(F1, text='Oblicz wspó³czynnik imbredu', command=wynikInbred).grid(column=0, row=10, columnspan=3)
+    B1_wsimb = Button(F1, text='Oblicz wspó³czynnik inbredu', command=wynikInbred).grid(column=0, row=10, columnspan=3)
     B2_wsimb = Button(F2, text='Zapisz wynik do pliku tekstowego',
                       command=zapisywanieDoPlikuInbred).grid(column=0, row=4, columnspan=3)
     B3_wsimb = Button(wsimb, text='Zakoñcz', command=wsimb.destroy).grid(column=0, row=10, columnspan=3)
@@ -831,7 +831,7 @@ class NoteBook(Frame):
         # Obliczenia
         oblicz = Menu(menu)
         menu.add_cascade(label="Wspó³czynniki", menu=oblicz)
-        oblicz.add_command(label="Wspó³czynnik inbredu", command=imbred)
+        oblicz.add_command(label="Wspó³czynnik inbredu", command=inbred)
         oblicz.add_command(label="Wspó³czynnik pokrewieñsta", command=pokrewienstwo)
         oblicz.add_command(label="Œredni wspó³czynnik pokrewieñstwa", command=avgpokrewienstwa)
 
